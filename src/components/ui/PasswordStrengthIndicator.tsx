@@ -42,6 +42,11 @@ export default function PasswordStrengthIndicator({
 
   const { label, color } = getStrengthInfo();
 
+  // Don't render anything if password is empty
+  if (!password) {
+    return null;
+  }
+
   return (
     <div className={cn("space-y-3", className)}>
       {/* Strength meter */}

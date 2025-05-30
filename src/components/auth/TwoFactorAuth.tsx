@@ -244,6 +244,7 @@ export default function TwoFactorAuth({
                     onPaste={index === 0 ? handlePaste : undefined}
                     className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-semibold rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:text-white"
                     disabled={isSubmitting}
+                    aria-label={`Digit ${index + 1}`}
                   />
                 ))}
               </div>
@@ -253,6 +254,7 @@ export default function TwoFactorAuth({
                   className={`ml-1 text-primary hover:text-primary-dark dark:hover:text-primary-light ${countdown > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={handleResend}
                   disabled={countdown > 0}
+                  type="button"
                 >
                   {countdown > 0 ? `Resend in ${countdown}s` : 'Resend code'}
                 </button>

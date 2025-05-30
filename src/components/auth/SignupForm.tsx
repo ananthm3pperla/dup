@@ -14,13 +14,15 @@ export default function SignupForm({ onSubmit, isSubmitting, error }: SignupForm
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptTerms: false
   });
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
     password?: string;
     confirmPassword?: string;
+    acceptTerms?: string;
   }>({});
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -42,14 +44,18 @@ export default function SignupForm({ onSubmit, isSubmitting, error }: SignupForm
     const schema = z.object({
       name: z.string()
         .min(2, 'Name must be at least 2 characters')
-        .max(100, 'Name cannot exceed 100 characters'),
+        .max(100, 'Name cannot exceed 100 characters')
+        .regex(/^[a-zA-Z\s\-']+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
       email: z.string().email('Invalid email address'),
       password: z.string()
         .min(8, 'Password must be at least 8 characters')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[0-9]/, 'Password must contain at least one number')
         .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-      confirmPassword: z.string()
+      confirmPassword: z.string(),
+      acceptTerms: z.boolean().refine(val => val === true, {
+        message: 'You must accept the terms and conditions'
+      })
     }).refine(data => data.password === data.confirmPassword, {
       message: "Passwords don't match",
       path: ['confirmPassword']
@@ -73,8 +79,11 @@ export default function SignupForm({ onSubmit, isSubmitting, error }: SignupForm
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
     
     // Clear error for this field
     if (errors[name as keyof typeof formData]) {
@@ -233,6 +242,28 @@ export default function SignupForm({ onSubmit, isSubmitting, error }: SignupForm
           <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword}</p>
         )}
       </div>
+
+      {/* Terms and Privacy Policy Checkbox */}
+      <div className="flex items-start">
+        <div className="flex items-center h-5">
+          <input
+            id="acceptTerms"
+            name="acceptTerms"
+            type="checkbox"
+            checked={formData.acceptTerms}
+            onChange={handleInputChange}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700"
+          />
+        </div>
+        <div className="ml-3 text-sm">
+          <label htmlFor="acceptTerms" className="text-gray-600 dark:text-gray-400">
+            I agree to the <a href="/terms" className="text-primary hover:text-primary-dark dark:hover:text-primary-light">Terms of Service</a> and <a href="/privacy" className="text-primary hover:text-primary-dark dark:hover:text-primary-light">Privacy Policy</a>
+          </label>
+        </div>
+      </div>
+      {errors.acceptTerms && (
+        <p className="text-sm text-red-600 dark:text-red-400">{errors.acceptTerms}</p>
+      )}
 
       <div>
         <Button

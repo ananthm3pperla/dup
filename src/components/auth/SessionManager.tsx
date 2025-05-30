@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { refreshSession } from '@/lib/supabase';
+import { supabase, refreshSession } from '@/lib/supabase';
 import { toast } from 'sonner';
 import SessionExpiredDialog from './SessionExpiredDialog';
 import { isDemoMode } from '@/lib/demo';
@@ -15,12 +15,15 @@ interface SessionManagerProps {
 }
 
 export default function SessionManager({ children }: SessionManagerProps) {
-  const { user, signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [sessionExpiryTime, setSessionExpiryTime] = useState<number | null>(null);
-
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [inactivityTimeout, setInactivityTimeout] = useState<NodeJS.Timeout | null>(null);
+  
   // Check session validity periodically
   useEffect(() => {
     if (!user) return;
@@ -70,6 +73,59 @@ export default function SessionManager({ children }: SessionManagerProps) {
     return () => clearInterval(intervalId);
   }, [user]);
 
+  // Track user activity to detect inactivity
+  useEffect(() => {
+    if (!user) return;
+    
+    // Skip inactivity tracking in demo mode
+    if (isDemoMode()) return;
+    
+    const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
+    
+    const handleActivity = () => {
+      setLastActivity(Date.now());
+    };
+    
+    // Set up activity listeners
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('scroll', handleActivity);
+    window.addEventListener('touchstart', handleActivity);
+    
+    // Check for inactivity
+    const checkInactivity = () => {
+      const now = Date.now();
+      const timeSinceLastActivity = now - lastActivity;
+      
+      if (timeSinceLastActivity >= INACTIVITY_LIMIT) {
+        // User has been inactive for too long
+        setSessionExpired(true);
+      }
+    };
+    
+    // Set up inactivity check
+    const timeoutId = setInterval(checkInactivity, 60 * 1000); // Check every minute
+    setInactivityTimeout(timeoutId);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('scroll', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
+      
+      if (inactivityTimeout) {
+        clearInterval(inactivityTimeout);
+      }
+    };
+  }, [user, lastActivity]);
+
+  // Reset inactivity timer when location changes (user navigates)
+  useEffect(() => {
+    setLastActivity(Date.now());
+  }, [location.pathname]);
+
   // Handle session refresh
   const handleRefreshSession = async () => {
     setIsRefreshing(true);
@@ -78,6 +134,7 @@ export default function SessionManager({ children }: SessionManagerProps) {
       
       if (success) {
         setSessionExpired(false);
+        setLastActivity(Date.now());
         toast.success('Session refreshed successfully');
       } else {
         // If refresh fails, sign out

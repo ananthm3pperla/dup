@@ -15,6 +15,7 @@ export default function UserOnboarding() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stage, setStage] = useState<'profile' | 'security'>('profile');
+  const [hasSeenWalkthrough, setHasSeenWalkthrough] = useState(false);
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -73,6 +74,9 @@ export default function UserOnboarding() {
           navigate('/dashboard');
           return;
         }
+        
+        // Check if user has seen the walkthrough
+        setHasSeenWalkthrough(!!localStorage.getItem('hasSeenWalkthrough'));
       } catch (err) {
         console.error('Error in onboarding check:', err);
         setError(err instanceof Error ? err.message : 'There was an error checking your onboarding status');
@@ -99,6 +103,12 @@ export default function UserOnboarding() {
       // In demo mode, just navigate to dashboard
       if (isDemoMode()) {
         toast.success('Setup complete! Welcome to Hi-Bridge');
+        
+        // Set walkthrough flag for first-time users
+        if (!hasSeenWalkthrough) {
+          localStorage.setItem('hasSeenWalkthrough', 'true');
+        }
+        
         navigate('/dashboard');
         return;
       }
@@ -124,6 +134,11 @@ export default function UserOnboarding() {
           return;
         }
         throw error;
+      }
+      
+      // Set walkthrough flag for first-time users
+      if (!hasSeenWalkthrough) {
+        localStorage.setItem('hasSeenWalkthrough', 'true');
       }
       
       toast.success('Setup complete! Welcome to Hi-Bridge');
