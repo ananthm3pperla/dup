@@ -1,9 +1,0 @@
-export { default as DashboardHeader } from './DashboardHeader';
-export { default as DailyPulse } from './DailyPulse';
-export { default as DailyPulseSettings } from './DailyPulseSettings';
-export { default as TodaySchedule } from './TodaySchedule';
-export { default as TeamSchedule } from './TeamSchedule';
-export { default as CheckInCard } from './CheckInCard';
-export { default as RecentAchievements } from './RecentAchievements';
-export { default as KeyMetrics } from './KeyMetrics';
-export { default as TeamPulseMonitoring } from './TeamPulseMonitoring';
