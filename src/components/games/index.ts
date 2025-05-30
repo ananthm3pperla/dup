@@ -1,0 +1,1 @@
+export { default as HiBridgeGames } from './HiBridgeGames';
