@@ -257,7 +257,7 @@ export default function SignupForm({ onSubmit, isSubmitting, error }: SignupForm
         </div>
         <div className="ml-3 text-sm">
           <label htmlFor="acceptTerms" className="text-gray-600 dark:text-gray-400">
-            I agree to the <a href="/terms" className="text-primary hover:text-primary-dark dark:hover:text-primary-light">Terms of Service</a> and <a href="/privacy" className=\"text-primary hover:text-primary-dark dark:hover:text-primary-light">Privacy Policy</a>
+            I agree to the <a href="/terms" className="text-primary hover:text-primary-dark dark:hover:text-primary-light">Terms of Service</a> and <a href="/privacy" className="text-primary hover:text-primary-dark dark:hover:text-primary-light">Privacy Policy</a>
           </label>
         </div>
       </div>
