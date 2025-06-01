@@ -120,23 +120,34 @@ export const signUp = async (userData: {
   return response.json();
 };
 
-export const loginUser = async (credentials: {
-  email: string;
-  password: string;
-}) => {
-  const response = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials)
-  });
+/**
+ * Login user with email and password
+ */
+export const login = async (email: string, password: string) => {
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Login failed');
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Login failed');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
-
-  return response.json();
 };
+
+// Alias for backward compatibility
+export const loginUser = login;
 export const getCurrentUser = async () => {
   const response = await fetch('/api/auth/me');
 
