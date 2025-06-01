@@ -350,3 +350,36 @@ export async function updateTeamCheckInSettings(
     throw error;
   }
 }
+interface CheckIn {
+  id: string;
+  userId: string;
+  location: string;
+  photoPath?: string;
+  timestamp: string;
+  date: string;
+}
+
+class CheckInService {
+  async createCheckIn(location: string, photo?: File): Promise<CheckIn> {
+    const formData = new FormData();
+    formData.append('location', location);
+    if (photo) {
+      formData.append('photo', photo);
+    }
+
+    const response = await fetch('/api/checkins', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create check-in');
+    }
+
+    return response.json();
+  }
+}
+
+export const checkInService = new CheckInService();
+export type { CheckIn };

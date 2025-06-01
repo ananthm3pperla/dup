@@ -102,3 +102,101 @@ export async function joinTeamWithInvite(userId: string, inviteCode: string): Pr
     };
   }
 }
+interface Team {
+  id: string;
+  name: string;
+  description: string;
+  requiredDays: number;
+  anchorDays: string[];
+  createdBy: string;
+  createdAt: string;
+  members: string[];
+  inviteCode: string;
+}
+
+interface TeamMember {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+  points: number;
+  remoteDays: number;
+}
+
+interface AnalyticsData {
+  team: Team;
+  members: TeamMember[];
+  pulseData: any[];
+  totalMembers: number;
+  avgMood: number;
+}
+
+class TeamService {
+  async createTeam(name: string, description: string, requiredDays: number, anchorDays: string[] = []): Promise<Team> {
+    const response = await fetch('/api/teams', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, description, requiredDays, anchorDays }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create team');
+    }
+
+    return response.json();
+  }
+
+  async joinTeam(inviteCode: string): Promise<Team> {
+    const response = await fetch('/api/teams/join', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ inviteCode }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to join team');
+    }
+
+    return response.json();
+  }
+
+  async getMyTeam(): Promise<Team | null> {
+    const response = await fetch('/api/teams/my');
+
+    if (!response.ok) {
+      throw new Error('Failed to get team data');
+    }
+
+    return response.json();
+  }
+
+  async getTeamAnalytics(): Promise<AnalyticsData> {
+    const response = await fetch('/api/analytics/team');
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get analytics data');
+    }
+
+    return response.json();
+  }
+
+  async getLeaderboard(): Promise<TeamMember[]> {
+    const response = await fetch('/api/leaderboard');
+
+    if (!response.ok) {
+      throw new Error('Failed to get leaderboard data');
+    }
+
+    return response.json();
+  }
+}
+
+export const teamService = new TeamService();
+export type { Team, TeamMember, AnalyticsData };
