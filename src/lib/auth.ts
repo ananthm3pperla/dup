@@ -99,3 +99,62 @@ export const authService = new AuthService();
 
 // Export types
 export type { User, AuthResponse };
+// Auth API functions
+export const signUp = async (userData: {
+  email: string;
+  password: string;
+  fullName: string;
+  role?: string;
+}) => {
+  const response = await fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Registration failed');
+  }
+
+  return response.json();
+};
+
+export const loginUser = async (credentials: {
+  email: string;
+  password: string;
+}) => {
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Login failed');
+  }
+
+  return response.json();
+};
+export const getCurrentUser = async () => {
+  const response = await fetch('/api/auth/me');
+
+  if (!response.ok) {
+    throw new Error('Failed to get user data');
+  }
+
+  return response.json();
+};
+
+export const logout = async () => {
+  const response = await fetch('/api/auth/logout', {
+    method: 'POST'
+  });
+
+  if (!response.ok) {
+    throw new Error('Logout failed');
+  }
+
+  return response.json();
+};
