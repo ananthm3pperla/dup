@@ -9,15 +9,32 @@ run = ["sh", "-c", "npm start"]
 build = ["sh", "-c", "npm run build"]
 
 [[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
 localPort = 5173
 externalPort = 3000
 exposeLocalhost = true
 
 [workflows]
-runButton = "Development"
+runButton = "Hi-Bridge Development"
 
 [[workflows.workflow]]
 name = "Development"
+author = 43324003
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Hi-Bridge Development"
 author = 43324003
 mode = "sequential"
 
