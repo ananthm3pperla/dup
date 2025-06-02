@@ -1,188 +1,366 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+/**
+ * Schedule Context for Hi-Bridge
+ * Manages work schedules and anchor days using Replit Database
+ */
+
+import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { database } from '../lib/database';
-import { toast } from 'sonner';
+import { scheduleAPI } from '../lib/api';
 
-interface ScheduleEntry {
+export interface WorkSchedule {
   id: string;
-  user_id: string;
+  userId: string;
+  teamId: string;
   date: string;
-  work_location: 'office' | 'remote' | 'hybrid';
-  is_anchor_day?: boolean;
-  created_at: string;
-  updated_at: string;
+  location: 'office' | 'remote' | 'hybrid';
+  isAnchorDay: boolean;
+  isConfirmed: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface ScheduleContextType {
-  scheduleEntries: ScheduleEntry[];
-  loading: boolean;
+export interface AnchorDay {
+  id: string;
+  teamId: string;
+  date: string;
+  votesFor: string[];
+  votesAgainst: string[];
+  isConfirmed: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
+interface ScheduleState {
+  schedules: WorkSchedule[];
+  anchorDays: AnchorDay[];
+  isLoading: boolean;
   error: string | null;
-  fetchSchedule: (startDate: string, endDate: string) => Promise<void>;
-  updateScheduleEntry: (date: string, workLocation: 'office' | 'remote' | 'hybrid') => Promise<void>;
-  deleteScheduleEntry: (date: string) => Promise<void>;
-  refreshSchedule: () => Promise<void>;
+}
+
+type ScheduleAction =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SET_SCHEDULES'; payload: WorkSchedule[] }
+  | { type: 'SET_ANCHOR_DAYS'; payload: AnchorDay[] }
+  | { type: 'ADD_SCHEDULE'; payload: WorkSchedule }
+  | { type: 'UPDATE_SCHEDULE'; payload: WorkSchedule }
+  | { type: 'REMOVE_SCHEDULE'; payload: string }
+  | { type: 'ADD_ANCHOR_DAY'; payload: AnchorDay }
+  | { type: 'UPDATE_ANCHOR_DAY'; payload: AnchorDay };
+
+const initialState: ScheduleState = {
+  schedules: [],
+  anchorDays: [],
+  isLoading: false,
+  error: null,
+};
+
+const scheduleReducer = (state: ScheduleState, action: ScheduleAction): ScheduleState => {
+  switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, isLoading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload, isLoading: false };
+    case 'SET_SCHEDULES':
+      return { ...state, schedules: action.payload, isLoading: false };
+    case 'SET_ANCHOR_DAYS':
+      return { ...state, anchorDays: action.payload, isLoading: false };
+    case 'ADD_SCHEDULE':
+      return { ...state, schedules: [...state.schedules, action.payload] };
+    case 'UPDATE_SCHEDULE':
+      return {
+        ...state,
+        schedules: state.schedules.map(s => 
+          s.id === action.payload.id ? action.payload : s
+        )
+      };
+    case 'REMOVE_SCHEDULE':
+      return {
+        ...state,
+        schedules: state.schedules.filter(s => s.id !== action.payload)
+      };
+    case 'ADD_ANCHOR_DAY':
+      return { ...state, anchorDays: [...state.anchorDays, action.payload] };
+    case 'UPDATE_ANCHOR_DAY':
+      return {
+        ...state,
+        anchorDays: state.anchorDays.map(a => 
+          a.id === action.payload.id ? action.payload : a
+        )
+      };
+    default:
+      return state;
+  }
+};
+
+interface ScheduleContextType {
+  schedules: WorkSchedule[];
+  anchorDays: AnchorDay[];
+  isLoading: boolean;
+  error: string | null;
+  loadSchedules: (startDate?: string, endDate?: string) => Promise<void>;
+  loadAnchorDays: (teamId: string) => Promise<void>;
+  createSchedule: (schedule: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>) => Promise<WorkSchedule>;
+  updateSchedule: (id: string, updates: Partial<WorkSchedule>) => Promise<void>;
+  deleteSchedule: (id: string) => Promise<void>;
+  createAnchorDay: (anchorDay: Omit<AnchorDay, 'id' | 'createdAt'>) => Promise<AnchorDay>;
+  voteOnAnchorDay: (anchorDayId: string, vote: 'for' | 'against') => Promise<void>;
+  confirmAnchorDay: (anchorDayId: string) => Promise<void>;
 }
 
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
 
-export function useSchedule() {
+export const useSchedule = (): ScheduleContextType => {
   const context = useContext(ScheduleContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSchedule must be used within a ScheduleProvider');
   }
   return context;
-}
+};
 
 interface ScheduleProviderProps {
   children: ReactNode;
 }
 
-export function ScheduleProvider({ children }: ScheduleProviderProps) {
+export const ScheduleProvider: React.FC<ScheduleProviderProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(scheduleReducer, initialState);
   const { user } = useAuth();
-  const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchSchedule = async (startDate: string, endDate: string) => {
-    if (!user) {
-      setError('User not authenticated');
-      return;
-    }
+  /**
+   * Load user schedules within a date range
+   */
+  const loadSchedules = async (
+    startDate = new Date().toISOString().split('T')[0],
+    endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  ) => {
+    if (!user) return;
 
-    setLoading(true);
-    setError(null);
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
-      // Fetch schedule entries from database
-      const scheduleKeys = await database.list();
-      const userScheduleKeys = scheduleKeys.filter(key => 
-        key.startsWith(`schedule:${user.id}:`) &&
-        key >= `schedule:${user.id}:${startDate}` &&
-        key <= `schedule:${user.id}:${endDate}`
+      const response = await scheduleAPI.getSchedule();
+      const schedules = response.schedules || [];
+      
+      // Filter schedules by date range
+      const filteredSchedules = schedules.filter((schedule: WorkSchedule) => 
+        schedule.date >= startDate && schedule.date <= endDate
       );
 
-      const entries: ScheduleEntry[] = [];
-      for (const key of userScheduleKeys) {
-        try {
-          const entry = await database.get(key);
-          if (entry) {
-            entries.push(entry as ScheduleEntry);
+      dispatch({ type: 'SET_SCHEDULES', payload: filteredSchedules });
+    } catch (error) {
+      console.error('Error loading schedules:', error);
+      dispatch({ type: 'SET_ERROR', payload: 'Failed to load schedules' });
+    }
+  };
+
+  /**
+   * Load anchor days for a team
+   */
+  const loadAnchorDays = async (teamId: string) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: null });
+
+    try {
+      // Use database directly for anchor days
+      const keys = await database.db.list('anchor:');
+      const anchorDays: AnchorDay[] = [];
+
+      for (const key of keys) {
+        const anchorData = await database.db.get(key);
+        if (anchorData) {
+          const anchor: AnchorDay = JSON.parse(anchorData);
+          if (anchor.teamId === teamId) {
+            anchorDays.push(anchor);
           }
-        } catch (err) {
-          console.error(`Error fetching schedule entry ${key}:`, err);
         }
       }
 
-      // Sort entries by date
-      entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      setScheduleEntries(entries);
-    } catch (err) {
-      console.error('Error fetching schedule:', err);
-      setError('Failed to fetch schedule entries');
-      toast.error('Failed to load schedule');
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_ANCHOR_DAYS', payload: anchorDays });
+    } catch (error) {
+      console.error('Error loading anchor days:', error);
+      dispatch({ type: 'SET_ERROR', payload: 'Failed to load anchor days' });
     }
   };
 
-  const updateScheduleEntry = async (date: string, workLocation: 'office' | 'remote' | 'hybrid') => {
-    if (!user) {
-      setError('User not authenticated');
-      return;
-    }
+  /**
+   * Create a new work schedule
+   */
+  const createSchedule = async (
+    scheduleData: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<WorkSchedule> => {
+    if (!user) throw new Error('User not authenticated');
 
     try {
-      const entryKey = `schedule:${user.id}:${date}`;
-      const existingEntry = await database.get(entryKey);
-
-      const entry: ScheduleEntry = {
-        id: existingEntry?.id || `schedule_${user.id}_${date}_${Date.now()}`,
-        user_id: user.id,
-        date,
-        work_location: workLocation,
-        is_anchor_day: existingEntry?.is_anchor_day || false,
-        created_at: existingEntry?.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString()
+      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const newSchedule: WorkSchedule = {
+        ...scheduleData,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
-      await database.set(entryKey, entry);
+      await database.db.set(`schedule:${id}`, JSON.stringify(newSchedule));
+      await database.db.set(`schedule:user:${scheduleData.userId}:${scheduleData.date}`, id);
 
-      // Update local state
-      setScheduleEntries(prev => {
-        const filtered = prev.filter(e => e.date !== date);
-        return [...filtered, entry].sort((a, b) => 
-          new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-      });
-
-      toast.success('Schedule updated successfully');
-    } catch (err) {
-      console.error('Error updating schedule entry:', err);
-      setError('Failed to update schedule entry');
-      toast.error('Failed to update schedule');
+      dispatch({ type: 'ADD_SCHEDULE', payload: newSchedule });
+      return newSchedule;
+    } catch (error) {
+      console.error('Error creating schedule:', error);
+      throw new Error('Failed to create schedule');
     }
   };
 
-  const deleteScheduleEntry = async (date: string) => {
-    if (!user) {
-      setError('User not authenticated');
-      return;
+  /**
+   * Update an existing schedule
+   */
+  const updateSchedule = async (id: string, updates: Partial<WorkSchedule>) => {
+    try {
+      const scheduleData = await database.db.get(`schedule:${id}`);
+      if (!scheduleData) throw new Error('Schedule not found');
+
+      const schedule: WorkSchedule = JSON.parse(scheduleData);
+      const updatedSchedule = {
+        ...schedule,
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+
+      await database.db.set(`schedule:${id}`, JSON.stringify(updatedSchedule));
+      dispatch({ type: 'UPDATE_SCHEDULE', payload: updatedSchedule });
+    } catch (error) {
+      console.error('Error updating schedule:', error);
+      throw new Error('Failed to update schedule');
     }
+  };
+
+  /**
+   * Delete a schedule
+   */
+  const deleteSchedule = async (id: string) => {
+    try {
+      const scheduleData = await database.db.get(`schedule:${id}`);
+      if (scheduleData) {
+        const schedule: WorkSchedule = JSON.parse(scheduleData);
+        await database.db.delete(`schedule:${id}`);
+        await database.db.delete(`schedule:user:${schedule.userId}:${schedule.date}`);
+      }
+
+      dispatch({ type: 'REMOVE_SCHEDULE', payload: id });
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+      throw new Error('Failed to delete schedule');
+    }
+  };
+
+  /**
+   * Create a new anchor day
+   */
+  const createAnchorDay = async (
+    anchorDayData: Omit<AnchorDay, 'id' | 'createdAt'>
+  ): Promise<AnchorDay> => {
+    if (!user) throw new Error('User not authenticated');
 
     try {
-      const entryKey = `schedule:${user.id}:${date}`;
-      await database.delete(entryKey);
+      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const newAnchorDay: AnchorDay = {
+        ...anchorDayData,
+        id,
+        createdAt: new Date().toISOString(),
+      };
 
-      // Update local state
-      setScheduleEntries(prev => prev.filter(entry => entry.date !== date));
-      toast.success('Schedule entry deleted');
-    } catch (err) {
-      console.error('Error deleting schedule entry:', err);
-      setError('Failed to delete schedule entry');
-      toast.error('Failed to delete schedule entry');
+      await database.db.set(`anchor:${id}`, JSON.stringify(newAnchorDay));
+      dispatch({ type: 'ADD_ANCHOR_DAY', payload: newAnchorDay });
+      return newAnchorDay;
+    } catch (error) {
+      console.error('Error creating anchor day:', error);
+      throw new Error('Failed to create anchor day');
     }
   };
 
-  const refreshSchedule = async () => {
-    if (scheduleEntries.length > 0) {
-      const dates = scheduleEntries.map(entry => entry.date);
-      const startDate = dates.reduce((min, date) => date < min ? date : min);
-      const endDate = dates.reduce((max, date) => date > max ? date : max);
-      await fetchSchedule(startDate, endDate);
+  /**
+   * Vote on an anchor day
+   */
+  const voteOnAnchorDay = async (anchorDayId: string, vote: 'for' | 'against') => {
+    if (!user) throw new Error('User not authenticated');
+
+    try {
+      const anchorData = await database.db.get(`anchor:${anchorDayId}`);
+      if (!anchorData) throw new Error('Anchor day not found');
+
+      const anchorDay: AnchorDay = JSON.parse(anchorData);
+      
+      // Remove user from both arrays first
+      const votesFor = anchorDay.votesFor.filter(id => id !== user.id);
+      const votesAgainst = anchorDay.votesAgainst.filter(id => id !== user.id);
+
+      // Add user to appropriate array
+      if (vote === 'for') {
+        votesFor.push(user.id);
+      } else {
+        votesAgainst.push(user.id);
+      }
+
+      const updatedAnchorDay = {
+        ...anchorDay,
+        votesFor,
+        votesAgainst
+      };
+
+      await database.db.set(`anchor:${anchorDayId}`, JSON.stringify(updatedAnchorDay));
+      dispatch({ type: 'UPDATE_ANCHOR_DAY', payload: updatedAnchorDay });
+    } catch (error) {
+      console.error('Error voting on anchor day:', error);
+      throw new Error('Failed to vote on anchor day');
     }
   };
 
-  // Load initial schedule data when user changes
-  useEffect(() => {
-    if (user) {
-      // Load current month by default
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  /**
+   * Confirm an anchor day
+   */
+  const confirmAnchorDay = async (anchorDayId: string) => {
+    if (!user) throw new Error('User not authenticated');
 
-      const startDate = startOfMonth.toISOString().split('T')[0];
-      const endDate = endOfMonth.toISOString().split('T')[0];
+    try {
+      const anchorData = await database.db.get(`anchor:${anchorDayId}`);
+      if (!anchorData) throw new Error('Anchor day not found');
 
-      fetchSchedule(startDate, endDate);
-    } else {
-      setScheduleEntries([]);
-      setError(null);
+      const anchorDay: AnchorDay = JSON.parse(anchorData);
+      const updatedAnchorDay = {
+        ...anchorDay,
+        isConfirmed: true
+      };
+
+      await database.db.set(`anchor:${anchorDayId}`, JSON.stringify(updatedAnchorDay));
+      dispatch({ type: 'UPDATE_ANCHOR_DAY', payload: updatedAnchorDay });
+    } catch (error) {
+      console.error('Error confirming anchor day:', error);
+      throw new Error('Failed to confirm anchor day');
     }
-  }, [user]);
+  };
 
-  const value: ScheduleContextType = {
-    scheduleEntries,
-    loading,
-    error,
-    fetchSchedule,
-    updateScheduleEntry,
-    deleteScheduleEntry,
-    refreshSchedule
+  const contextValue: ScheduleContextType = {
+    schedules: state.schedules,
+    anchorDays: state.anchorDays,
+    isLoading: state.isLoading,
+    error: state.error,
+    loadSchedules,
+    loadAnchorDays,
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    createAnchorDay,
+    voteOnAnchorDay,
+    confirmAnchorDay,
   };
 
   return (
-    <ScheduleContext.Provider value={value}>
+    <ScheduleContext.Provider value={contextValue}>
       {children}
     </ScheduleContext.Provider>
   );
-}
+};
+
+export default ScheduleProvider;
