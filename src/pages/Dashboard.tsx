@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
@@ -29,6 +28,26 @@ export default function Dashboard() {
   const [teamStats, setTeamStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Mock data for AI features
+  const mockPulseData = [
+    { rating: 4, comment: "Great team collaboration today", date: "2024-01-15", userId: "1" },
+    { rating: 3, comment: "Feeling a bit overwhelmed with deadlines", date: "2024-01-14", userId: "2" },
+    { rating: 5, comment: "Love working from the office on Tuesdays", date: "2024-01-13", userId: "3" },
+    { rating: 2, comment: "Having connectivity issues while remote", date: "2024-01-12", userId: "4" },
+  ];
+
+  const mockTeamData = {
+    memberCount: 8,
+    hybridPolicy: "3 days office, 2 days remote"
+  };
+
+  const mockTeamSchedule = {
+    officeSchedule: {
+      "2024-01-15": ["user1", "user2", "user3"],
+      "2024-01-16": ["user1", "user4", "user5"],
+    }
+  };
+
   useEffect(() => {
     loadDashboardData();
   }, []);
@@ -36,7 +55,7 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load today's pulse check
       const pulseResponse = await pulseAPI.getTodaysPulse();
       setTodaysPulse(pulseResponse.pulseCheck);
@@ -163,7 +182,7 @@ export default function Dashboard() {
             </h3>
             <Heart className="h-6 w-6 text-red-500" />
           </div>
-          
+
           {todaysPulse ? (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -214,7 +233,7 @@ export default function Dashboard() {
             </h3>
             <Camera className="h-6 w-6 text-blue-500" />
           </div>
-          
+
           <div className="space-y-4">
             <p className="text-gray-600 dark:text-gray-400">
               Verify your office presence with a photo check-in and earn points!
@@ -245,7 +264,7 @@ export default function Dashboard() {
             </h3>
             <Users className="h-6 w-6 text-purple-500" />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-primary">{teamStats.totalResponses}</p>
@@ -260,7 +279,7 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600 dark:text-gray-400">Response Rate</p>
             </div>
           </div>
-          
+
           <div className="mt-6">
             <Link to="/analytics">
               <Button variant="outline" className="w-full">
