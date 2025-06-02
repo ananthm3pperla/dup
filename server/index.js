@@ -344,20 +344,34 @@ app.get('/api/leaderboard', async (req, res) => {
     // Get all users and calculate points
     const allKeys = await db.list();
     const userKeys = allKeys.filter(key => key.startsWith('user:'));
+    const pulseKeys = allKeys.filter(key => key.startsWith('pulse:'));
+    const checkinKeys = allKeys.filter(key => key.startsWith('checkin:'));
     const leaderboard = [];
 
     for (const key of userKeys) {
       const user = await db.get(key);
       if (user) {
         // Calculate points based on activity
-        const userPulseKeys = allKeys.filter(k => 
-          k.startsWith('pulse:') && (await db.get(k))?.userId === user.id
-        );
-        const userCheckinKeys = allKeys.filter(k => 
-          k.startsWith('checkin:') && (await db.get(k))?.userId === user.id
-        );
+        let userPulseCount = 0;
+        let userCheckinCount = 0;
+
+        // Count user's pulse checks
+        for (const pulseKey of pulseKeys) {
+          const pulse = await db.get(pulseKey);
+          if (pulse && pulse.userId === user.id) {
+            userPulseCount++;
+          }
+        }
+
+        // Count user's check-ins
+        for (const checkinKey of checkinKeys) {
+          const checkin = await db.get(checkinKey);
+          if (checkin && checkin.userId === user.id) {
+            userCheckinCount++;
+          }
+        }
         
-        const points = (userPulseKeys.length * 10) + (userCheckinKeys.length * 25);
+        const points = (userPulseCount * 10) + (userCheckinCount * 25);
         
         leaderboard.push({
           id: user.id,
