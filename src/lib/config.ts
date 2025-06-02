@@ -85,7 +85,7 @@ class ConfigManager {
       features: {
         ...defaultConfig.features,
         enableAnalytics:
-          import.meta.env.VITE_ENABLE_ANALYTICS === "true" ||
+          (import.meta.env.VITE_ENABLE_ANALYTICS === "true") ||
           defaultConfig.features.enableAnalytics,
         maxFileSize:
           Number(import.meta.env.VITE_MAX_FILE_SIZE) ||
@@ -118,7 +118,7 @@ class ConfigManager {
   }
 
   getEnvironment(): string {
-    return import.meta.env.MODE;
+    return import.meta.env.MODE || 'development';
   }
 }
 
