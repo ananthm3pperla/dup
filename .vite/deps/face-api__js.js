@@ -1,7 +1,4 @@
 import {
-  require_crypto
-} from "./chunk-YRH7LGQF.js";
-import {
   require_fs
 } from "./chunk-MG562XKQ.js";
 import {
@@ -9,6 +6,19 @@ import {
   __export,
   __require
 } from "./chunk-624QZG55.js";
+
+// browser-external:crypto
+var require_crypto = __commonJS({
+  "browser-external:crypto"(exports, module2) {
+    module2.exports = Object.create(new Proxy({}, {
+      get(_2, key) {
+        if (key !== "__esModule" && key !== "__proto__" && key !== "constructor" && key !== "splice") {
+          console.warn(`Module "crypto" has been externalized for browser compatibility. Cannot access "crypto.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`);
+        }
+      }
+    }));
+  }
+});
 
 // browser-external:node-fetch
 var require_node_fetch = __commonJS({
