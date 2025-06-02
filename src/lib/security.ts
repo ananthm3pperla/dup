@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { z } from "zod";
 
 const SALT_ROUNDS = 12;
 
@@ -98,3 +99,14 @@ export function sanitizeInput(input: string): string {
     .replace(/'/g, "&#x27;")
     .replace(/\//g, "&#x2F;");
 }
+
+/**
+ * Zod schema for password validation
+ */
+export const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters long")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character");
