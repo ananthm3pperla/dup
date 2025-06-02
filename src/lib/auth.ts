@@ -97,3 +97,35 @@ export async function checkAuthStatus(): Promise<boolean> {
     return false;
   }
 }
+
+// Legacy aliases for backward compatibility
+export const login = loginUser;
+export const signUp = registerUser;
+export const signOut = logoutUser;
+
+// Social login stubs (implement when needed)
+export async function signInWithGoogle(): Promise<User> {
+  throw new Error('Google sign-in not implemented yet');
+}
+
+export async function signInWithMicrosoft(): Promise<User> {
+  throw new Error('Microsoft sign-in not implemented yet');
+}
+
+// Demo mode functions
+export function isDemoMode(): boolean {
+  return localStorage.getItem('demo-mode') === 'true';
+}
+
+export async function enterDemoMode(): Promise<void> {
+  localStorage.setItem('demo-mode', 'true');
+  // Set demo user data
+  localStorage.setItem('demo-user', JSON.stringify({
+    id: 'demo-user',
+    email: 'demo@hibridge.com',
+    firstName: 'Demo',
+    lastName: 'User',
+    role: 'employee',
+    createdAt: new Date().toISOString()
+  }));
+}
