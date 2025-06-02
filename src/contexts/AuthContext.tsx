@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { login, getCurrentUser } from '../lib/auth';
+import { getCurrentUser, logoutUser } from '@/lib/auth';
+
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  createdAt: string;
+}
 
 interface AuthContextType {
   user: any | null;
@@ -17,20 +26,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
-    const fetchUser = async () => {
+    // Get initial user
+    const checkCurrentUser = async () => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        setLoading(false);
       } catch (error) {
-        console.error("Failed to fetch current user:", error);
+        console.error('Auth check error:', error);
         setUser(null);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    checkCurrentUser();
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -70,10 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await fetch('/api/logout', { method: 'POST' });
+      await logoutUser();
       setUser(null);
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Error signing out:', error);
     }
   };
 

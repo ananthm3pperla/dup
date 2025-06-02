@@ -1,82 +1,78 @@
-const API_BASE_URL = '/api';
 
-export interface User {
+interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: 'employee' | 'manager' | 'hr';
+  role: string;
   createdAt: string;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
+interface AuthResponse {
+  user?: User;
+  error?: string;
 }
 
-export interface RegisterCredentials {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role?: 'employee' | 'manager' | 'hr';
-}
+const API_BASE = '/api';
 
-export async function loginUser(credentials: LoginCredentials): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-    credentials: 'include',
-  });
+export async function registerUser(email: string, password: string, firstName: string, lastName: string, role: string = 'employee'): Promise<AuthResponse> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, firstName, lastName, role }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Login failed');
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || 'Registration failed' };
+    }
+
+    return { user: data.user };
+  } catch (error) {
+    return { error: 'Network error during registration' };
   }
-
-  const data = await response.json();
-  return data.user;
 }
 
-export async function registerUser(credentials: RegisterCredentials): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-    credentials: 'include',
-  });
+export async function loginUser(email: string, password: string): Promise<AuthResponse> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Registration failed');
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || 'Login failed' };
+    }
+
+    return { user: data.user };
+  } catch (error) {
+    return { error: 'Network error during login' };
   }
-
-  const data = await response.json();
-  return data.user;
 }
 
 export async function logoutUser(): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('Logout failed');
+  try {
+    await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
   }
 }
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
-      credentials: 'include',
-    });
-
+    const response = await fetch(`${API_BASE}/auth/me`);
+    
     if (!response.ok) {
       return null;
     }
@@ -84,12 +80,13 @@ export async function getCurrentUser(): Promise<User | null> {
     const data = await response.json();
     return data.user;
   } catch (error) {
-    console.error('Error getting current user:', error);
+    console.error('Get current user error:', error);
     return null;
   }
 }
 
-export async function checkAuthStatus(): Promise<boolean> {
+// Check authentication status
+export async function checkAuth(): Promise<boolean> {
   try {
     const user = await getCurrentUser();
     return user !== null;
