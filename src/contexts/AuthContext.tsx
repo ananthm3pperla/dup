@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { database } from '../lib/database';
 import { hashPassword, verifyPassword } from '../lib/auth';
@@ -79,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // Hash password
       const hashedPassword = await hashPassword(password);
-      
+
       // Create user object
       const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const newUser: User = {
@@ -125,7 +124,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // Remove password from user object before setting state
       const { password: _, ...userWithoutPassword } = userData;
-      
+
       // Create session
       localStorage.setItem('hibridge_session', JSON.stringify({ userId: userData.id }));
       setUser(userWithoutPassword as User);

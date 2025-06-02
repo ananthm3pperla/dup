@@ -1,338 +1,346 @@
 
 /**
- * Replit Database adapter for Hi-Bridge
- * Replaces Supabase functionality with Replit's built-in database
+ * Replit Database API layer for Hi-Bridge
+ * Complete replacement for Supabase functionality
  */
 
-import { Database } from '@replit/database';
+import { database } from './database';
+import type { User, Team, PulseCheck, CheckIn } from './types';
 
-// Initialize Replit Database
-const db = new Database();
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'employee' | 'manager' | 'hr';
-  avatar_url?: string;
-  team_id?: string;
-  created_at: string;
-  updated_at: string;
-  email_verified: boolean;
-  last_login?: string;
-}
-
-export interface Team {
-  id: string;
-  name: string;
-  description?: string;
-  manager_id: string;
-  member_ids: string[];
-  settings: {
-    anchor_days: string[];
-    pulse_enabled: boolean;
-    gamification_enabled: boolean;
-  };
-  created_at: string;
-}
-
-export interface PulseCheck {
-  id: string;
-  user_id: string;
-  team_id: string;
-  rating: number;
-  comment?: string;
-  date: string;
-  submitted_at: string;
-}
-
-export interface CheckIn {
-  id: string;
-  user_id: string;
-  team_id: string;
-  location: 'office' | 'remote';
-  timestamp: string;
-  photo_url?: string;
-  verified: boolean;
-  points: number;
+// API response types
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
 }
 
 /**
- * User management functions
+ * Auth API functions
  */
-export async function createUser(userData: Omit<User, 'id' | 'created_at' | 'updated_at'>): Promise<User> {
-  const id = generateId();
-  const user: User = {
-    ...userData,
-    id,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
-
-  await db.set(`user:${id}`, JSON.stringify(user));
-  await db.set(`user:email:${userData.email}`, id);
-  
-  return user;
-}
-
-export async function getUserById(id: string): Promise<User | null> {
-  try {
-    const userData = await db.get(`user:${id}`);
-    return userData ? JSON.parse(userData) : null;
-  } catch (error) {
-    console.error('Error getting user by ID:', error);
-    return null;
-  }
-}
-
-export async function getUserByEmail(email: string): Promise<User | null> {
-  try {
-    const userId = await db.get(`user:email:${email}`);
-    if (!userId) return null;
-    
-    return await getUserById(userId);
-  } catch (error) {
-    console.error('Error getting user by email:', error);
-    return null;
-  }
-}
-
-export async function updateUser(id: string, updates: Partial<User>): Promise<User | null> {
-  try {
-    const user = await getUserById(id);
-    if (!user) return null;
-
-    const updatedUser = {
-      ...user,
-      ...updates,
-      updated_at: new Date().toISOString()
-    };
-
-    await db.set(`user:${id}`, JSON.stringify(updatedUser));
-    return updatedUser;
-  } catch (error) {
-    console.error('Error updating user:', error);
-    return null;
-  }
-}
-
-/**
- * Team management functions
- */
-export async function createTeam(teamData: Omit<Team, 'id' | 'created_at'>): Promise<Team> {
-  const id = generateId();
-  const team: Team = {
-    ...teamData,
-    id,
-    created_at: new Date().toISOString()
-  };
-
-  await db.set(`team:${id}`, JSON.stringify(team));
-  return team;
-}
-
-export async function getTeamById(id: string): Promise<Team | null> {
-  try {
-    const teamData = await db.get(`team:${id}`);
-    return teamData ? JSON.parse(teamData) : null;
-  } catch (error) {
-    console.error('Error getting team by ID:', error);
-    return null;
-  }
-}
-
-export async function getUserTeams(userId: string): Promise<Team[]> {
-  try {
-    const keys = await db.list('team:');
-    const teams: Team[] = [];
-
-    for (const key of keys) {
-      const teamData = await db.get(key);
-      if (teamData) {
-        const team: Team = JSON.parse(teamData);
-        if (team.manager_id === userId || team.member_ids.includes(userId)) {
-          teams.push(team);
-        }
-      }
-    }
-
-    return teams;
-  } catch (error) {
-    console.error('Error getting user teams:', error);
-    return [];
-  }
-}
-
-/**
- * Pulse check functions
- */
-export async function createPulseCheck(pulseData: Omit<PulseCheck, 'id' | 'submitted_at'>): Promise<PulseCheck> {
-  const id = generateId();
-  const pulseCheck: PulseCheck = {
-    ...pulseData,
-    id,
-    submitted_at: new Date().toISOString()
-  };
-
-  await db.set(`pulse:${id}`, JSON.stringify(pulseCheck));
-  await db.set(`pulse:user:${pulseData.user_id}:${pulseData.date}`, id);
-  
-  return pulseCheck;
-}
-
-export async function getPulseCheck(userId: string, date: string): Promise<PulseCheck | null> {
-  try {
-    const pulseId = await db.get(`pulse:user:${userId}:${date}`);
-    if (!pulseId) return null;
-
-    const pulseData = await db.get(`pulse:${pulseId}`);
-    return pulseData ? JSON.parse(pulseData) : null;
-  } catch (error) {
-    console.error('Error getting pulse check:', error);
-    return null;
-  }
-}
-
-export async function getTeamPulseChecks(teamId: string, startDate: string, endDate: string): Promise<PulseCheck[]> {
-  try {
-    const keys = await db.list('pulse:');
-    const pulseChecks: PulseCheck[] = [];
-
-    for (const key of keys) {
-      const pulseData = await db.get(key);
-      if (pulseData) {
-        const pulse: PulseCheck = JSON.parse(pulseData);
-        if (pulse.team_id === teamId && 
-            pulse.date >= startDate && 
-            pulse.date <= endDate) {
-          pulseChecks.push(pulse);
-        }
-      }
-    }
-
-    return pulseChecks.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  } catch (error) {
-    console.error('Error getting team pulse checks:', error);
-    return [];
-  }
-}
-
-/**
- * Check-in functions
- */
-export async function createCheckIn(checkInData: Omit<CheckIn, 'id'>): Promise<CheckIn> {
-  const id = generateId();
-  const checkIn: CheckIn = {
-    ...checkInData,
-    id
-  };
-
-  await db.set(`checkin:${id}`, JSON.stringify(checkIn));
-  return checkIn;
-}
-
-export async function getUserCheckIns(userId: string, startDate: string, endDate: string): Promise<CheckIn[]> {
-  try {
-    const keys = await db.list('checkin:');
-    const checkIns: CheckIn[] = [];
-
-    for (const key of keys) {
-      const checkInData = await db.get(key);
-      if (checkInData) {
-        const checkIn: CheckIn = JSON.parse(checkInData);
-        if (checkIn.user_id === userId && 
-            checkIn.timestamp >= startDate && 
-            checkIn.timestamp <= endDate) {
-          checkIns.push(checkIn);
-        }
-      }
-    }
-
-    return checkIns.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-  } catch (error) {
-    console.error('Error getting user check-ins:', error);
-    return [];
-  }
-}
-
-/**
- * Session management
- */
-export async function createSession(userId: string, expiresAt: Date): Promise<string> {
-  const sessionId = generateId();
-  const session = {
-    user_id: userId,
-    created_at: new Date().toISOString(),
-    expires_at: expiresAt.toISOString(),
-    is_active: true
-  };
-
-  await db.set(`session:${sessionId}`, JSON.stringify(session));
-  return sessionId;
-}
-
-export async function getSession(sessionId: string): Promise<any | null> {
-  try {
-    const sessionData = await db.get(`session:${sessionId}`);
-    if (!sessionData) return null;
-
-    const session = JSON.parse(sessionData);
-    
-    // Check if session is expired
-    if (new Date(session.expires_at) < new Date()) {
-      await db.delete(`session:${sessionId}`);
-      return null;
-    }
-
-    return session;
-  } catch (error) {
-    console.error('Error getting session:', error);
-    return null;
-  }
-}
-
-export async function deleteSession(sessionId: string): Promise<void> {
-  try {
-    await db.delete(`session:${sessionId}`);
-  } catch (error) {
-    console.error('Error deleting session:', error);
-  }
-}
-
-/**
- * Utility functions
- */
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-export async function clearAllData(): Promise<void> {
-  try {
-    const keys = await db.list();
-    for (const key of keys) {
-      await db.delete(key);
-    }
-  } catch (error) {
-    console.error('Error clearing data:', error);
-  }
-}
-
-// Legacy compatibility - export the database instance
-export const supabase = {
-  auth: {
-    signUp: async (data: any) => {
-      throw new Error('Use createUser instead');
-    },
-    signInWithPassword: async (data: any) => {
-      throw new Error('Use auth.ts loginUser instead');
-    },
-    signOut: async () => {
-      throw new Error('Use auth.ts logoutUser instead');
+export const authAPI = {
+  async register(userData: {
+    email: string;
+    password: string;
+    fullName: string;
+    role: 'employee' | 'manager' | 'hr';
+  }): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Registration failed' };
     }
   },
-  from: (table: string) => {
-    throw new Error('Use direct database functions instead');
+
+  async login(email: string, password: string): Promise<ApiResponse<{ user: User; session: any }>> {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Login failed' };
+    }
+  },
+
+  async logout(): Promise<ApiResponse> {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Logout failed' };
+    }
+  },
+
+  async getCurrentUser(): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch('/api/auth/me', {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get current user' };
+    }
+  },
+
+  async refreshSession(): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Session refresh failed' };
+    }
   }
 };
 
-export default db;
+/**
+ * User API functions
+ */
+export const userAPI = {
+  async updateProfile(updates: Partial<User>): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Profile update failed' };
+    }
+  },
+
+  async uploadAvatar(file: File): Promise<ApiResponse<{ avatarUrl: string }>> {
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await fetch('/api/users/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Avatar upload failed' };
+    }
+  }
+};
+
+/**
+ * Team API functions
+ */
+export const teamAPI = {
+  async createTeam(teamData: {
+    name: string;
+    description?: string;
+  }): Promise<ApiResponse<Team>> {
+    try {
+      const response = await fetch('/api/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(teamData),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Team creation failed' };
+    }
+  },
+
+  async getMyTeams(): Promise<ApiResponse<Team[]>> {
+    try {
+      const response = await fetch('/api/teams/my');
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get teams' };
+    }
+  },
+
+  async joinTeam(inviteCode: string): Promise<ApiResponse<Team>> {
+    try {
+      const response = await fetch('/api/teams/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inviteCode }),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to join team' };
+    }
+  },
+
+  async updateTeamSettings(teamId: string, settings: any): Promise<ApiResponse<Team>> {
+    try {
+      const response = await fetch(`/api/teams/${teamId}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to update team settings' };
+    }
+  }
+};
+
+/**
+ * Pulse check API functions
+ */
+export const pulseAPI = {
+  async submitPulse(pulseData: {
+    rating: number;
+    comment?: string;
+  }): Promise<ApiResponse<PulseCheck>> {
+    try {
+      const response = await fetch('/api/pulse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pulseData),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Pulse submission failed' };
+    }
+  },
+
+  async getTodaysPulse(): Promise<ApiResponse<PulseCheck | null>> {
+    try {
+      const response = await fetch('/api/pulse/today');
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get today\'s pulse' };
+    }
+  },
+
+  async getTeamPulseHistory(startDate: string, endDate: string): Promise<ApiResponse<PulseCheck[]>> {
+    try {
+      const response = await fetch(`/api/pulse/team?start=${startDate}&end=${endDate}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get pulse history' };
+    }
+  }
+};
+
+/**
+ * Check-in API functions
+ */
+export const checkinAPI = {
+  async submitCheckin(checkinData: FormData): Promise<ApiResponse<CheckIn>> {
+    try {
+      const response = await fetch('/api/checkins', {
+        method: 'POST',
+        body: checkinData,
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Check-in submission failed' };
+    }
+  },
+
+  async getCheckinHistory(startDate: string, endDate: string): Promise<ApiResponse<CheckIn[]>> {
+    try {
+      const response = await fetch(`/api/checkins?start=${startDate}&end=${endDate}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get check-in history' };
+    }
+  }
+};
+
+/**
+ * Schedule API functions
+ */
+export const scheduleAPI = {
+  async updateSchedule(schedule: any): Promise<ApiResponse> {
+    try {
+      const response = await fetch('/api/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ schedule }),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Schedule update failed' };
+    }
+  },
+
+  async getSchedule(startDate?: string, endDate?: string): Promise<ApiResponse> {
+    try {
+      const params = new URLSearchParams();
+      if (startDate) params.append('start', startDate);
+      if (endDate) params.append('end', endDate);
+      
+      const response = await fetch(`/api/schedule?${params.toString()}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get schedule' };
+    }
+  }
+};
+
+/**
+ * Analytics API functions
+ */
+export const analyticsAPI = {
+  async getTeamAnalytics(): Promise<ApiResponse> {
+    try {
+      const response = await fetch('/api/analytics/team');
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get team analytics' };
+    }
+  },
+
+  async getLeaderboard(): Promise<ApiResponse> {
+    try {
+      const response = await fetch('/api/leaderboard');
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get leaderboard' };
+    }
+  }
+};
+
+// Legacy compatibility exports - these will throw errors to help identify remaining Supabase usage
+export const supabase = {
+  auth: {
+    signUp: () => {
+      throw new Error('Use authAPI.register instead of supabase.auth.signUp');
+    },
+    signInWithPassword: () => {
+      throw new Error('Use authAPI.login instead of supabase.auth.signInWithPassword');
+    },
+    signOut: () => {
+      throw new Error('Use authAPI.logout instead of supabase.auth.signOut');
+    },
+    getUser: () => {
+      throw new Error('Use authAPI.getCurrentUser instead of supabase.auth.getUser');
+    }
+  },
+  from: () => {
+    throw new Error('Use the appropriate API functions instead of supabase.from');
+  }
+};
+
+// Helper function for session management
+export async function refreshSession(): Promise<{ success: boolean; session?: any }> {
+  const result = await authAPI.refreshSession();
+  return {
+    success: result.success,
+    session: result.data
+  };
+}
+
+// Export all API modules for easy importing
+export {
+  authAPI,
+  userAPI,
+  teamAPI,
+  pulseAPI,
+  checkinAPI,
+  scheduleAPI,
+  analyticsAPI
+};
+
+export default {
+  auth: authAPI,
+  users: userAPI,
+  teams: teamAPI,
+  pulse: pulseAPI,
+  checkins: checkinAPI,
+  schedule: scheduleAPI,
+  analytics: analyticsAPI
+};
