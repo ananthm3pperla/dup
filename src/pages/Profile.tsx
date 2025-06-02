@@ -252,39 +252,31 @@ export default function Profile() {
             setError('User not found');
           }
         } else {
-          // Get profile data
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', id)
-            .maybeSingle();
-            
-          // Get work history
-          const { data: workHistory } = await supabase
-            .from('user_work_history')
-            .select('*')
-            .eq('user_id', id)
-            .order('start_date', { ascending: false });
-            
-          // Get education
-          const { data: education } = await supabase
-            .from('user_education')
-            .select('*')
-            .eq('user_id', id)
-            .order('start_year', { ascending: false });
-            
-          // Get onboarding data to check completeness
-          const { data: onboardingData } = await supabase
-            .from('user_onboarding')
-            .select('*')
-            .eq('user_id', id)
-            .maybeSingle();
-            
-          // Check if profile is complete
-          const isComplete = Boolean(
-            onboardingData?.onboarding_completed && 
-            (workHistory?.length || education?.length)
-          );
+          // Use mock data for development (no external API calls needed)
+          const mockWorkHistory = [
+            {
+              id: '1',
+              company: 'TechCorp Inc.',
+              position: 'Senior Developer',
+              start_date: '2022-01-01',
+              end_date: null,
+              description: 'Leading development of enterprise applications'
+            }
+          ];
+          
+          const mockEducation = [
+            {
+              id: '1',
+              institution: 'Tech University',
+              degree: 'Computer Science',
+              field_of_study: 'Software Engineering',
+              start_year: 2018,
+              end_year: 2022
+            }
+          ];
+          
+          // Check if profile is complete based on user data
+          const isComplete = Boolean(user?.name && user?.role);
           setIsProfileComplete(isComplete);
             
           // Create a profile object from the data

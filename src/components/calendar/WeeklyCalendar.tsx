@@ -73,7 +73,7 @@ export default function WeeklyCalendar({
         
         if (!isDemoMode()) {
           try {
-            // In production, try to fetch data from Supabase
+            // In production, try to fetch data from API
             await loadUserSchedule(startDate, endDate);
             await loadTeamSchedule(startDate, endDate);
           } catch (error) {
@@ -224,13 +224,33 @@ export default function WeeklyCalendar({
     setIsSubmitting(true);
     
     try {
-      // In production mode, save to Supabase directly
+      // In production mode, save to API directly
       if (!isDemoMode()) {
-        // Check if this day already exists
-        const { data: existingSchedule } = await supabase
-          .from('work_schedules')
-          .select('id')
-          .eq('user_id', user.id)
+        try {
+          const response = await fetch('/api/schedule', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              date: selectedDay,
+              work_type: selectedWorkType,
+              notes
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to save schedule');
+          }
+          
+          // Refresh data
+          const startDate = viewMode === 'current' ? currentWeek : nextWeek;
+          const endDate = addDays(startDate, 6);
+          await loadUserSchedule(startDate, endDate);
+          
+          toast.success('Schedule updated successfully');
+        } catch (error) {
+          console.error('Error saving schedule:', error);
+          toast.error('Failed to save schedule');
+        }
           .eq('date', selectedDay)
           .single();
           

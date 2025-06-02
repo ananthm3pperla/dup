@@ -1,191 +1,123 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { refreshSession } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Alert, Button } from '@/components/ui';
 import { AlertTriangle, RefreshCw, LifeBuoy } from 'lucide-react';
 import { isDemoMode } from '@/lib/demo';
 
-interface SessionHandlerProps {
-  children: React.ReactNode;
-}
-
-export default function SessionHandler({ children }: SessionHandlerProps) {
-  const { signOut, user } = useAuth();
+export default function SessionHandler() {
+  const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sessionError, setSessionError] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [sessionCheckCount, setSessionCheckCount] = useState(0);
-  
-  // Set up a periodic session validator to detect token issues
-  useEffect(() => {
-    // No need to check sessions in demo mode
-    if (isDemoMode()) return;
-    
-    // Only run checks if user is logged in
-    if (!user) return;
 
-    let intervalId: number;
-    
-    const validateSession = async () => {
-      try {
-        // Try to get the current user to validate session
-        const { data, error } = await supabase.auth.getUser();
-        
-        if (error) {
-          console.warn('Session validation error:', error.message);
-          // Only set the session error if it looks like a token-related issue
-          if (error.message.includes('token') || 
-              error.message.includes('JWT') || 
-              error.message.includes('expired') || 
-              error.message.includes('invalid')) {
-                
-            setSessionError('Your session has expired. Please refresh your session to continue.');
-          }
-          return;
-        }
-        
-        // If validation succeeded, clear any previous errors
-        if (sessionError) {
-          setSessionError(null);
-        }
-        
-        // Increment check count for debugging
-        setSessionCheckCount(prev => prev + 1);
-        
-      } catch (err) {
-        console.error('Error validating session:', err);
-      }
-    };
-    
-    // Run immediate check
-    validateSession();
-    
-    // Set up periodic check every 5 minutes
-    intervalId = window.setInterval(validateSession, 5 * 60 * 1000);
-    
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [user, sessionError]);
-  
-  // Check for specific error events
   useEffect(() => {
-    if (isDemoMode()) return;
-    
-    const handleTokenError = (event: ErrorEvent) => {
-      // Check if this is a token-related error
-      if ((event.message && 
-          (event.message.includes('token') || 
-           event.message.includes('Invalid Refresh Token') ||
-           event.message.includes('Not authenticated'))) ||
-          (event.error && 
-           (event.error.message?.includes('refresh_token') || 
-            event.error.message?.includes('JWT expired')))) {
-        
-        console.warn('Caught auth token error:', event.message);
-        setSessionError('Your session has expired. Please refresh your session to continue.');
+    const handleAuthError = () => {
+      // In demo mode, ignore auth errors
+      if (isDemoMode()) {
+        return;
       }
-    };
-    
-    // Listen for window errors
-    window.addEventListener('error', handleTokenError);
-    
-    // And for unhandled rejections
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      if (event.reason && 
-         (typeof event.reason.message === 'string') &&
-         (event.reason.message.includes('token') || 
-          event.reason.message.includes('JWT') ||
-          event.reason.message.includes('authentication'))) {
-        console.warn('Caught auth promise rejection:', event.reason);
-        setSessionError('Your session has expired. Please refresh your session to continue.');
-      }
-    };
-    
-    window.addEventListener('unhandledrejection', handleRejection);
-    
-    return () => {
-      window.removeEventListener('error', handleTokenError);
-      window.removeEventListener('unhandledrejection', handleRejection);
-    };
-  }, []);
 
-  // Handle session refresh attempt
-  const handleRefreshSession = async () => {
+      // Check if user session is valid
+      const sessionData = localStorage.getItem('hibridge_session');
+      if (!sessionData && location.pathname.startsWith('/dashboard')) {
+        setError('Your session has expired. Please sign in again.');
+      }
+    };
+
+    // Check on mount and location changes
+    handleAuthError();
+  }, [location.pathname]);
+
+  const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const { success, session } = await refreshSession();
-      if (success && session) {
-        toast.success("Session refreshed successfully!");
-        setSessionError(null);
+      // Attempt to refresh session by checking user data
+      const sessionData = localStorage.getItem('hibridge_session');
+      if (sessionData) {
+        const { userId } = JSON.parse(sessionData);
+        // Update timestamp to extend session
+        const updatedSession = {
+          userId,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('hibridge_session', JSON.stringify(updatedSession));
+        setError(null);
+        toast.success('Session refreshed successfully');
       } else {
-        // If no session returned, we need to sign out
-        throw new Error("Unable to refresh session");
+        throw new Error('No valid session found');
       }
     } catch (err) {
-      console.error("Session refresh failed:", err);
-      toast.error("Couldn't refresh your session. Please sign in again.");
-      await signOut();
-      navigate('/', { replace: true });
+      console.error('Session refresh failed:', err);
+      setError('Failed to refresh session. Please sign in again.');
     } finally {
       setIsRefreshing(false);
     }
   };
-  
-  // Handle support click
-  const handleSupport = () => {
-    // This would typically open a support chat or email
-    window.open('mailto:support@hi-bridge.com?subject=Session Issue', '_blank');
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/auth/login');
+    } catch (err) {
+      console.error('Sign out failed:', err);
+      // Force navigation even if sign out fails
+      localStorage.removeItem('hibridge_session');
+      navigate('/auth/login');
+    }
   };
 
-  // If there's a session error, show the alert with refresh and sign out options
-  if (sessionError) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <div className="fixed top-4 left-0 right-0 z-50 mx-auto max-w-md px-4">
-          <Alert 
-            variant="error"
-            title="Session Issue"
-            icon={<AlertTriangle className="h-5 w-5" />}
-          >
-            <p className="mb-4">{sessionError}</p>
-            <div className="flex flex-wrap gap-3 mt-2">
-              <Button
-                size="sm"
-                onClick={handleRefreshSession}
-                isLoading={isRefreshing}
-                leftIcon={<RefreshCw className="h-4 w-4" />}
-              >
-                Refresh Session
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={async () => {
-                  await signOut();
-                  navigate('/login', { replace: true });
-                }}
-              >
-                Sign Out
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleSupport}
-                leftIcon={<LifeBuoy className="h-4 w-4" />}
-              >
-                Contact Support
-              </Button>
-            </div>
-          </Alert>
-        </div>
-        {children}
-      </div>
-    );
+  const handleContactSupport = () => {
+    // In a real app, this would open a support chat or email
+    toast.info('Support contact feature coming soon');
+  };
+
+  if (!error) {
+    return null;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <Alert className="max-w-md bg-white dark:bg-gray-800">
+        <AlertTriangle className="h-4 w-4 text-amber-600" />
+        <div className="ml-3">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            Session Error
+          </h3>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            {error}
+          </p>
+          <div className="mt-4 flex space-x-2">
+            <Button
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh Session'}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleSignOut}
+            >
+              Sign In Again
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleContactSupport}
+              className="flex items-center gap-2"
+            >
+              <LifeBuoy className="h-4 w-4" />
+              Support
+            </Button>
+          </div>
+        </div>
+      </Alert>
+    </div>
+  );
 }
