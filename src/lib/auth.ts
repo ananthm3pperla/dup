@@ -1,3 +1,4 @@
+
 import { api } from './api';
 
 export interface User {
@@ -22,11 +23,12 @@ export interface AuthResponse {
 /**
  * Register a new user
  */
-export async function registerUser(email: string, password: string, fullName?: string): Promise<AuthResponse> {
+export async function registerUser(userData: { email: string; password: string; firstName: string; lastName: string; role?: string }): Promise<User> {
   const response = await api.post('/auth/register', {
-    email,
-    password,
-    full_name: fullName
+    email: userData.email,
+    password: userData.password,
+    full_name: `${userData.firstName} ${userData.lastName}`,
+    role: userData.role
   });
 
   if (!response.ok) {
@@ -34,13 +36,14 @@ export async function registerUser(email: string, password: string, fullName?: s
     throw new Error(error.message || 'Registration failed');
   }
 
-  return response.json();
+  const data = await response.json();
+  return data.user;
 }
 
 /**
  * Login user with email and password
  */
-export async function loginUser(email: string, password: string): Promise<AuthResponse> {
+export async function loginUser(email: string, password: string): Promise<User> {
   const response = await api.post('/auth/login', {
     email,
     password
@@ -51,7 +54,8 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
     throw new Error(error.message || 'Login failed');
   }
 
-  return response.json();
+  const data = await response.json();
+  return data.user;
 }
 
 /**

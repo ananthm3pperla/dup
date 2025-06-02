@@ -239,7 +239,7 @@
   }
 
   .glass-card {
-    @apply bg-card border border-gray-200 backdrop-blur-sm relative overflow-hidden;
+    @apply bg-card opacity-80 backdrop-blur supports-[backdrop-filter]:bg-card supports-[backdrop-filter]:opacity-60;
   }
 
   .glass-card[aria-pressed="true"] {
