@@ -25,7 +25,10 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../dist')));
+// Serve static files in production, skip in development when using Vite dev server
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist')));
+}
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'hibridge-dev-secret-2025',
@@ -142,9 +145,13 @@ app.post('/api/auth/refresh', requireAuth, (req, res) => {
   res.json({ message: 'Session refreshed' });
 });
 
-// Serve React app for all other routes
+// Serve React app for all other routes (only in production)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  if (process.env.NODE_ENV === 'production') {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  } else {
+    res.status(404).json({ message: 'API route not found' });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {

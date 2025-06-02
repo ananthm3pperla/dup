@@ -1,95 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTeam } from '@/contexts/TeamContext';
-import { SimpleCard, LoadingState, PageHeader } from '@/components/ui';
-import { isDemoMode } from '@/lib/demo';
-import { Plus } from 'lucide-react';
-import { AccountVerificationPrompt } from '@/components/auth';
-
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DailyPulse from '@/components/dashboard/DailyPulse';
-import TodaySchedule from '@/components/dashboard/TodaySchedule';
-import TeamSchedule from '@/components/dashboard/TeamSchedule';
-import CheckInCard from '@/components/dashboard/CheckInCard';
-import RecentAchievements from '@/components/dashboard/RecentAchievements';
-import TeamPulseMonitoring from '@/components/dashboard/TeamPulseMonitoring';
-import KeyMetrics from '@/components/dashboard/KeyMetrics';
+import React from 'react';
 
 export default function Dashboard() {
-  const { user } = useAuth();
-  const { isTeamLeader } = useTeam();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [showVerificationPrompt, setShowVerificationPrompt] = useState(false);
-
-  // Get user's first name from the profile
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'there';
-
-  // Check if email is verified
-  useEffect(() => {
-    if (user && !user.email_confirmed_at && !isDemoMode()) {
-      setShowVerificationPrompt(true);
-    }
-  }, [user]);
-
-  // Simulate loading to ensure all components are ready
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-
-      // If in demo mode, trigger walkthrough if not seen
-      if (isDemoMode() && !localStorage.getItem('hasSeenWalkthrough')) {
-        localStorage.removeItem('hasSeenWalkthrough');
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <LoadingState message="Loading dashboard..." />;
-  }
-
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
-      <DashboardHeader firstName={firstName} />
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Dashboard
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Welcome to Hi-Bridge! Your hybrid work engagement platform.
+        </p>
+      </div>
 
-      {/* Email verification prompt */}
-      {showVerificationPrompt && (
-        <AccountVerificationPrompt 
-          onVerify={() => setShowVerificationPrompt(false)}
-          onSkip={() => setShowVerificationPrompt(false)}
-        />
-      )}
-
-      <div className="grid grid-cols-1 gap-4 sm:gap-8 pb-4 sm:pb-8">
-        {/* First row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 dark:border dark:border-gray-700">
-            <TodaySchedule />
-          </div>
-          <div className="lg:col-span-1">
-            <DailyPulse />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-2">Daily Pulse</h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Share how you're feeling today
+          </p>
+          <div className="mt-4">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+              Submit Pulse
+            </button>
           </div>
         </div>
 
-        {/* Second row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 dark:border dark:border-gray-700">
-            <TeamSchedule />
-          </div>
-          <div className="lg:col-span-1 space-y-4 sm:space-y-8">
-            <CheckInCard />
-            <RecentAchievements />
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-2">Team Schedule</h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            See who's in the office today
+          </p>
+          <div className="mt-4">
+            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+              View Schedule
+            </button>
           </div>
         </div>
 
-        {/* Team Pulse Monitoring for leaders */}
-        {isTeamLeader && (
-          <div className="grid grid-cols-1 gap-4 sm:gap-8">
-            <KeyMetrics />
-            <TeamPulseMonitoring />
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-2">My Points</h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Current engagement score
+          </p>
+          <div className="mt-4">
+            <span className="text-2xl font-bold text-blue-600">125</span>
+            <span className="text-gray-500 ml-2">points</span>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

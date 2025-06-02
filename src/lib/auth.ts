@@ -1,71 +1,90 @@
-import { api } from './api';
-import type { User, AuthResponse } from './types';
 
-/**
- * Register a new user
- */
-export const registerUser = async (userData: {
+import { api } from './api';
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
   email: string;
   password: string;
   full_name: string;
   role?: string;
-}): Promise<AuthResponse> => {
-  try {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Registration failed');
-  }
-};
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  user_metadata: {
+    full_name: string;
+    role: string;
+  };
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+}
 
 /**
- * Log in user
+ * Login user with email and password
  */
-export const loginUser = async (credentials: {
-  email: string;
-  password: string;
-}): Promise<AuthResponse> => {
+export async function loginUser(credentials: LoginCredentials): Promise<AuthResponse> {
   try {
     const response = await api.post('/auth/login', credentials);
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Login failed');
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
-};
+}
 
 /**
- * Get current user
+ * Register new user
  */
-export const getCurrentUser = async (): Promise<User | null> => {
+export async function registerUser(credentials: RegisterCredentials): Promise<AuthResponse> {
+  try {
+    const response = await api.post('/auth/register', credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get current user session
+ */
+export async function getCurrentUser(): Promise<AuthResponse> {
   try {
     const response = await api.get('/auth/me');
-    return response.data.user;
+    return response.data;
   } catch (error) {
-    return null;
+    console.error('Get current user error:', error);
+    throw error;
   }
-};
+}
 
 /**
- * Log out user
+ * Logout current user
  */
-export const logoutUser = async (): Promise<void> => {
+export async function logoutUser(): Promise<void> {
   try {
     await api.post('/auth/logout');
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Logout failed');
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
   }
-};
+}
 
 /**
- * Refresh session
+ * Refresh user session
  */
-export const refreshSession = async (): Promise<void> => {
+export async function refreshSession(): Promise<void> {
   try {
     await api.post('/auth/refresh');
-  } catch (error: any) {
-    throw new Error('Session refresh failed');
+  } catch (error) {
+    console.error('Refresh session error:', error);
+    throw error;
   }
-};
-
-// Alias for compatibility
-export const login = loginUser;
+}
