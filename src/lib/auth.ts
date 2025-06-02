@@ -1,22 +1,29 @@
-import bcrypt from "bcrypt";
 import { database } from "./database";
 
 /**
- * Hash a password using bcrypt
+ * Hash a password using Web Crypto API (browser-compatible)
+ * Note: In production, password hashing should be done server-side
  */
 export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 10;
-  return bcrypt.hash(password, saltRounds);
+  // For demo purposes only - real apps should hash passwords server-side
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
  * Verify a password against its hash
+ * Note: In production, password verification should be done server-side
  */
 export async function verifyPassword(
   password: string,
   hashedPassword: string,
 ): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
+  // For demo purposes only - real apps should verify passwords server-side
+  const currentHash = await hashPassword(password);
+  return currentHash === hashedPassword;
 }
 
 /**
