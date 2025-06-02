@@ -240,14 +240,24 @@
 
   /* Enhanced Card styles with glassmorphism */
   .card {
-    @apply bg-card backdrop-blur-sm rounded-xl border border-default/50 shadow-lg 
-           transition-all duration-300 hover:shadow-xl hover:border-primary/30
+    @apply bg-card backdrop-blur-sm rounded-xl border border-default shadow-lg 
+           transition-all duration-300 hover:shadow-xl hover:border-primary
            hover:bg-card-hover relative overflow-hidden;
     background-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(226, 228, 237, 0.5);
   }
 
   .dark .card {
     background-color: rgba(30, 33, 48, 0.8);
+    border-color: rgba(46, 52, 70, 0.5);
+  }
+
+  .card:hover {
+    border-color: rgba(0, 73, 119, 0.3);
+  }
+
+  .dark .card:hover {
+    border-color: rgba(51, 133, 191, 0.3);
   }
 
   .card::before {
@@ -262,10 +272,23 @@
 
   /* Enhanced Input styles */
   .input {
-    @apply block w-full rounded-lg border-default/60 bg-card backdrop-blur-sm
+    @apply block w-full rounded-lg border-default bg-card backdrop-blur-sm
            text-default shadow-sm focus:border-primary focus:ring-primary 
            focus:ring-2 focus:ring-offset-0 sm:text-sm transition-all duration-200
-           hover:border-primary/50 hover:bg-card-hover;
+           hover:border-primary hover:bg-card-hover;
+    border-color: rgba(226, 228, 237, 0.6);
+  }
+
+  .dark .input {
+    border-color: rgba(46, 52, 70, 0.6);
+  }
+
+  .input:hover {
+    border-color: rgba(0, 73, 119, 0.5);
+  }
+
+  .dark .input:hover {
+    border-color: rgba(51, 133, 191, 0.5);
   }
 
   .input-error {
@@ -292,9 +315,26 @@
   }
 
   .btn-outline {
-    @apply border-2 border-primary/30 bg-transparent text-primary 
-           hover:bg-primary/5 hover:border-primary/50 backdrop-blur-sm
-           hover:shadow-lg hover:shadow-primary/10;
+    @apply border-2 border-primary bg-transparent text-primary 
+           hover:bg-primary hover:border-primary backdrop-blur-sm
+           hover:shadow-lg;
+    border-color: rgba(0, 73, 119, 0.3);
+  }
+
+  .dark .btn-outline {
+    border-color: rgba(51, 133, 191, 0.3);
+  }
+
+  .btn-outline:hover {
+    background-color: rgba(0, 73, 119, 0.05);
+    border-color: rgba(0, 73, 119, 0.5);
+    box-shadow: 0 10px 15px -3px rgba(0, 73, 119, 0.1), 0 4px 6px -4px rgba(0, 73, 119, 0.1);
+  }
+
+  .dark .btn-outline:hover {
+    background-color: rgba(51, 133, 191, 0.05);
+    border-color: rgba(51, 133, 191, 0.5);
+    box-shadow: 0 10px 15px -3px rgba(51, 133, 191, 0.1), 0 4px 6px -4px rgba(51, 133, 191, 0.1);
   }
 
   .btn-ghost {
@@ -309,8 +349,14 @@
   }
 
   .btn-glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20 text-default
-           hover:bg-white/20 hover:border-white/30 shadow-lg;
+    @apply backdrop-blur-md border text-default shadow-lg;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-glass:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
   /* Custom scrollbar */
