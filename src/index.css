@@ -18,12 +18,12 @@
     --bg-app: #F8F9FC;
     --bg-card: #FFFFFF;
     --bg-card-hover: #F3F4F8;
-    
+
     /* Text Colors - Light Mode */
     --text-default: #1A1A2B;
     --text-muted: #64647B;
     --text-light: #9494A6;
-    
+
     /* Border Colors - Light Mode */
     --border-default: #E2E4ED;
     --border-dark: #D1D3DC;
@@ -33,32 +33,32 @@
     --color-primary-light: #3385BF;
     --color-primary-dark: #003A5F;
     --color-primary-contrast: #FFFFFF;
-    
+
     --color-secondary: #A12B2B;
     --color-secondary-light: #E74747;
     --color-secondary-dark: #812222;
     --color-secondary-contrast: #FFFFFF;
-    
+
     --color-accent: #00A4B4;
     --color-accent-light: #33C1CB;
     --color-accent-dark: #008390;
     --color-accent-contrast: #FFFFFF;
-    
+
     --color-success: #10B981;
     --color-success-light: #34D399;
     --color-success-dark: #059669;
     --color-success-bg: rgba(16, 185, 129, 0.1);
-    
+
     --color-warning: #F59E0B;
     --color-warning-light: #FBBF24;
     --color-warning-dark: #D97706;
     --color-warning-bg: rgba(245, 158, 11, 0.1);
-    
+
     --color-error: #EF4444;
     --color-error-light: #F87171;
     --color-error-dark: #DC2626;
     --color-error-bg: rgba(239, 68, 68, 0.1);
-    
+
     --color-info: #3B82F6;
     --color-info-light: #60A5FA;
     --color-info-dark: #2563EB;
@@ -70,12 +70,12 @@
     --bg-app: #0F1117;
     --bg-card: #1E2130;
     --bg-card-hover: #2A2D3D;
-    
+
     /* Text Colors - Dark Mode */
     --text-default: #F1F1F6;
     --text-muted: #9494A6;
     --text-light: #7C7C8F;
-    
+
     /* Border Colors - Dark Mode */
     --border-default: #2E3446;
     --border-dark: #3A4057;
@@ -85,32 +85,32 @@
     --color-primary-light: #66A3CF;
     --color-primary-dark: #004977;
     --color-primary-contrast: #FFFFFF;
-    
+
     --color-secondary: #E74747;
     --color-secondary-light: #ED7575;
     --color-secondary-dark: #A12B2B;
     --color-secondary-contrast: #FFFFFF;
-    
+
     --color-accent: #33C1CB;
     --color-accent-light: #5ECDD5;
     --color-accent-dark: #00A4B4;
     --color-accent-contrast: #FFFFFF;
-    
+
     --color-success: #34D399;
     --color-success-light: #4DE0A5;
     --color-success-dark: #10B981;
     --color-success-bg: rgba(16, 185, 129, 0.2);
-    
+
     --color-warning: #FBBF24;
     --color-warning-light: #FCC93A;
     --color-warning-dark: #F59E0B;
     --color-warning-bg: rgba(245, 158, 11, 0.2);
-    
+
     --color-error: #F87171;
     --color-error-light: #FA8989;
     --color-error-dark: #EF4444;
     --color-error-bg: rgba(239, 68, 68, 0.2);
-    
+
     --color-info: #60A5FA;
     --color-info-light: #7AB3FC;
     --color-info-dark: #3B82F6;
@@ -124,32 +124,32 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     overflow-x: hidden;
   }
-  
+
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
     @apply font-medium tracking-tight;
   }
-  
+
   h1 {
     @apply text-3xl sm:text-4xl;
   }
-  
+
   h2 {
     @apply text-2xl sm:text-3xl;
   }
-  
+
   h3 {
     @apply text-xl;
   }
-  
+
   h4 {
     @apply text-lg;
   }
-  
+
   p {
     @apply leading-relaxed;
   }
-  
+
   a {
     @apply text-primary hover:text-primary-dark transition-colors;
   }
@@ -177,7 +177,7 @@
            focus:ring-offset-2 focus:ring-primary transition-all duration-200 cursor-pointer
            disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md
            backdrop-blur-sm relative overflow-hidden;
-    
+
     &[aria-pressed="true"] {
       @apply bg-primary-dark;
     }
@@ -202,7 +202,7 @@
   .form-input {
     @apply block w-full rounded-md border-default bg-card text-default
            focus:border-primary focus:ring-primary sm:text-sm;
-    
+
     &[aria-invalid="true"] {
       @apply border-error focus:border-error focus:ring-error;
     }
@@ -210,7 +210,7 @@
 
   .form-label {
     @apply block text-sm font-medium text-default mb-1;
-    
+
     &[aria-required="true"]::after {
       content: " *";
       @apply text-error;
@@ -379,6 +379,19 @@
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400 dark:bg-gray-500;
+  }
+
+  /* Authentication form styles */
+  .auth-form {
+    @apply backdrop-blur-sm rounded-xl border p-8
+           shadow-xl transition-all duration-300 hover:shadow-2xl;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(226, 228, 237, 0.5);
+  }
+
+  .dark .auth-form {
+    background-color: rgba(30, 33, 48, 0.8);
+    border-color: rgba(46, 52, 70, 0.5);
   }
 }
 
