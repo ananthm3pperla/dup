@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey: import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY,
   dangerouslyAllowBrowser: true // Only for demo - in production, use server-side
 });
 
