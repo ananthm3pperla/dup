@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { isDemoMode, DEMO_STATIC_SCHEDULES } from '@/lib/demo';
 import { supabase } from '@/lib/supabase';
+import { scheduleAPI } from '@/lib/api';
 
 interface WeeklyCalendarProps {
   viewMode: 'current' | 'next'; 

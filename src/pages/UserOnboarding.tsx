@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Building2, AlertCircle, LifeBuoy } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import { LoadingState, Button, Alert } from '@/components/ui';
 import { toast } from 'sonner';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import { AccountSecurity } from '@/components/auth';
 import { isDemoMode } from '@/lib/demo';
+import { userAPI } from '@/lib/api';
 
 export default function UserOnboarding() {
   const navigate = useNavigate();
@@ -27,25 +27,25 @@ export default function UserOnboarding() {
       try {
         setLoading(true);
         setError(null);
-        
+
         // In demo mode, just proceed with onboarding
         if (isDemoMode()) {
           setLoading(false);
           return;
         }
-        
+
         // Check if user has already completed onboarding
         const { data, error: queryError } = await supabase
           .from('user_onboarding')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle();
-          
+
         if (queryError) {
           // Don't throw on 'no rows returned' (PGRST116)
           if (queryError.code !== 'PGRST116') {
             console.error('Error checking onboarding status:', queryError);
-            
+
             if (queryError.code === 'PGRST406') {
               // Permission error - likely RLS issue
               throw new Error('Permission denied accessing onboarding data. This may be a temporary issue with our database.');
@@ -53,7 +53,7 @@ export default function UserOnboarding() {
               throw new Error('Failed to check onboarding status');
             }
           }
-          
+
           // If no onboarding record exists, create one
           const { error: insertError } = await supabase
             .from('user_onboarding')
@@ -61,7 +61,7 @@ export default function UserOnboarding() {
               user_id: user.id,
               onboarding_completed: false
             });
-            
+
           if (insertError) {
             console.error('Error creating onboarding record:', insertError);
             if (insertError.code === 'PGRST406') {
@@ -74,7 +74,7 @@ export default function UserOnboarding() {
           navigate('/dashboard');
           return;
         }
-        
+
         // Check if user has seen the walkthrough
         setHasSeenWalkthrough(!!localStorage.getItem('hasSeenWalkthrough'));
       } catch (err) {
@@ -99,22 +99,22 @@ export default function UserOnboarding() {
   const handleOnboardingComplete = async () => {
     try {
       if (!user) return;
-      
+
       // In demo mode, just navigate to dashboard
       if (isDemoMode()) {
         toast.success('Setup complete! Welcome to Hi-Bridge');
-        
+
         // Set walkthrough flag for first-time users
         if (!hasSeenWalkthrough) {
           localStorage.setItem('hasSeenWalkthrough', 'true');
         }
-        
+
         navigate('/dashboard');
         return;
       }
-      
+
       // Update user's onboarding status
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_onboarding')
         .upsert({ 
           user_id: user.id,
@@ -122,8 +122,8 @@ export default function UserOnboarding() {
           onboarding_completed_at: new Date().toISOString()
         }, {
           onConflict: 'user_id'
-        });
-        
+        }).select().single();
+
       if (error) {
         if (error.code === 'PGRST406') {
           // Handle permission error
@@ -135,12 +135,12 @@ export default function UserOnboarding() {
         }
         throw error;
       }
-      
+
       // Set walkthrough flag for first-time users
       if (!hasSeenWalkthrough) {
         localStorage.setItem('hasSeenWalkthrough', 'true');
       }
-      
+
       toast.success('Setup complete! Welcome to Hi-Bridge');
       navigate('/dashboard');
     } catch (err) {
@@ -149,7 +149,7 @@ export default function UserOnboarding() {
       setError('Failed to complete onboarding');
     }
   };
-  
+
   const handleTryDemoMode = async () => {
     try {
       await enterDemoMode();
@@ -179,7 +179,7 @@ export default function UserOnboarding() {
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
             Something went wrong
           </h2>
-          
+
           <div className="mt-8">
             <Alert
               variant="error"

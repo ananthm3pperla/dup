@@ -1,7 +1,11 @@
 import React from 'react';
 import { Check, Users } from 'lucide-react';
 import { Button, Alert } from '@/components/ui';
-import { MockUser as User } from '@/lib/supabase';
+interface User {
+  id: string;
+  email: string;
+  full_name: string;
+}
 import { motion } from 'framer-motion';
 
 interface TeamJoinConfirmationProps {

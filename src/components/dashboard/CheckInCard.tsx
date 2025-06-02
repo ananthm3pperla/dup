@@ -3,7 +3,7 @@ import { Camera, MapPin, Check } from 'lucide-react';
 import { Card, Button } from '@/components/ui';
 import { CheckInButton } from '@/components/checkin';
 import { format } from 'date-fns';
-import { getUserCheckIns, LastCheckIn } from '@/lib/checkin';
+import { checkinAPI } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { isDemoMode } from '@/lib/demo';
@@ -22,16 +22,16 @@ export default function CheckInCard({ className }: CheckInCardProps) {
   useEffect(() => {
     const loadCheckIns = async () => {
       if (!user?.id) return;
-      
+
       try {
         // Reset states
         setLoading(true);
         setError(null);
-        
+
         const today = new Date();
         const startDate = new Date(today);
         startDate.setDate(today.getDate() - 1); // Last 24 hours
-        
+
         // If in demo mode, use mock data instead of making API calls
         if (isDemoMode()) {
           // Create mock check-in data for demo mode
@@ -45,20 +45,20 @@ export default function CheckInCard({ className }: CheckInCardProps) {
             status: 'approved' as const,
             created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           };
-          
+
           setLastCheckIn(mockCheckIn);
           setLoading(false);
           return;
         }
-        
+
         // For non-demo mode, make the actual API call with error handling
         try {
-          const checkIns = await getUserCheckIns(
+          const checkIns = await checkinAPI.getUserCheckIns(
             user.id,
             startDate.toISOString(),
             today.toISOString()
           );
-          
+
           if (checkIns && checkIns.length > 0) {
             setLastCheckIn(checkIns[0] as LastCheckIn);
           } else {
@@ -66,7 +66,7 @@ export default function CheckInCard({ className }: CheckInCardProps) {
           }
         } catch (apiError: any) {
           console.warn('Check-in API call failed, using fallback:', apiError);
-          
+
           // Create a fallback check-in for demonstration
           const fallbackCheckIn = {
             id: 'fallback-checkin-1',
@@ -74,15 +74,15 @@ export default function CheckInCard({ className }: CheckInCardProps) {
             status: 'approved' as const,
             location_verified: true
           };
-          
+
           setLastCheckIn(fallbackCheckIn);
         }
       } catch (error: any) {
         console.error('Error loading check-ins:', error);
-        
+
         // More graceful error handling - don't fail the entire component
         setError('Unable to load check-in data.');
-        
+
         // Use a fallback check-in
         if (retryCount < 2) {
           const fallbackCheckIn = {
@@ -91,14 +91,14 @@ export default function CheckInCard({ className }: CheckInCardProps) {
             status: 'approved' as const,
             location_verified: true
           };
-          
+
           setLastCheckIn(fallbackCheckIn);
         }
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadCheckIns();
   }, [user?.id, retryCount]);
 

@@ -3,7 +3,8 @@ import { Check, X, MapPin, Search, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card, Button } from '@/components/ui';
 import { useTeam } from '@/contexts/TeamContext';
-import { verifyCheckIn, getTeamCheckIns } from '@/lib/checkin';
+import { verifyCheckIn } from '@/lib/checkin';
+import { checkinAPI } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 interface CheckIn {
@@ -47,12 +48,18 @@ export default function CheckInVerification() {
       const startDate = new Date(today);
       startDate.setDate(today.getDate() - 7); // Last 7 days
       
-      const data = await getTeamCheckIns(
+      const result = await checkinAPI.getTeamCheckins(
         currentTeam.id, 
         startDate.toISOString(), 
         today.toISOString(),
-        statusFilter === 'all' ? undefined : statusFilter as any
+        statusFilter === 'all' ? undefined : statusFilter
       );
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const data = result.data;
       
       setCheckins(data as any);
     } catch (error) {

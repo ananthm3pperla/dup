@@ -1,4 +1,3 @@
-
 /**
  * Replit Database API layer for Hi-Bridge
  * Complete replacement for Supabase functionality
@@ -107,7 +106,7 @@ export const userAPI = {
     try {
       const formData = new FormData();
       formData.append('avatar', file);
-      
+
       const response = await fetch('/api/users/avatar', {
         method: 'POST',
         body: formData,
@@ -248,6 +247,24 @@ export const checkinAPI = {
     } catch (error) {
       return { success: false, error: 'Failed to get check-in history' };
     }
+  },
+
+  async getTeamCheckins(teamId: string, startDate: string, endDate: string): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await fetch(`/api/teams/${teamId}/checkins?start=${startDate}&end=${endDate}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get team check-ins' };
+    }
+  },
+
+  async getUserCheckins(userId: string, startDate: string, endDate: string): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await fetch(`/api/users/${userId}/checkins?start=${startDate}&end=${endDate}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get user check-ins' };
+    }
   }
 };
 
@@ -273,11 +290,29 @@ export const scheduleAPI = {
       const params = new URLSearchParams();
       if (startDate) params.append('start', startDate);
       if (endDate) params.append('end', endDate);
-      
+
       const response = await fetch(`/api/schedule?${params.toString()}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: 'Failed to get schedule' };
+    }
+  },
+
+  async getTeamSchedule(teamId: string, startDate: string, endDate: string): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await fetch(`/api/teams/${teamId}/schedule?start=${startDate}&end=${endDate}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get team schedule' };
+    }
+  },
+
+  async getAnchorDays(teamId: string, startDate: string, endDate: string): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await fetch(`/api/teams/${teamId}/anchor-days?start=${startDate}&end=${endDate}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get anchor days' };
     }
   }
 };

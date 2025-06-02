@@ -32,13 +32,13 @@ export default function Profile() {
 
   const handleSave = useCallback(async (index: number, data: any) => {
     if (!user || !profile) return;
-    
+
     // Skip API calls in demo mode
     if (isDemoMode()) {
       window.location.reload();
       return;
     }
-    
+
     try {
       if (currentTab === 'experience') {
         // Save work history
@@ -53,7 +53,7 @@ export default function Profile() {
             end_date: data.endDate || null,
             description: data.highlights?.join('\n') || ''
           });
-          
+
         if (error) throw error;
       } else if (currentTab === 'education') {
         // Save education
@@ -69,10 +69,10 @@ export default function Profile() {
             end_year: data.endYear || null,
             honors: data.honors || []
           });
-          
+
         if (error) throw error;
       }
-      
+
       // Refresh the profile data
       window.location.reload();
     } catch (err) {
@@ -82,13 +82,13 @@ export default function Profile() {
 
   const handleAdd = useCallback(async () => {
     if (!user) return;
-    
+
     // Skip API calls in demo mode
     if (isDemoMode()) {
       window.location.reload();
       return;
     }
-    
+
     try {
       if (currentTab === 'experience') {
         // Add new work history
@@ -101,7 +101,7 @@ export default function Profile() {
             start_date: new Date().toISOString().split('T')[0],
             description: ''
           });
-          
+
         if (error) throw error;
       } else if (currentTab === 'education') {
         // Add new education
@@ -115,10 +115,10 @@ export default function Profile() {
             start_year: new Date().getFullYear() - 4,
             end_year: new Date().getFullYear()
           });
-          
+
         if (error) throw error;
       }
-      
+
       // Refresh the profile data
       window.location.reload();
     } catch (err) {
@@ -128,13 +128,13 @@ export default function Profile() {
 
   const handleDelete = useCallback(async (index: number) => {
     if (!user || !profile) return;
-    
+
     // Skip API calls in demo mode
     if (isDemoMode()) {
       window.location.reload();
       return;
     }
-    
+
     try {
       if (currentTab === 'experience' && profile.member_work_history?.[index]) {
         // Delete work history
@@ -143,7 +143,7 @@ export default function Profile() {
           .from('user_work_history')
           .delete()
           .eq('id', workItem.id);
-          
+
         if (error) throw error;
       } else if (currentTab === 'education' && profile.member_education?.[index]) {
         // Delete education
@@ -152,10 +152,10 @@ export default function Profile() {
           .from('user_education')
           .delete()
           .eq('id', eduItem.id);
-          
+
         if (error) throw error;
       }
-      
+
       // Refresh the profile data
       window.location.reload();
     } catch (err) {
@@ -170,17 +170,17 @@ export default function Profile() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    
+
     const loadProfile = async () => {
       try {
         if (!id) {
           navigate('/dashboard', { replace: true });
           return;
         }
-        
+
         // Check if this is the current user's profile
         setIsCurrentUser(user?.id === id);
-        
+
         // Check if we're in demo mode
         if (isDemoMode()) {
           // Find the demo team member
@@ -214,13 +214,13 @@ export default function Profile() {
           setLoading(false);
           return;
         }
-        
+
         // For non-demo mode, fetch from API
         // First get the user's basic info
         const response = await fetch(`/api/users/${id}`);
         const userData = response.ok ? await response.json() : null;
         const userError = !response.ok ? new Error('User not found') : null;
-          
+
         if (userError) {
           throw userError;
         } else if (!userData) {
@@ -263,7 +263,7 @@ export default function Profile() {
               description: 'Leading development of enterprise applications'
             }
           ];
-          
+
           const mockEducation = [
             {
               id: '1',
@@ -274,11 +274,11 @@ export default function Profile() {
               end_year: 2022
             }
           ];
-          
+
           // Check if profile is complete based on user data
           const isComplete = Boolean(user?.name && user?.role);
           setIsProfileComplete(isComplete);
-            
+
           // Create a profile object from the data
           const userProfile: Employee = {
             id: userData.id,
@@ -315,7 +315,7 @@ export default function Profile() {
               highlights: work.description ? [work.description] : ['No description provided']
             })) || []
           };
-          
+
           setProfile(userProfile);
         }
       } catch (err) {
@@ -325,7 +325,7 @@ export default function Profile() {
         setLoading(false);
       }
     };
-    
+
     loadProfile();
   }, [id, navigate, user]);
 
@@ -344,7 +344,7 @@ export default function Profile() {
             <ChevronLeft className="h-4 w-4 mr-1" />
             Back
           </button>
-          
+
           <ErrorState 
             message={error} 
             onRetry={() => navigate('/dashboard')} 
@@ -375,7 +375,7 @@ export default function Profile() {
       member_education: [],
       member_work_history: []
     };
-    
+
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
