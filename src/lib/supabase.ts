@@ -56,6 +56,230 @@ export const authAPI = {
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Logout failed" };
+    }
+  },
+
+  async getCurrentUser(): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch("/api/auth/me");
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get current user" };
+    }
+  },
+
+  async refreshSession(): Promise<ApiResponse> {
+    try {
+      const response = await fetch("/api/auth/refresh", {
+        method: "POST",
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to refresh session" };
+    }
+  },
+};
+
+/**
+ * User API functions
+ */
+export const userAPI = {
+  async getProfile(userId: string): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch(`/api/users/${userId}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get user profile" };
+    }
+  },
+
+  async updateProfile(updates: Partial<User>): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch("/api/users/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to update profile" };
+    }
+  },
+};
+
+/**
+ * Team API functions
+ */
+export const teamAPI = {
+  async createTeam(teamData: {
+    name: string;
+    description?: string;
+  }): Promise<ApiResponse<Team>> {
+    try {
+      const response = await fetch("/api/teams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(teamData),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to create team" };
+    }
+  },
+
+  async getTeam(teamId: string): Promise<ApiResponse<Team>> {
+    try {
+      const response = await fetch(`/api/teams/${teamId}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get team" };
+    }
+  },
+
+  async getUserTeams(): Promise<ApiResponse<Team[]>> {
+    try {
+      const response = await fetch("/api/teams/my");
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get user teams" };
+    }
+  },
+
+  async joinTeam(inviteCode: string): Promise<ApiResponse> {
+    try {
+      const response = await fetch("/api/teams/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inviteCode }),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to join team" };
+    }
+  },
+};
+
+/**
+ * Pulse check API functions
+ */
+export const pulseAPI = {
+  async submitPulse(pulseData: {
+    rating: number;
+    comment?: string;
+    date: string;
+  }): Promise<ApiResponse<PulseCheck>> {
+    try {
+      const response = await fetch("/api/pulse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pulseData),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to submit pulse check" };
+    }
+  },
+
+  async getTodayPulse(): Promise<ApiResponse<PulseCheck>> {
+    try {
+      const response = await fetch("/api/pulse/today");
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get today's pulse" };
+    }
+  },
+};
+
+/**
+ * Check-in API functions
+ */
+export const checkinAPI = {
+  async submitCheckin(formData: FormData): Promise<ApiResponse<CheckIn>> {
+    try {
+      const response = await fetch("/api/checkins", {
+        method: "POST",
+        body: formData,
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to submit check-in" };
+    }
+  },
+
+  async getCheckins(
+    startDate: string,
+    endDate: string,
+  ): Promise<ApiResponse<CheckIn[]>> {
+    try {
+      const response = await fetch(
+        `/api/checkins?start=${startDate}&end=${endDate}`,
+      );
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get check-ins" };
+    }
+  },
+};
+
+/**
+ * Schedule API functions
+ */
+export const scheduleAPI = {
+  async updateSchedule(scheduleData: {
+    date: string;
+    workType?: string;
+    preference?: string;
+    userId?: string;
+    notes?: string;
+  }): Promise<ApiResponse> {
+    try {
+      const response = await fetch("/api/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(scheduleData),
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to update schedule" };
+    }
+  },
+
+  async getSchedule(
+    startDate: string,
+    endDate: string,
+  ): Promise<ApiResponse> {
+    try {
+      const response = await fetch(
+        `/api/schedule?start=${startDate}&end=${endDate}`,
+      );
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get schedule" };
+    }
+  },
+};
+
+/**
+ * Analytics API functions
+ */
+export const analyticsAPI = {
+  async getTeamAnalytics(): Promise<ApiResponse> {
+    try {
+      const response = await fetch("/api/analytics/team");
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get team analytics" };
+    }
+  },
+
+  async logout(): Promise<ApiResponse> {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
       });
       return await response.json();

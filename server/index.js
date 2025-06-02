@@ -126,6 +126,219 @@ const requireRole = (roles) => {
   };
 };
 
+// Hi-Bridge API Routes
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Authentication routes
+app.post('/api/auth/register', (req, res) => {
+  const { email, password, fullName, role } = req.body;
+
+  // Demo mode - always succeed
+  const userId = `user_${Date.now()}`;
+  req.session.userId = userId;
+  req.session.userEmail = email;
+  req.session.userRole = role;
+
+  res.json({
+    success: true,
+    data: {
+      id: userId,
+      email,
+      fullName,
+      role,
+      createdAt: new Date().toISOString()
+    }
+  });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+
+  // Demo mode - always succeed
+  const userId = `user_${Date.now()}`;
+  req.session.userId = userId;
+  req.session.userEmail = email;
+  req.session.userRole = 'employee';
+
+  res.json({
+    success: true,
+    data: {
+      user: {
+        id: userId,
+        email,
+        fullName: 'Demo User',
+        role: 'employee'
+      },
+      session: { id: req.sessionID }
+    }
+  });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: 'Logout failed' });
+    }
+    res.json({ success: true });
+  });
+});
+
+app.get('/api/auth/me', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.json({ 
+      success: true, 
+      data: { 
+        id: req.session.userId, 
+        email: req.session.userEmail || 'demo@hibridge.com',
+        fullName: 'Demo User',
+        role: req.session.userRole || 'employee'
+      } 
+    });
+  } else {
+    res.status(401).json({ success: false, error: 'Not authenticated' });
+  }
+});
+
+// Team routes
+app.post('/api/teams', (req, res) => {
+  const { name, description } = req.body;
+  const teamId = `team_${Date.now()}`;
+
+  res.json({
+    success: true,
+    data: {
+      id: teamId,
+      name,
+      description,
+      managerId: req.session.userId,
+      memberIds: [req.session.userId],
+      createdAt: new Date().toISOString()
+    }
+  });
+});
+
+app.get('/api/teams/my', (req, res) => {
+  res.json({
+    success: true,
+    data: [{
+      id: 'demo-team',
+      name: 'Demo Team',
+      description: 'A demo team for testing',
+      managerId: req.session.userId,
+      memberIds: [req.session.userId]
+    }]
+  });
+});
+
+// Pulse check routes
+app.post('/api/pulse', (req, res) => {
+  const { rating, comment, date } = req.body;
+
+  res.json({
+    success: true,
+    data: {
+      id: `pulse_${Date.now()}`,
+      userId: req.session.userId,
+      rating,
+      comment,
+      date,
+      submittedAt: new Date().toISOString()
+    }
+  });
+});
+
+app.get('/api/pulse/today', (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+
+  res.json({
+    success: true,
+    data: {
+      id: `pulse_${Date.now()}`,
+      userId: req.session.userId,
+      rating: 4,
+      comment: 'Demo pulse check',
+      date: today,
+      submittedAt: new Date().toISOString()
+    }
+  });
+});
+
+// Schedule routes
+app.post('/api/schedule', (req, res) => {
+  const { date, workType, notes } = req.body;
+
+  res.json({
+    success: true,
+    data: {
+      id: `schedule_${Date.now()}`,
+      userId: req.session.userId,
+      date,
+      workType,
+      notes,
+      updatedAt: new Date().toISOString()
+    }
+  });
+});
+
+app.get('/api/schedule', (req, res) => {
+  const { start, end } = req.query;
+
+  res.json({
+    success: true,
+    data: {
+      schedules: [],
+      dateRange: { start, end }
+    }
+  });
+});
+
+// Check-in routes
+app.post('/api/checkins', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      id: `checkin_${Date.now()}`,
+      userId: req.session.userId,
+      location: 'office',
+      timestamp: new Date().toISOString(),
+      verified: true,
+      points: 20
+    }
+  });
+});
+
+// Analytics routes
+app.get('/api/analytics/team', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      totalMembers: 10,
+      activeToday: 7,
+      averagePulse: 4.2,
+      officeAttendance: 0.65
+    }
+  });
+});
+
+// Leaderboard route
+app.get('/api/leaderboard', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      weekly: [
+        { id: 1, name: 'Demo User', points: 150, rank: 1 },
+        { id: 2, name: 'Team Member', points: 120, rank: 2 }
+      ]
+    }
+  });
+});
+
 // Auth routes
 app.post("/api/auth/register", async (req, res) => {
   try {

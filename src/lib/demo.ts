@@ -3,6 +3,22 @@
 import { User } from '@/lib/types';
 
 /**
+ * Demo mode configuration and mock data for Hi-Bridge
+ * Used when running without a backend or for testing
+ */
+
+// Check if we're in demo mode
+export const isDemoMode = (): boolean => {
+  // Check multiple conditions for demo mode
+  const envDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+  const urlDemo = window.location.search.includes('demo=true');
+  const localDemo = localStorage.getItem('hibridge_demo_mode') === 'true';
+
+  // Default to demo mode if no backend is detected
+  return envDemo || urlDemo || localDemo || true;
+};
+
+/**
  * Check if the application is running in demo mode
  */
 export function isDemoMode(): boolean {
