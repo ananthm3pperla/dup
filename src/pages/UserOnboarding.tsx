@@ -5,7 +5,7 @@ import { Building2, AlertCircle, LifeBuoy } from "lucide-react";
 import { LoadingState, Button, Alert } from "../components/ui";
 import { toast } from "sonner";
 import OnboardingFlow from "../components/onboarding/OnboardingFlow";
-import { AccountSecurity } from "../components/auth/AccountSecurity";
+import AccountSecurity from "../components/auth/AccountSecurity";
 import { isDemoMode, getDemoUser } from "../lib/demo";
 import { database } from "../lib/database";
 import { userAPI } from "../lib/api";
