@@ -1,124 +1,164 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { getCurrentUser, logoutUser } from '@/lib/auth';
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  createdAt: string;
-}
+import { authService } from '@/lib/auth';
+import { logger } from '@/lib/logger';
+import { performanceMonitor } from '@/lib/performance';
+import type { User } from '@/lib/types';
 
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   loading: boolean;
+  error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<void>;
+  signUp: (userData: SignUpData) => Promise<void>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
+  clearError: () => void;
+}
+
+interface SignUpData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get initial user
-    const checkCurrentUser = async () => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      const endTimer = performanceMonitor.startTimer('auth_initialization');
+
       try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
+        logger.info('Initializing authentication');
+        const { user: currentUser } = await authService.getCurrentUser();
+
+        if (mounted) {
+          setUser(currentUser);
+          logger.info('User authenticated', { userId: currentUser.id });
+        }
       } catch (error) {
-        console.error('Auth check error:', error);
-        setUser(null);
+        if (mounted) {
+          logger.info('No authenticated user found');
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          endTimer({ success: true });
+        }
       }
     };
 
-    checkCurrentUser();
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    const endTimer = performanceMonitor.startTimer('auth_signin');
+    setLoading(true);
+    setError(null);
+
     try {
-      const user = await login(email, password);
+      logger.info('Attempting user sign in', { email });
+      const { user } = await authService.login(email, password);
       setUser(user);
-    } catch (error) {
-      console.error("Sign-in failed:", error);
-      throw error; // Re-throw the error to be caught by the component
+      logger.info('User signed in successfully', { userId: user.id });
+      endTimer({ success: true });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign in failed';
+      logger.error('Sign in failed', err as Error, { email });
+      setError(errorMessage);
+      endTimer({ success: false, error: errorMessage });
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: string = 'employee') => {
+  const signUp = async (userData: SignUpData) => {
+    const endTimer = performanceMonitor.startTimer('auth_signup');
+    setLoading(true);
+    setError(null);
+
     try {
-       // Assuming the signup API returns the user object upon successful signup
-      const response = await fetch('/api/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, fullName, role }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Signup failed');
-      }
-
-      const newUser = await response.json();
-      setUser(newUser);
-
-    } catch (error: any) {
-      console.error("Signup failed:", error);
-      throw error; // Re-throw the error for handling in the signup component
+      logger.info('Attempting user sign up', { email: userData.email });
+      const { user } = await authService.register(userData);
+      setUser(user);
+      logger.info('User signed up successfully', { userId: user.id });
+      endTimer({ success: true });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign up failed';
+      logger.error('Sign up failed', err as Error, { email: userData.email });
+      setError(errorMessage);
+      endTimer({ success: false, error: errorMessage });
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
+    const endTimer = performanceMonitor.startTimer('auth_signout');
+    setLoading(true);
+    setError(null);
+
     try {
-      await logoutUser();
+      logger.info('Attempting user sign out', { userId: user?.id });
+      await authService.logout();
       setUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
+      logger.info('User signed out successfully');
+      endTimer({ success: true });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign out failed';
+      logger.error('Sign out failed', err as Error);
+      setError(errorMessage);
+      endTimer({ success: false, error: errorMessage });
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const resetPassword = async (email: string) => {
+  const refreshUser = async () => {
+    const endTimer = performanceMonitor.startTimer('auth_refresh');
+
     try {
-      // Call your reset password API endpoint
-      const response = await fetch('/api/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Reset password request failed');
-      }
-
-      // Handle success (e.g., display a success message)
-      console.log('Password reset email sent successfully');
-
-    } catch (error: any) {
-      console.error("Reset password request failed:", error);
-      throw error;
+      logger.debug('Refreshing user data');
+      const { user: currentUser } = await authService.getCurrentUser();
+      setUser(currentUser);
+      logger.debug('User data refreshed successfully', { userId: currentUser.id });
+      endTimer({ success: true });
+    } catch (err) {
+      logger.warn('Failed to refresh user data', err as Error);
+      setUser(null);
+      endTimer({ success: false });
     }
   };
 
+  const clearError = () => {
+    setError(null);
+  };
 
   const value = {
     user,
     loading,
+    error,
     signIn,
     signUp,
     signOut,
-    resetPassword,
+    refreshUser,
+    clearError,
   };
 
   return (

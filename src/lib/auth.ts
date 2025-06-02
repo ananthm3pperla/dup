@@ -1,3 +1,92 @@
+import type { User } from '@/lib/types';
+
+/**
+ * Authentication service using Replit backend
+ */
+class AuthService {
+  private static instance: AuthService;
+  private baseURL = '/api/auth';
+
+  static getInstance(): AuthService {
+    if (!AuthService.instance) {
+      AuthService.instance = new AuthService();
+    }
+    return AuthService.instance;
+  }
+
+  async login(email: string, password: string): Promise<{ user: User }> {
+    const response = await fetch(`${this.baseURL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Login failed');
+    }
+
+    return response.json();
+  }
+
+  async register(userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role?: string;
+  }): Promise<{ user: User }> {
+    const response = await fetch(`${this.baseURL}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Registration failed');
+    }
+
+    return response.json();
+  }
+
+  async logout(): Promise<void> {
+    const response = await fetch(`${this.baseURL}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Logout failed');
+    }
+  }
+
+  async getCurrentUser(): Promise<{ user: User }> {
+    const response = await fetch(`${this.baseURL}/me`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Not authenticated');
+    }
+
+    return response.json();
+  }
+}
+
+export const authService = AuthService.getInstance();
+
+// Export individual functions for backward compatibility
+export const loginUser = authService.login.bind(authService);
+export const signupUser = authService.register.bind(authService);
+export const logoutUser = authService.logout.bind(authService);
+export const getCurrentUser = authService.getCurrentUser.bind(authService);
 
 interface User {
   id: string;
@@ -72,7 +161,7 @@ export async function logoutUser(): Promise<void> {
 export async function getCurrentUser(): Promise<User | null> {
   try {
     const response = await fetch(`${API_BASE}/auth/me`);
-    
+
     if (!response.ok) {
       return null;
     }
