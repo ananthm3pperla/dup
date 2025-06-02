@@ -20,6 +20,49 @@ export interface AuthSession {
 }
 
 /**
+ * Store session in localStorage
+ */
+export function storeSession(session: AuthSession): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('hibridge_session', JSON.stringify(session));
+    localStorage.setItem('hibridge_user', JSON.stringify(session.user));
+  }
+}
+
+/**
+ * Get stored session from localStorage
+ */
+export function getStoredSession(): AuthSession | null {
+  if (typeof window !== 'undefined') {
+    const sessionData = localStorage.getItem('hibridge_session');
+    const userData = localStorage.getItem('hibridge_user');
+    
+    if (sessionData && userData) {
+      try {
+        return {
+          ...JSON.parse(sessionData),
+          user: JSON.parse(userData)
+        };
+      } catch (error) {
+        console.error('Error parsing stored session:', error);
+        clearStoredSession();
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Clear stored session from localStorage
+ */
+export function clearStoredSession(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('hibridge_session');
+    localStorage.removeItem('hibridge_user');
+  }
+}
+
+/**
  * Sign up a new user
  */
 export async function signUp(email: string, password: string, fullName: string): Promise<{ user: AuthUser | null; error: string | null }> {
@@ -45,7 +88,7 @@ export async function signUp(email: string, password: string, fullName: string):
     });
 
     // Store password separately (in production, this should be more secure)
-    await database.db.set(`user:password:${newUser.id}`, hashedPassword);
+    await database['db'].set(`user:password:${newUser.id}`, hashedPassword);
 
     const authUser: AuthUser = {
       id: newUser.id,
@@ -79,7 +122,7 @@ export async function signIn(email: string, password: string): Promise<{ user: A
     }
 
     // Get stored password hash
-    const storedHash = await database.db.get(`user:password:${user.id}`);
+    const storedHash = await database['db'].get(`user:password:${user.id}`);
     if (!storedHash) {
       return { user: null, session: null, error: 'Invalid email or password' };
     }
@@ -225,5 +268,55 @@ export async function refreshSession(sessionId: string): Promise<{ user: AuthUse
   } catch (error) {
     logger.error('Unexpected session refresh error', { error });
     return { user: null, session: null, error: 'An unexpected error occurred during session refresh' };
+  }
+}
+
+/**
+ * Login user (alias for signIn for compatibility)
+ */
+export async function loginUser(email: string, password: string): Promise<AuthUser> {
+  const result = await signIn(email, password);
+  if (result.error || !result.user || !result.session) {
+    throw new Error(result.error || 'Login failed');
+  }
+  
+  // Store session
+  storeSession(result.session);
+  
+  return result.user;
+}
+
+/**
+ * Register user (alias for signUp for compatibility)
+ */
+export async function registerUser(userData: { email: string; password: string; firstName: string; lastName: string; role?: string }): Promise<AuthUser> {
+  const fullName = `${userData.firstName} ${userData.lastName}`;
+  const result = await signUp(userData.email, userData.password, fullName);
+  
+  if (result.error || !result.user) {
+    throw new Error(result.error || 'Registration failed');
+  }
+  
+  return result.user;
+}
+
+/**
+ * Get current user
+ */
+export async function getCurrentUser(): Promise<AuthUser | null> {
+  const result = await getCurrentSession();
+  return result.user;
+}
+
+/**
+ * Logout user
+ */
+export async function logout(): Promise<void> {
+  const session = getStoredSession();
+  const result = await signOut(session?.sessionId);
+  clearStoredSession();
+  
+  if (result.error) {
+    throw new Error(result.error);
   }
 }

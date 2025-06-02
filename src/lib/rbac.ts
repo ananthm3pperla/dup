@@ -1,4 +1,4 @@
-import { MockUser as User } from './supabase';
+import { User } from './database';
 
 // Define user roles
 export type UserRole = 'admin' | 'manager' | 'member' | 'guest';
@@ -7,18 +7,17 @@ export type UserRole = 'admin' | 'manager' | 'member' | 'guest';
 export function getUserRoles(user: User | null): UserRole[] {
   if (!user) return ['guest'];
 
-  // Check if user has roles in their metadata
-  const roles = user.user_metadata?.roles as UserRole[] | undefined;
-  
-  if (roles && Array.isArray(roles)) return roles;
-  
-  // Check if user is a team leader
-  if (user.user_metadata?.is_team_leader) {
-    return ['manager', 'member'];
+  // Map user role to UserRole array
+  switch (user.role) {
+    case 'hr':
+      return ['admin', 'manager', 'member'];
+    case 'manager':
+      return ['manager', 'member'];
+    case 'employee':
+      return ['member'];
+    default:
+      return ['member'];
   }
-  
-  // Default role for authenticated users
-  return ['member'];
 }
 
 // Check if user has specific role

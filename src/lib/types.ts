@@ -18,21 +18,73 @@ export interface BaseEntity {
 }
 
 // User types
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  role: 'employee' | 'manager' | 'hr';
+  teamId?: string;
+  createdAt: string;
+  lastActive: string;
+  avatar?: string;
+  location?: string;
+  isActive: boolean;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  managerId: string;
+  memberIds: string[];
+  settings: {
+    anchorDays: string[];
+    pulseEnabled: boolean;
+    gamificationEnabled: boolean;
+  };
+  createdAt: string;
+}
+
+export interface PulseCheck {
+  id: string;
+  userId: string;
+  teamId: string;
+  rating: number;
+  comment?: string;
+  date: string;
+  submittedAt: string;
+}
+
+export interface CheckIn {
+  id: string;
+  userId: string;
+  teamId: string;
+  location: 'office' | 'remote';
+  timestamp: string;
+  photoUrl?: string;
+  verified: boolean;
+  points: number;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  fullName?: string;
+  avatar?: string;
+  role?: 'employee' | 'manager' | 'hr';
+  teamId?: string;
+  emailVerified: boolean;
+  lastSignIn?: string;
+}
+
+export interface AuthSession {
+  user: AuthUser;
+  sessionId: string;
+  expiresAt: number;
+}
+
 export type UserRole = 'employee' | 'manager' | 'hr' | 'admin';
 export type WorkLocation = 'office' | 'remote' | 'hybrid';
-
-export interface User extends BaseEntity {
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
-  department?: string;
-  jobTitle?: string;
-  profilePicture?: string;
-  preferences?: UserPreferences;
-  isActive: boolean;
-  lastLoginAt?: string;
-}
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
@@ -65,17 +117,6 @@ export interface PrivacySettings {
   shareCalendar: boolean;
 }
 
-// Team types
-export interface Team extends BaseEntity {
-  name: string;
-  description: string;
-  leaderId: string;
-  members: string[];
-  inviteCode: string;
-  settings: TeamSettings;
-  stats: TeamStats;
-}
-
 export interface TeamSettings {
   requiredOfficeDays: number;
   anchorDays: string[];
@@ -90,42 +131,8 @@ export interface TeamStats {
   officeAttendanceRate: number;
 }
 
-// Pulse check types
 export type MoodType = 'excellent' | 'good' | 'okay' | 'poor' | 'terrible';
 
-export interface PulseCheck extends BaseEntity {
-  userId: string;
-  rating: number; // 1-5
-  mood: MoodType;
-  feedback?: string;
-  workLocation: WorkLocation;
-  date: string;
-  tags?: string[];
-}
-
-// Check-in types
-export interface CheckIn extends BaseEntity {
-  userId: string;
-  location: string;
-  workType: WorkLocation;
-  notes?: string;
-  photoUrl?: string;
-  timestamp: string;
-  isVerified: boolean;
-  verificationMethod?: 'photo' | 'location' | 'manual';
-}
-
-// Schedule types
-export interface Schedule extends BaseEntity {
-  userId: string;
-  date: string;
-  workLocation: WorkLocation;
-  notes?: string;
-  isConfirmed: boolean;
-  teamId?: string;
-}
-
-// Rewards types
 export interface Reward extends BaseEntity {
   name: string;
   description: string;
@@ -223,4 +230,17 @@ export interface AppEvent {
   data: Record<string, any>;
   timestamp: string;
   userId?: string;
+}
+
+export interface Employee extends BaseEntity {
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  department?: string;
+  jobTitle?: string;
+  profilePicture?: string;
+  preferences?: UserPreferences;
+  isActive: boolean;
+  lastLoginAt?: string;
 }

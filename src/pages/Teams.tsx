@@ -4,7 +4,7 @@ import { useTeam } from '@/contexts/TeamContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Users, Plus, Copy, Check, Settings, ArrowRight, Building2, Clock, AlertCircle } from 'lucide-react';
 import { Button, LoadingState, PageHeader } from '@/components/ui';
-import { generateInviteLink } from '@/lib/supabase';
+import { createTeam, getUserTeams } from '@/lib/supabase';
 
 export default function Teams() {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { logger } from '@/lib/logger';
 import { performanceMonitor } from '@/lib/performance';
-import type { User } from '@/lib/types';
-import { loginUser, getCurrentUser, registerUser, logout, refreshSession, storeSession, getStoredSession, clearStoredSession } from '@/lib/auth';
+import type { User } from '@/lib/database';
+import { loginUser, getCurrentUser, registerUser, logout } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
