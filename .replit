@@ -18,7 +18,7 @@ externalPort = 3000
 exposeLocalhost = true
 
 [workflows]
-runButton = "Hi-Bridge Development"
+runButton = "Hi-Bridge Dev Server"
 
 [[workflows.workflow]]
 name = "Development"
@@ -49,3 +49,29 @@ args = "npm run build"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node server/index.js"
+
+[[workflows.workflow]]
+name = "Hi-Bridge Dev Server"
+author = 43324003
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:server"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:client"
+
+[[workflows.workflow]]
+name = "Hi-Bridge Dev Server"
+author = 43324003
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:server"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:client"

@@ -1,69 +1,111 @@
+
 /**
- * API utility functions for Hi-Bridge application
+ * API client for Hi-Bridge Express backend
+ * Handles all HTTP requests with proper error handling
  */
 
-const BASE_URL = process.env.NODE_ENV === 'production' 
-  ? window.location.origin 
-  : 'http://localhost:5000';
+interface ApiResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+}
 
-interface ApiResponse extends Response {
-  json(): Promise<any>;
+interface ApiError {
+  message: string;
+  status?: number;
 }
 
 class ApiClient {
-  private baseUrl: string;
+  private baseURL: string;
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
+  constructor() {
+    // Use current domain in production, localhost in development
+    this.baseURL = window.location.origin;
   }
 
-  private async request(
-    endpoint: string, 
+  private async request<T>(
+    endpoint: string,
     options: RequestInit = {}
-  ): Promise<ApiResponse> {
-    const url = `${this.baseUrl}/api${endpoint}`;
-
+  ): Promise<ApiResponse<T>> {
+    const url = `${this.baseURL}/api${endpoint}`;
+    
     const config: RequestInit = {
+      credentials: 'include', // Include cookies for session management
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      credentials: 'include', // Include cookies for session management
       ...options,
     };
 
     try {
       const response = await fetch(url, config);
-      return response as ApiResponse;
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        const error: ApiError = {
+          message: data?.message || `HTTP Error: ${response.status}`,
+          status: response.status,
+        };
+        throw error;
+      }
+
+      return {
+        data,
+        status: response.status,
+        statusText: response.statusText,
+      };
     } catch (error) {
-      console.error('API request failed:', error);
-      throw new Error('Network request failed');
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
+      
+      // Network or other errors
+      throw {
+        message: error instanceof Error ? error.message : 'Network error occurred',
+        status: 0,
+      };
     }
   }
 
-  async get(endpoint: string, options?: RequestInit): Promise<ApiResponse> {
-    return this.request(endpoint, { ...options, method: 'GET' });
+  async get<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  async post(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse> {
-    return this.request(endpoint, {
+  async post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse> {
-    return this.request(endpoint, {
+  async put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async delete(endpoint: string, options?: RequestInit): Promise<ApiResponse> {
-    return this.request(endpoint, { ...options, method: 'DELETE' });
+  async delete<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+  }
+
+  async patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+    });
   }
 }
 
-export const api = new ApiClient(BASE_URL);
+export const api = new ApiClient();
+export type { ApiResponse, ApiError };

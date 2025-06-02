@@ -1,131 +1,71 @@
-
 import { api } from './api';
-
-export interface User {
-  id: string;
-  email: string;
-  user_metadata: {
-    full_name?: string;
-    avatar_url?: string;
-    role?: string;
-  };
-}
-
-export interface Session {
-  id: string;
-  expires_at: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  session?: Session;
-}
+import type { User, AuthResponse } from './types';
 
 /**
  * Register a new user
  */
-export async function registerUser(userData: { 
-  email: string; 
-  password: string; 
-  firstName: string; 
-  lastName: string; 
-  role?: string 
-}): Promise<User> {
-  const response = await api.post('/auth/register', {
-    email: userData.email,
-    password: userData.password,
-    full_name: `${userData.firstName} ${userData.lastName}`,
-    role: userData.role || 'employee'
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Registration failed');
-  }
-
-  const data = await response.json();
-  return data.user;
-}
-
-/**
- * Login user with email and password
- */
-export async function loginUser(email: string, password: string): Promise<User> {
-  const response = await api.post('/auth/login', {
-    email,
-    password
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Login failed');
-  }
-
-  const data = await response.json();
-  return data.user;
-}
-
-/**
- * Alternative login function name for compatibility
- */
-export const login = loginUser;
-
-/**
- * Get current authenticated user
- */
-export async function getCurrentUser(): Promise<User> {
-  const response = await api.get('/auth/me');
-
-  if (!response.ok) {
-    throw new Error('Failed to get current user');
-  }
-
-  const data = await response.json();
-  return data.user;
-}
-
-/**
- * Logout current user
- */
-export async function logout(): Promise<void> {
-  await api.post('/auth/logout');
-}
-
-/**
- * Refresh user session
- */
-export async function refreshSession(): Promise<{ success: boolean; session?: Session }> {
+export const registerUser = async (userData: {
+  email: string;
+  password: string;
+  full_name: string;
+  role?: string;
+}): Promise<AuthResponse> => {
   try {
-    const response = await api.post('/auth/refresh');
-
-    if (!response.ok) {
-      return { success: false };
-    }
-
-    return { success: true, session: { id: 'session', expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() } };
-  } catch (error) {
-    return { success: false };
+    const response = await api.post('/auth/register', userData);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Registration failed');
   }
-}
+};
 
 /**
- * Store session in localStorage
+ * Log in user
  */
-export function storeSession(session: Session): void {
-  localStorage.setItem('hibridge_session', JSON.stringify(session));
-}
+export const loginUser = async (credentials: {
+  email: string;
+  password: string;
+}): Promise<AuthResponse> => {
+  try {
+    const response = await api.post('/auth/login', credentials);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Login failed');
+  }
+};
 
 /**
- * Get stored session from localStorage
+ * Get current user
  */
-export function getStoredSession(): Session | null {
-  const stored = localStorage.getItem('hibridge_session');
-  return stored ? JSON.parse(stored) : null;
-}
+export const getCurrentUser = async (): Promise<User | null> => {
+  try {
+    const response = await api.get('/auth/me');
+    return response.data.user;
+  } catch (error) {
+    return null;
+  }
+};
 
 /**
- * Clear stored session
+ * Log out user
  */
-export function clearStoredSession(): void {
-  localStorage.removeItem('hibridge_session');
-}
+export const logoutUser = async (): Promise<void> => {
+  try {
+    await api.post('/auth/logout');
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Logout failed');
+  }
+};
+
+/**
+ * Refresh session
+ */
+export const refreshSession = async (): Promise<void> => {
+  try {
+    await api.post('/auth/refresh');
+  } catch (error: any) {
+    throw new Error('Session refresh failed');
+  }
+};
+
+// Alias for compatibility
+export const login = loginUser;
