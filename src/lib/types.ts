@@ -401,4 +401,7 @@ export interface User {
   };
 }
 
+// Tab types for profile navigation
+export type TabType = "experience" | "education" | "team" | "activity";
+
 export default {};

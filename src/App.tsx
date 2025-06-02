@@ -27,6 +27,8 @@ import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/PrivateRoute";
 import AppErrorBoundary from "./components/error/AppErrorBoundary";
 import Layout from "./components/layout/Layout";
+import { isDemoMode } from "@/lib/demo";
+import { Toaster } from "@/components/ui";
 
 function App() {
   return (
