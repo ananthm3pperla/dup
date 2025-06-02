@@ -1,184 +1,112 @@
 {
-  "hash": "68ebc2ab",
+  "hash": "7234ea8b",
   "configHash": "076931d9",
-  "lockfileHash": "03b94f0f",
-  "browserHash": "8e390c43",
+  "lockfileHash": "593740e3",
+  "browserHash": "e5d9491f",
   "optimized": {
     "react": {
       "src": "../../node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "b400ef11",
+      "fileHash": "0a1c938e",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "e33394dd",
+      "fileHash": "7f79ac0a",
       "needsInterop": true
     },
     "react/jsx-runtime": {
       "src": "../../node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "2ad26a31",
+      "fileHash": "7cb1d53e",
       "needsInterop": true
     },
-    "@faker-js/faker": {
-      "src": "../../node_modules/@faker-js/faker/dist/esm/index.mjs",
-      "file": "@faker-js_faker.js",
-      "fileHash": "805efb00",
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "38b74129",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "be648548",
       "needsInterop": false
     },
-    "@fullcalendar/daygrid": {
-      "src": "../../node_modules/@fullcalendar/daygrid/index.js",
-      "file": "@fullcalendar_daygrid.js",
-      "fileHash": "ac93b6fd",
-      "needsInterop": false
-    },
-    "@fullcalendar/interaction": {
-      "src": "../../node_modules/@fullcalendar/interaction/index.js",
-      "file": "@fullcalendar_interaction.js",
-      "fileHash": "ab8cd4bf",
-      "needsInterop": false
-    },
-    "@fullcalendar/react": {
-      "src": "../../node_modules/@fullcalendar/react/dist/index.js",
-      "file": "@fullcalendar_react.js",
-      "fileHash": "762f8190",
-      "needsInterop": false
-    },
-    "@fullcalendar/timegrid": {
-      "src": "../../node_modules/@fullcalendar/timegrid/index.js",
-      "file": "@fullcalendar_timegrid.js",
-      "fileHash": "790dee1e",
-      "needsInterop": false
-    },
-    "@supabase/supabase-js": {
-      "src": "../../node_modules/@supabase/supabase-js/dist/module/index.js",
-      "file": "@supabase_supabase-js.js",
-      "fileHash": "546d2d6f",
-      "needsInterop": false
-    },
-    "clsx": {
-      "src": "../../node_modules/clsx/dist/clsx.mjs",
-      "file": "clsx.js",
-      "fileHash": "dfd4a8c9",
-      "needsInterop": false
-    },
-    "date-fns": {
-      "src": "../../node_modules/date-fns/index.mjs",
-      "file": "date-fns.js",
-      "fileHash": "25995c01",
-      "needsInterop": false
-    },
-    "face-api.js": {
-      "src": "../../node_modules/face-api.js/build/es6/index.js",
-      "file": "face-api__js.js",
-      "fileHash": "243a1edd",
-      "needsInterop": false
-    },
-    "framer-motion": {
-      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
-      "file": "framer-motion.js",
-      "fileHash": "0b07aa24",
+    "react-error-boundary": {
+      "src": "../../node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
+      "file": "react-error-boundary.js",
+      "fileHash": "3d6c2c92",
       "needsInterop": false
     },
     "lucide-react": {
       "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
       "file": "lucide-react.js",
-      "fileHash": "f2b2d066",
-      "needsInterop": false
-    },
-    "react-dom/client": {
-      "src": "../../node_modules/react-dom/client.js",
-      "file": "react-dom_client.js",
-      "fileHash": "7fa26783",
-      "needsInterop": true
-    },
-    "react-error-boundary": {
-      "src": "../../node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
-      "file": "react-error-boundary.js",
-      "fileHash": "4a27a60d",
-      "needsInterop": false
-    },
-    "react-focus-lock": {
-      "src": "../../node_modules/react-focus-lock/dist/es2015/index.js",
-      "file": "react-focus-lock.js",
-      "fileHash": "72c54ae9",
-      "needsInterop": false
-    },
-    "react-router-dom": {
-      "src": "../../node_modules/react-router-dom/dist/index.js",
-      "file": "react-router-dom.js",
-      "fileHash": "5c2582be",
-      "needsInterop": false
-    },
-    "react-textarea-autosize": {
-      "src": "../../node_modules/react-textarea-autosize/dist/react-textarea-autosize.browser.development.esm.js",
-      "file": "react-textarea-autosize.js",
-      "fileHash": "8499bb4e",
+      "fileHash": "f7779428",
       "needsInterop": false
     },
     "sonner": {
       "src": "../../node_modules/sonner/dist/index.mjs",
       "file": "sonner.js",
-      "fileHash": "34f597d7",
+      "fileHash": "42fc209a",
       "needsInterop": false
     },
-    "tailwind-merge": {
-      "src": "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
-      "file": "tailwind-merge.js",
-      "fileHash": "1f936784",
+    "date-fns": {
+      "src": "../../node_modules/date-fns/index.mjs",
+      "file": "date-fns.js",
+      "fileHash": "f9347037",
+      "needsInterop": false
+    },
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "a147a05d",
       "needsInterop": false
     },
     "zod": {
       "src": "../../node_modules/zod/lib/index.mjs",
       "file": "zod.js",
-      "fileHash": "cbda6183",
+      "fileHash": "4eb3ddce",
+      "needsInterop": false
+    },
+    "clsx": {
+      "src": "../../node_modules/clsx/dist/clsx.mjs",
+      "file": "clsx.js",
+      "fileHash": "2fcb1ff1",
+      "needsInterop": false
+    },
+    "tailwind-merge": {
+      "src": "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+      "file": "tailwind-merge.js",
+      "fileHash": "6bc9556a",
       "needsInterop": false
     },
     "zustand": {
       "src": "../../node_modules/zustand/esm/index.mjs",
       "file": "zustand.js",
-      "fileHash": "f690b2e9",
+      "fileHash": "3f734c34",
       "needsInterop": false
     },
     "zustand/middleware": {
       "src": "../../node_modules/zustand/esm/middleware.mjs",
       "file": "zustand_middleware.js",
-      "fileHash": "ce68b3df",
+      "fileHash": "cc4ab265",
       "needsInterop": false
     }
   },
   "chunks": {
-    "browser-C3GKYE5T": {
-      "file": "browser-C3GKYE5T.js"
+    "chunk-GACRHWME": {
+      "file": "chunk-GACRHWME.js"
     },
-    "browser-UAC2NLU3": {
-      "file": "browser-UAC2NLU3.js"
+    "chunk-DXOUNB47": {
+      "file": "chunk-DXOUNB47.js"
     },
-    "chunk-XLW57I3Q": {
-      "file": "chunk-XLW57I3Q.js"
+    "chunk-JBG67EE7": {
+      "file": "chunk-JBG67EE7.js"
     },
-    "chunk-XCDHS5NV": {
-      "file": "chunk-XCDHS5NV.js"
-    },
-    "chunk-BWCZL6O6": {
-      "file": "chunk-BWCZL6O6.js"
-    },
-    "chunk-K33Y5SO4": {
-      "file": "chunk-K33Y5SO4.js"
-    },
-    "chunk-JY3LWUAG": {
-      "file": "chunk-JY3LWUAG.js"
-    },
-    "chunk-JINCTG6U": {
-      "file": "chunk-JINCTG6U.js"
-    },
-    "chunk-M4O6YPK6": {
-      "file": "chunk-M4O6YPK6.js"
-    },
-    "chunk-624QZG55": {
-      "file": "chunk-624QZG55.js"
+    "chunk-UV5CTPV7": {
+      "file": "chunk-UV5CTPV7.js"
     }
   }
 }
