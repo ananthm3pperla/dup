@@ -278,29 +278,100 @@ export const analyticsAPI = {
 };
 
 // Legacy compatibility exports - these will throw errors to help identify remaining Supabase usage
-export const supabase = {
-  auth: {
-    signUp: () => {
-      throw new Error("Use authAPI.register instead of supabase.auth.signUp");
-    },
-    signInWithPassword: () => {
-      throw new Error(
-        "Use authAPI.login instead of supabase.auth.signInWithPassword",
-      );
-    },
-    signOut: () => {
-      throw new Error("Use authAPI.logout instead of supabase.auth.signOut");
-    },
-    getUser: () => {
-      throw new Error(
-        "Use authAPI.getCurrentUser instead of supabase.auth.getUser",
-      );
-    },
+// Supabase compatibility layer removed - use direct API calls
+
+/**
+ * Games API for Hi-Bridge Games beta mode
+ */
+export const gamesAPI = {
+  /**
+   * Get player's game statistics
+   */
+  async getPlayerStats() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/games/stats`, {
+        headers: await getAuthHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch player stats: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching player stats:", error);
+      return { success: false, error: error.message };
+    }
   },
-  from: () => {
-    throw new Error(
-      "Use the appropriate API functions instead of supabase.from",
-    );
+
+  /**
+   * Get team leaderboard
+   */
+  async getLeaderboard() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/games/leaderboard`, {
+        headers: await getAuthHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch leaderboard: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  /**
+   * Upload office photo for points
+   */
+  async uploadPhoto(photoData: { image: File; description?: string; location?: string }) {
+    try {
+      const formData = new FormData();
+      formData.append('image', photoData.image);
+      if (photoData.description) formData.append('description', photoData.description);
+      if (photoData.location) formData.append('location', photoData.location);
+
+      const response = await fetch(`${API_BASE_URL}/games/photo-upload`, {
+        method: 'POST',
+        headers: {
+          ...await getAuthHeaders(),
+          // Don't set Content-Type for FormData, let the browser set it
+        },
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to upload photo: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  /**
+   * Get player's photo history
+   */
+  async getPhotoHistory() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/games/photos`, {
+        headers: await getAuthHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch photo history: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching photo history:", error);
+      return { success: false, error: error.message };
+    }
   },
 };
 

@@ -20,6 +20,7 @@ import CreateTeam from "./pages/team/Create";
 import JoinTeamPage from "./pages/team/Join";
 import TeamSettings from "./pages/team/Settings";
 import Rewards from "./pages/Rewards";
+import Games from "./pages/Games";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -137,7 +138,27 @@ function App() {
                 }
               />
               <Route
+                path="/games"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Games />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/profile/:id"
                 element={
                   <PrivateRoute>
                     <Layout>
