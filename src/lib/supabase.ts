@@ -1,59 +1,38 @@
-// Placeholder supabase module for Hi-Bridge
-// This app uses Replit Database instead of Supabase
+// Stub file - Supabase replaced with Replit backend
+export const createClient = () => {
+  throw new Error('Supabase is no longer used. Use /api/auth endpoints instead.');
+};
 
-/**
- * Placeholder functions for compatibility with existing code
- * All actual authentication and data operations go through the Replit backend
- */
-
-// Create a mock client to prevent "supabaseUrl is required" errors
-const createMockClient = () => ({
+export const supabase = {
   auth: {
-    getSession: async () => ({ data: { session: null }, error: null }),
-    signOut: async () => ({ error: null }),
-    onAuthStateChange: (callback: any) => {
-      // Return a mock subscription object
-      return {
-        data: {
-          subscription: {
-            unsubscribe: () => {
-              console.log('Mock auth subscription unsubscribed');
-            }
-          }
-        }
-      };
+    signInWithPassword: () => Promise.reject(new Error('Use /api/auth/login')),
+    signUp: () => Promise.reject(new Error('Use /api/auth/register')),
+    signOut: () => Promise.reject(new Error('Use /api/auth/logout')),
+    getUser: () => Promise.reject(new Error('Use /api/auth/me')),
+    getSession: () => Promise.reject(new Error('getSession is deprecated')),
+    onAuthStateChange: () => {
+      console.warn('onAuthStateChange is deprecated');
+      return { data: { subscription: { unsubscribe: () => {} }}};
     },
-    signInWithPassword: async () => ({ data: null, error: null }),
-    signUp: async () => ({ data: null, error: null }),
-    resetPasswordForEmail: async () => ({ data: null, error: null }),
+    resetPasswordForEmail: () => Promise.reject(new Error('resetPasswordForEmail is deprecated')),
   },
-  from: (table: string) => ({
-    select: () => Promise.resolve({ data: [], error: null }),
-    insert: () => Promise.resolve({ data: null, error: null }),
-    update: () => Promise.resolve({ data: null, error: null }),
-    delete: () => Promise.resolve({ data: [], error: null }),
-    eq: () => ({ data: [], error: null }),
-    order: () => ({ data: [], error: null }),
-    limit: () => ({ data: [], error: null }),
+  from: () => ({
+    select: () => Promise.reject(new Error('Direct DB access is not allowed')),
+    insert: () => Promise.reject(new Error('Direct DB access is not allowed')),
+    update: () => Promise.reject(new Error('Direct DB access is not allowed')),
+    delete: () => Promise.reject(new Error('Direct DB access is not allowed')),
+    eq: () => Promise.reject(new Error('Direct DB access is not allowed')),
+    order: () => Promise.reject(new Error('Direct DB access is not allowed')),
+    limit: () => Promise.reject(new Error('Direct DB access is not allowed')),
   }),
   channel: () => ({
     on: () => ({ subscribe: () => {} }),
     subscribe: () => {},
     unsubscribe: () => {},
   }),
-});
-
-export const supabase = createMockClient();
-
-// Placeholder exports for backward compatibility
-export const refreshSession = async () => {
-  console.log('Mock refresh session called');
-  return { data: { session: null }, error: null };
 };
 
-export const getSession = async () => {
-  console.warn('getSession called but using Replit backend');
-  return null;
-};
+// Legacy exports for compatibility
+export const refreshSession = () => Promise.reject(new Error('Session refresh handled by backend'));
 
 export default supabase;
