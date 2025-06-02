@@ -1,8 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '@/lib/types';
-import { authAPI } from '@/lib/api';
-import { isDemoMode, getDemoUser } from '@/lib/demo';
+import { User } from '../lib/types';
+import { authAPI } from '../lib/api';
+import { isDemoMode, getDemoUser } from '../lib/demo';
 import { toast } from 'sonner';
 
 interface AuthContextType {

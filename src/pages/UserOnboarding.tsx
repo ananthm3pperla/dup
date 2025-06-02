@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Building2, AlertCircle, LifeBuoy } from "lucide-react";
-import { LoadingState, Button, Alert } from "@/components/ui";
+import { LoadingState, Button, Alert } from "../components/ui";
 import { toast } from "sonner";
-import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
-import { AccountSecurity } from "@/components/auth";
-import { isDemoMode } from "@/lib/demo";
-import { userAPI } from "@/lib/api";
+import OnboardingFlow from "../components/onboarding/OnboardingFlow";
+import { AccountSecurity } from "../components/auth/AccountSecurity";
+import { isDemoMode, getDemoUser } from "../lib/demo";
+import { database } from "../lib/database";
+import { userAPI } from "../lib/api";
 
 export default function UserOnboarding() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function UserOnboarding() {
         }
 
         // Check if user has already completed onboarding
-        const { data, error: queryError } = await supabase
+        const { data, error: queryError } = await database
           .from("user_onboarding")
           .select("*")
           .eq("user_id", user.id)
@@ -57,7 +58,7 @@ export default function UserOnboarding() {
           }
 
           // If no onboarding record exists, create one
-          const { error: insertError } = await supabase
+          const { error: insertError } = await database
             .from("user_onboarding")
             .insert({
               user_id: user.id,
@@ -122,7 +123,7 @@ export default function UserOnboarding() {
       }
 
       // Update user's onboarding status
-      const { data, error } = await supabase
+      const { data, error } = await database
         .from("user_onboarding")
         .upsert(
           {

@@ -385,4 +385,20 @@ export interface AppConfig {
   };
 }
 
+// Basic types for Hi-Bridge application
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  role: 'employee' | 'manager' | 'hr_admin';
+  teamId?: string;
+  avatarUrl?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user_metadata?: {
+    full_name?: string;
+  };
+}
+
 export default {};

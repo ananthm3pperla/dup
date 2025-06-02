@@ -155,6 +155,10 @@ export const ScheduleProvider: React.FC<ScheduleProviderProps> = ({
     }
   }, [user?.teamId]);
 
+  // Memoize functions to prevent unnecessary re-renders
+  const memoizedLoadSchedules = React.useCallback(loadSchedules, [user]);
+  const memoizedLoadAnchorDays = React.useCallback(loadAnchorDays, []);
+
   /**
    * Load user schedules within a date range
    */

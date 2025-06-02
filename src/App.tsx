@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { ScheduleProvider } from "./contexts/ScheduleContext";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
@@ -20,7 +21,8 @@ function App() {
     <AppErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
-          <Router>
+          <ScheduleProvider>
+            <Router>
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<LandingPage />} />
@@ -87,6 +89,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
+          </ScheduleProvider>
         </AuthProvider>
       </ThemeProvider>
     </AppErrorBoundary>
