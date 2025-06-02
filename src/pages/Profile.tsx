@@ -278,31 +278,8 @@ export default function Profile() {
             setError("User not found");
           }
         } else {
-          // Use mock data for development (no external API calls needed)
-          const mockWorkHistory = [
-            {
-              id: "1",
-              company: "TechCorp Inc.",
-              position: "Senior Developer",
-              start_date: "2022-01-01",
-              end_date: null,
-              description: "Leading development of enterprise applications",
-            },
-          ];
-
-          const mockEducation = [
-            {
-              id: "1",
-              institution: "Tech University",
-              degree: "Computer Science",
-              field_of_study: "Software Engineering",
-              start_year: 2018,
-              end_year: 2022,
-            },
-          ];
-
           // Check if profile is complete based on user data
-          const isComplete = Boolean(user?.name && user?.role);
+          const isComplete = Boolean(userData.full_name && userData.email);
           setIsProfileComplete(isComplete);
 
           // Create a profile object from the data
@@ -311,44 +288,21 @@ export default function Profile() {
             member_id: userData.id,
             member_name: userData.full_name || userData.email.split("@")[0],
             member_email: userData.email,
-            member_role: onboardingData?.job_title || "Team Member",
-            member_department: onboardingData?.department || "Not specified",
+            member_role: userData.role || "Team Member",
+            member_department: userData.department || "Not specified",
             member_avatar:
               userData.avatar_url ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.full_name || "User")}&background=random`,
-            member_location:
-              onboardingData?.office_location ||
-              profileData?.location ||
-              "Not specified",
-            member_phone: "Not specified", // This would come from a different table in a real implementation
-            member_workLocation: "Not specified", // This would come from a different table in a real implementation
+            member_location: userData.location || "Not specified",
+            member_phone: userData.phone || "Not specified",
+            member_workLocation: userData.work_location || "Not specified",
             member_attendance: {
-              total: 0, // This would come from a different table in a real implementation
-              streak: 0, // This would come from a different table in a real implementation
+              total: 0,
+              streak: 0,
               lastVisit: new Date().toISOString(),
             },
-            member_education:
-              education?.map((edu) => ({
-                id: edu.id,
-                school: edu.institution,
-                degree: edu.degree,
-                field: edu.field_of_study,
-                startYear: edu.start_year,
-                endYear: edu.end_year,
-                honors: edu.honors || [],
-              })) || [],
-            member_work_history:
-              workHistory?.map((work) => ({
-                id: work.id,
-                company: work.company,
-                role: work.role,
-                location: "Not specified", // This would come from a different field in a real implementation
-                startDate: work.start_date,
-                endDate: work.end_date,
-                highlights: work.description
-                  ? [work.description]
-                  : ["No description provided"],
-              })) || [],
+            member_education: [],
+            member_work_history: [],
           };
 
           setProfile(userProfile);
