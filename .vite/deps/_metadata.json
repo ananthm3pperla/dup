@@ -1,139 +1,139 @@
 {
-  "hash": "2aa9f237",
+  "hash": "6c84333c",
   "configHash": "076931d9",
-  "lockfileHash": "aa2515c3",
-  "browserHash": "0444eb21",
+  "lockfileHash": "e4ffbf56",
+  "browserHash": "81aa94ed",
   "optimized": {
     "react": {
       "src": "../../node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "2f484312",
+      "fileHash": "df79e540",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "ecb158ff",
+      "fileHash": "78e3ec9e",
       "needsInterop": true
     },
     "react/jsx-runtime": {
       "src": "../../node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "832f43c6",
+      "fileHash": "7ab98414",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "6f5a711f",
+      "fileHash": "3a76c66d",
       "needsInterop": true
     },
     "react-router-dom": {
       "src": "../../node_modules/react-router-dom/dist/index.js",
       "file": "react-router-dom.js",
-      "fileHash": "f497fd74",
-      "needsInterop": false
-    },
-    "framer-motion": {
-      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
-      "file": "framer-motion.js",
-      "fileHash": "fbd05af5",
+      "fileHash": "68513f55",
       "needsInterop": false
     },
     "lucide-react": {
       "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
       "file": "lucide-react.js",
-      "fileHash": "1ee97c6a",
+      "fileHash": "8074532a",
       "needsInterop": false
     },
-    "react-error-boundary": {
-      "src": "../../node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
-      "file": "react-error-boundary.js",
-      "fileHash": "6a90bf3d",
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "2a64fb9c",
       "needsInterop": false
     },
     "sonner": {
       "src": "../../node_modules/sonner/dist/index.mjs",
       "file": "sonner.js",
-      "fileHash": "a4650bec",
+      "fileHash": "3d8fd091",
       "needsInterop": false
     },
     "date-fns": {
       "src": "../../node_modules/date-fns/index.mjs",
       "file": "date-fns.js",
-      "fileHash": "907c673d",
+      "fileHash": "276e8f6e",
+      "needsInterop": false
+    },
+    "react-error-boundary": {
+      "src": "../../node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
+      "file": "react-error-boundary.js",
+      "fileHash": "dd7708e9",
       "needsInterop": false
     },
     "class-variance-authority": {
       "src": "../../node_modules/class-variance-authority/dist/index.mjs",
       "file": "class-variance-authority.js",
-      "fileHash": "cdf3dbd1",
-      "needsInterop": false
-    },
-    "zustand": {
-      "src": "../../node_modules/zustand/esm/index.mjs",
-      "file": "zustand.js",
-      "fileHash": "0cd8d3a6",
-      "needsInterop": false
-    },
-    "zustand/middleware": {
-      "src": "../../node_modules/zustand/esm/middleware.mjs",
-      "file": "zustand_middleware.js",
-      "fileHash": "dcc23036",
+      "fileHash": "c59b0659",
       "needsInterop": false
     },
     "clsx": {
       "src": "../../node_modules/clsx/dist/clsx.mjs",
       "file": "clsx.js",
-      "fileHash": "a896514c",
+      "fileHash": "baf3da4c",
       "needsInterop": false
     },
     "tailwind-merge": {
       "src": "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
       "file": "tailwind-merge.js",
-      "fileHash": "be767b23",
+      "fileHash": "be51925f",
       "needsInterop": false
     },
-    "react-textarea-autosize": {
-      "src": "../../node_modules/react-textarea-autosize/dist/react-textarea-autosize.browser.development.esm.js",
-      "file": "react-textarea-autosize.js",
-      "fileHash": "a157eedf",
+    "zustand": {
+      "src": "../../node_modules/zustand/esm/index.mjs",
+      "file": "zustand.js",
+      "fileHash": "acc3369b",
       "needsInterop": false
     },
-    "zod": {
-      "src": "../../node_modules/zod/lib/index.mjs",
-      "file": "zod.js",
-      "fileHash": "2a82955a",
+    "zustand/middleware": {
+      "src": "../../node_modules/zustand/esm/middleware.mjs",
+      "file": "zustand_middleware.js",
+      "fileHash": "bd5b1c95",
       "needsInterop": false
     },
     "axios": {
       "src": "../../node_modules/axios/index.js",
       "file": "axios.js",
-      "fileHash": "b26b6222",
+      "fileHash": "12d65b96",
+      "needsInterop": false
+    },
+    "react-textarea-autosize": {
+      "src": "../../node_modules/react-textarea-autosize/dist/react-textarea-autosize.browser.development.esm.js",
+      "file": "react-textarea-autosize.js",
+      "fileHash": "d7aa2025",
+      "needsInterop": false
+    },
+    "zod": {
+      "src": "../../node_modules/zod/lib/index.mjs",
+      "file": "zod.js",
+      "fileHash": "5c92f6fb",
       "needsInterop": false
     },
     "@fullcalendar/react": {
       "src": "../../node_modules/@fullcalendar/react/dist/index.js",
       "file": "@fullcalendar_react.js",
-      "fileHash": "636a0839",
+      "fileHash": "ac1d865d",
       "needsInterop": false
     },
     "@fullcalendar/daygrid": {
       "src": "../../node_modules/@fullcalendar/daygrid/index.js",
       "file": "@fullcalendar_daygrid.js",
-      "fileHash": "19102bb7",
+      "fileHash": "b0424b38",
       "needsInterop": false
     },
     "@fullcalendar/timegrid": {
       "src": "../../node_modules/@fullcalendar/timegrid/index.js",
       "file": "@fullcalendar_timegrid.js",
-      "fileHash": "5d9d6e89",
+      "fileHash": "6f4de98a",
       "needsInterop": false
     },
     "@fullcalendar/interaction": {
       "src": "../../node_modules/@fullcalendar/interaction/index.js",
       "file": "@fullcalendar_interaction.js",
-      "fileHash": "16efd09e",
+      "fileHash": "71c729bd",
       "needsInterop": false
     }
   },
@@ -147,11 +147,11 @@
     "chunk-TMXZRJBF": {
       "file": "chunk-TMXZRJBF.js"
     },
-    "chunk-DXOUNB47": {
-      "file": "chunk-DXOUNB47.js"
-    },
     "chunk-GACRHWME": {
       "file": "chunk-GACRHWME.js"
+    },
+    "chunk-DXOUNB47": {
+      "file": "chunk-DXOUNB47.js"
     },
     "chunk-JBG67EE7": {
       "file": "chunk-JBG67EE7.js"
