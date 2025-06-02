@@ -3,8 +3,8 @@
  * Uses Replit Database through API endpoints
  */
 
-import { teamAPI } from './supabase';
-import { isDemoMode } from './demo';
+import { teamAPI } from "./supabase";
+import { isDemoMode } from "./demo";
 
 // Validate a team invite code
 export async function validateTeamInvite(inviteCode: string): Promise<{
@@ -19,36 +19,41 @@ export async function validateTeamInvite(inviteCode: string): Promise<{
   try {
     if (isDemoMode()) {
       // Mock validation for demo
-      if (inviteCode === 'DEMO123') {
+      if (inviteCode === "DEMO123") {
         return {
           valid: true,
           team: {
-            id: 'demo-team',
-            name: 'Demo Team',
-            description: 'A demo team for testing'
-          }
+            id: "demo-team",
+            name: "Demo Team",
+            description: "A demo team for testing",
+          },
         };
       }
-      return { valid: false, message: 'Invalid demo invite code. Try DEMO123' };
+      return { valid: false, message: "Invalid demo invite code. Try DEMO123" };
     }
 
     // Use API to validate invite
-    const response = await fetch(`/api/teams/validate-invite?code=${inviteCode}`);
+    const response = await fetch(
+      `/api/teams/validate-invite?code=${inviteCode}`,
+    );
     const result = await response.json();
 
     if (!result.success) {
-      return { valid: false, message: result.error || 'Invalid invite code' };
+      return { valid: false, message: result.error || "Invalid invite code" };
     }
 
     return { valid: true, team: result.data };
   } catch (error) {
-    console.error('Error validating team invite:', error);
-    return { valid: false, message: 'Failed to validate invite code' };
+    console.error("Error validating team invite:", error);
+    return { valid: false, message: "Failed to validate invite code" };
   }
 }
 
 // Join a team with an invite code
-export async function joinTeamWithInvite(userId: string, inviteCode: string): Promise<{
+export async function joinTeamWithInvite(
+  userId: string,
+  inviteCode: string,
+): Promise<{
   success: boolean;
   team?: {
     id: string;
@@ -59,37 +64,37 @@ export async function joinTeamWithInvite(userId: string, inviteCode: string): Pr
   try {
     if (isDemoMode()) {
       // Mock joining for demo
-      if (inviteCode === 'DEMO123') {
+      if (inviteCode === "DEMO123") {
         return {
           success: true,
           team: {
-            id: 'demo-team',
-            name: 'Demo Team'
+            id: "demo-team",
+            name: "Demo Team",
           },
-          message: 'Successfully joined demo team'
+          message: "Successfully joined demo team",
         };
       }
-      return { success: false, message: 'Invalid demo invite code' };
+      return { success: false, message: "Invalid demo invite code" };
     }
 
     // Use teamAPI to join team
     const result = await teamAPI.joinTeam(inviteCode);
 
     if (!result.success) {
-      return { 
-        success: false, 
-        message: result.error || 'Failed to join team' 
+      return {
+        success: false,
+        message: result.error || "Failed to join team",
       };
     }
 
     return {
       success: true,
       team: result.data,
-      message: 'Successfully joined team'
+      message: "Successfully joined team",
     };
   } catch (error) {
-    console.error('Error joining team:', error);
-    return { success: false, message: 'Failed to join team' };
+    console.error("Error joining team:", error);
+    return { success: false, message: "Failed to join team" };
   }
 }
 
@@ -107,12 +112,12 @@ export async function createNewTeam(teamData: {
       return {
         success: true,
         team: {
-          id: 'demo-team-new',
+          id: "demo-team-new",
           name: teamData.name,
           description: teamData.description,
-          invite_code: 'DEMO456'
+          invite_code: "DEMO456",
         },
-        message: 'Demo team created successfully'
+        message: "Demo team created successfully",
       };
     }
 
@@ -121,18 +126,18 @@ export async function createNewTeam(teamData: {
     if (!result.success) {
       return {
         success: false,
-        message: result.error || 'Failed to create team'
+        message: result.error || "Failed to create team",
       };
     }
 
     return {
       success: true,
       team: result.data,
-      message: 'Team created successfully'
+      message: "Team created successfully",
     };
   } catch (error) {
-    console.error('Error creating team:', error);
-    return { success: false, message: 'Failed to create team' };
+    console.error("Error creating team:", error);
+    return { success: false, message: "Failed to create team" };
   }
 }
 
@@ -148,13 +153,13 @@ export async function getUserTeams(): Promise<{
         success: true,
         teams: [
           {
-            id: 'demo-team',
-            name: 'Demo Team',
-            description: 'A demo team for testing',
-            role: 'member',
-            invite_code: 'DEMO123'
-          }
-        ]
+            id: "demo-team",
+            name: "Demo Team",
+            description: "A demo team for testing",
+            role: "member",
+            invite_code: "DEMO123",
+          },
+        ],
       };
     }
 
@@ -163,17 +168,17 @@ export async function getUserTeams(): Promise<{
     if (!result.success) {
       return {
         success: false,
-        message: result.error || 'Failed to get teams'
+        message: result.error || "Failed to get teams",
       };
     }
 
     return {
       success: true,
-      teams: result.data
+      teams: result.data,
     };
   } catch (error) {
-    console.error('Error getting user teams:', error);
-    return { success: false, message: 'Failed to get teams' };
+    console.error("Error getting user teams:", error);
+    return { success: false, message: "Failed to get teams" };
   }
 }
 
@@ -207,66 +212,71 @@ interface AnalyticsData {
 }
 
 class TeamService {
-  async createTeam(name: string, description: string, requiredDays: number, anchorDays: string[] = []): Promise<Team> {
-    const response = await fetch('/api/teams', {
-      method: 'POST',
+  async createTeam(
+    name: string,
+    description: string,
+    requiredDays: number,
+    anchorDays: string[] = [],
+  ): Promise<Team> {
+    const response = await fetch("/api/teams", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ name, description, requiredDays, anchorDays }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to create team');
+      throw new Error(error.error || "Failed to create team");
     }
 
     return response.json();
   }
 
   async joinTeam(inviteCode: string): Promise<Team> {
-    const response = await fetch('/api/teams/join', {
-      method: 'POST',
+    const response = await fetch("/api/teams/join", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ inviteCode }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to join team');
+      throw new Error(error.error || "Failed to join team");
     }
 
     return response.json();
   }
 
   async getMyTeam(): Promise<Team | null> {
-    const response = await fetch('/api/teams/my');
+    const response = await fetch("/api/teams/my");
 
     if (!response.ok) {
-      throw new Error('Failed to get team data');
+      throw new Error("Failed to get team data");
     }
 
     return response.json();
   }
 
   async getTeamAnalytics(): Promise<AnalyticsData> {
-    const response = await fetch('/api/analytics/team');
+    const response = await fetch("/api/analytics/team");
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to get analytics data');
+      throw new Error(error.error || "Failed to get analytics data");
     }
 
     return response.json();
   }
 
   async getLeaderboard(): Promise<TeamMember[]> {
-    const response = await fetch('/api/leaderboard');
+    const response = await fetch("/api/leaderboard");
 
     if (!response.ok) {
-      throw new Error('Failed to get leaderboard data');
+      throw new Error("Failed to get leaderboard data");
     }
 
     return response.json();

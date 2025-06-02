@@ -6,7 +6,12 @@ export interface User {
   emailVerified?: boolean;
 }
 
-export type TabType = 'overview' | 'experience' | 'education' | 'team' | 'activity';
+export type TabType =
+  | "overview"
+  | "experience"
+  | "education"
+  | "team"
+  | "activity";
 
 export interface TabComponentProps {
   profile: Employee;
@@ -66,7 +71,7 @@ export interface Reward {
   imageUrl: string;
   pointsCost: number;
   category: string;
-  availability: 'limited' | 'unlimited';
+  availability: "limited" | "unlimited";
   expiresAt?: string;
   remainingCount?: number;
 }
@@ -86,7 +91,7 @@ export type RtoPolicy = {
     start: string;
     end: string;
   };
-  allowed_work_types: ('office' | 'remote' | 'flexible')[];
+  allowed_work_types: ("office" | "remote" | "flexible")[];
   fixed_days?: string[];
 };
 
@@ -129,7 +134,7 @@ export interface WorkSchedule {
   id: string;
   user_id: string;
   date: string;
-  work_type: 'office' | 'remote' | 'flexible';
+  work_type: "office" | "remote" | "flexible";
   notes?: string | null;
   created_at: string;
   updated_at: string;
@@ -141,7 +146,7 @@ export interface TeamScheduleDay {
     user_id: string;
     user_name?: string;
     avatar_url?: string;
-    work_type: 'office' | 'remote' | 'flexible';
+    work_type: "office" | "remote" | "flexible";
   }[];
   officeMemberCount: number;
   remoteMemberCount: number;
@@ -170,7 +175,7 @@ export interface OneOnOneMeeting {
   updatedAt?: string;
 }
 
-export type LogLevel = 'error' | 'warn' | 'info' | 'debug';
+export type LogLevel = "error" | "warn" | "info" | "debug";
 
 // Company settings types
 export interface CompanySettings {
@@ -183,7 +188,7 @@ export interface CompanySettings {
     logo: string;
     hiBridgeLogo: {
       type: string;
-    }
+    };
   };
   workPolicy: {
     customStatuses: WorkStatus[];

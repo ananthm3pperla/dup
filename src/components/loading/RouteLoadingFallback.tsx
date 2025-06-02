@@ -1,5 +1,5 @@
-import React from 'react';
-import { LoadingState } from '@/components/ui';
+import React from "react";
+import { LoadingState } from "@/components/ui";
 
 export default function RouteLoadingFallback() {
   return (

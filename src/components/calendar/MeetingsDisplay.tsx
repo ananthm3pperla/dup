@@ -1,8 +1,8 @@
-import React from 'react';
-import { format } from 'date-fns';
-import { Users, Video, ExternalLink, MapPin, Clock } from 'lucide-react';
-import { Card, Badge } from '@/components/ui';
-import { motion } from 'framer-motion';
+import React from "react";
+import { format } from "date-fns";
+import { Users, Video, ExternalLink, MapPin, Clock } from "lucide-react";
+import { Card, Badge } from "@/components/ui";
+import { motion } from "framer-motion";
 
 export interface MeetingEvent {
   id: string;
@@ -20,26 +20,33 @@ interface MeetingsDisplayProps {
   date?: Date;
 }
 
-export default function MeetingsDisplay({ meetings, date }: MeetingsDisplayProps) {
+export default function MeetingsDisplay({
+  meetings,
+  date,
+}: MeetingsDisplayProps) {
   // Filter meetings for the specified date if provided
-  const filteredMeetings = date 
-    ? meetings.filter(meeting => {
+  const filteredMeetings = date
+    ? meetings.filter((meeting) => {
         const meetingDate = new Date(meeting.start);
-        return meetingDate.getDate() === date.getDate() &&
-               meetingDate.getMonth() === date.getMonth() &&
-               meetingDate.getFullYear() === date.getFullYear();
+        return (
+          meetingDate.getDate() === date.getDate() &&
+          meetingDate.getMonth() === date.getMonth() &&
+          meetingDate.getFullYear() === date.getFullYear()
+        );
       })
     : meetings;
-    
+
   // Sort meetings by start time
   const sortedMeetings = [...filteredMeetings].sort((a, b) => {
     return new Date(a.start).getTime() - new Date(b.start).getTime();
   });
-  
+
   if (sortedMeetings.length === 0) {
     return (
       <div className="text-center py-8 text-muted">
-        <p>No meetings scheduled {date ? `for ${format(date, 'MMMM d')}` : ''}</p>
+        <p>
+          No meetings scheduled {date ? `for ${format(date, "MMMM d")}` : ""}
+        </p>
       </div>
     );
   }
@@ -47,7 +54,7 @@ export default function MeetingsDisplay({ meetings, date }: MeetingsDisplayProps
   return (
     <div className="space-y-3">
       <h3 className="text-base font-medium text-default">
-        {date ? `Meetings on ${format(date, 'MMMM d')}` : 'Upcoming Meetings'}
+        {date ? `Meetings on ${format(date, "MMMM d")}` : "Upcoming Meetings"}
       </h3>
       {sortedMeetings.map((meeting, index) => (
         <motion.div
@@ -62,20 +69,25 @@ export default function MeetingsDisplay({ meetings, date }: MeetingsDisplayProps
                 <Video className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-default text-sm">{meeting.title}</h4>
+                <h4 className="font-medium text-default text-sm">
+                  {meeting.title}
+                </h4>
                 <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted">
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    <span>{format(new Date(meeting.start), 'h:mm a')} - {format(new Date(meeting.end), 'h:mm a')}</span>
+                    <span>
+                      {format(new Date(meeting.start), "h:mm a")} -{" "}
+                      {format(new Date(meeting.end), "h:mm a")}
+                    </span>
                   </div>
-                  
+
                   {meeting.location && (
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3 w-3" />
                       <span>{meeting.location}</span>
                     </div>
                   )}
-                  
+
                   {meeting.attendees && (
                     <div className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
@@ -83,20 +95,22 @@ export default function MeetingsDisplay({ meetings, date }: MeetingsDisplayProps
                     </div>
                   )}
                 </div>
-                
+
                 {meeting.description && (
-                  <p className="mt-2 text-xs text-muted line-clamp-2">{meeting.description}</p>
+                  <p className="mt-2 text-xs text-muted line-clamp-2">
+                    {meeting.description}
+                  </p>
                 )}
               </div>
-              
+
               {meeting.videoLink && (
-                <a 
-                  href={meeting.videoLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={meeting.videoLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-shrink-0"
                 >
-                  <Badge 
+                  <Badge
                     variant="primary"
                     size="sm"
                     className="flex items-center gap-1"

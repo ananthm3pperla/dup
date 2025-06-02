@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { Mail, Building2, Users, MapPin, Edit, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import {
+  Mail,
+  Building2,
+  Users,
+  MapPin,
+  Edit,
+  ExternalLink,
+} from "lucide-react";
+import { Button } from "@/components/ui";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileHeaderProps {
   name: string;
@@ -29,20 +36,20 @@ export default function ProfileHeader({
   employeeId,
   preferredName,
   workLocation,
-  isCurrentUser = false
+  isCurrentUser = false,
 }: ProfileHeaderProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
 
   const handleEditProfile = () => {
-    navigate('/settings');
+    navigate("/settings");
   };
 
   return (
     <div className="bg-card rounded-lg p-6 shadow-md relative">
       <div className="flex flex-col sm:flex-row items-start gap-6">
-        <div 
+        <div
           className="relative"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
@@ -69,7 +76,9 @@ export default function ProfileHeader({
                   Preferred Name: {preferredName}
                 </p>
               )}
-              <p className="mt-1 text-lg text-muted">{role || 'Not specified'}</p>
+              <p className="mt-1 text-lg text-muted">
+                {role || "Not specified"}
+              </p>
             </div>
             {employeeId && (
               <div className="text-sm text-muted">
@@ -81,11 +90,16 @@ export default function ProfileHeader({
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="text-sm">
               <span className="text-muted">Department:</span>{" "}
-              <span className="text-default">{department || 'Not specified'}</span>
+              <span className="text-default">
+                {department || "Not specified"}
+              </span>
             </div>
             <div className="text-sm">
               <span className="text-muted">Email:</span>{" "}
-              <a href={`mailto:${email}`} className="text-primary hover:underline flex items-center gap-1">
+              <a
+                href={`mailto:${email}`}
+                className="text-primary hover:underline flex items-center gap-1"
+              >
                 {email}
                 <ExternalLink className="h-3 w-3" />
               </a>
@@ -99,7 +113,10 @@ export default function ProfileHeader({
             {phone && (
               <div className="text-sm">
                 <span className="text-muted">Phone:</span>{" "}
-                <a href={`tel:${phone}`} className="text-primary hover:underline flex items-center gap-1">
+                <a
+                  href={`tel:${phone}`}
+                  className="text-primary hover:underline flex items-center gap-1"
+                >
                   {phone}
                   <ExternalLink className="h-3 w-3" />
                 </a>
@@ -114,12 +131,12 @@ export default function ProfileHeader({
           </div>
         </div>
       </div>
-      
+
       {isCurrentUser && (
         <div className="absolute top-6 right-6">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleEditProfile}
             leftIcon={<Edit className="h-4 w-4" />}
           >

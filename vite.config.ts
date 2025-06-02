@@ -1,41 +1,41 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   optimizeDeps: {
     exclude: [
-      'src/components/PrivateRoute',
-      'src/components/layout/Layout',
-      'src/components/dashboard/CheckInCard'
-    ]
+      "src/components/PrivateRoute",
+      "src/components/layout/Layout",
+      "src/components/dashboard/CheckInCard",
+    ],
   },
   server: {
     hmr: {
-      overlay: false
+      overlay: false,
     },
     watch: {
-      usePolling: true
+      usePolling: true,
     },
     clearScreen: false,
-    middlewareMode: false
+    middlewareMode: false,
   },
   build: {
     sourcemap: true,
     commonjsOptions: {
-      transformMixedEsModules: true
+      transformMixedEsModules: true,
     },
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html')
-      }
-    }
+        main: path.resolve(__dirname, "index.html"),
+      },
+    },
   },
-  cacheDir: '.vite'
+  cacheDir: ".vite",
 });

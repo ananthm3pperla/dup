@@ -1,6 +1,6 @@
-import React from 'react';
-import StatusDisplay from './ui/StatusDisplay';
-import { Button } from '@/components/ui';
+import React from "react";
+import StatusDisplay from "./ui/StatusDisplay";
+import { Button } from "@/components/ui";
 
 interface EmptyStateProps {
   title: string;
@@ -12,7 +12,12 @@ interface EmptyStateProps {
   icon?: React.ReactNode;
 }
 
-export default function EmptyState({ title, message, action, icon }: EmptyStateProps) {
+export default function EmptyState({
+  title,
+  message,
+  action,
+  icon,
+}: EmptyStateProps) {
   return (
     <StatusDisplay
       type="empty"
@@ -22,10 +27,7 @@ export default function EmptyState({ title, message, action, icon }: EmptyStateP
       className="min-h-[200px] bg-card-hover rounded-lg border border-default/20"
     >
       {action && (
-        <Button
-          onClick={action.onClick}
-          className="mx-auto mt-4"
-        >
+        <Button onClick={action.onClick} className="mx-auto mt-4">
           {action.label}
         </Button>
       )}

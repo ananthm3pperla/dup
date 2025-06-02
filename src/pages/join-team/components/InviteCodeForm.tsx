@@ -1,7 +1,7 @@
-import React from 'react';
-import { Users, ArrowRight, Link as LinkIcon } from 'lucide-react';
-import { Button, Alert } from '@/components/ui';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Users, ArrowRight, Link as LinkIcon } from "lucide-react";
+import { Button, Alert } from "@/components/ui";
+import { Link } from "react-router-dom";
 
 interface InviteCodeFormProps {
   inviteCode: string;
@@ -23,17 +23,16 @@ export default function InviteCodeForm({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       {error && (
-        <Alert 
-          variant="error" 
-          title="Invalid Invite Code"
-          className="mb-4"
-        >
+        <Alert variant="error" title="Invalid Invite Code" className="mb-4">
           {error}
         </Alert>
       )}
-      
+
       <div>
-        <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="inviteCode"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Team Invite Code
         </label>
         <div className="mt-1 relative">
@@ -47,9 +46,9 @@ export default function InviteCodeForm({
             value={inviteCode}
             onChange={onChange}
             className={`block w-full pl-10 rounded-md shadow-sm text-sm ${
-              error 
-                ? 'border-red-300 dark:border-red-500 focus:border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary'
+              error
+                ? "border-red-300 dark:border-red-500 focus:border-red-500 focus:ring-red-500"
+                : "border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary"
             } dark:bg-gray-700 dark:text-white`}
             placeholder="Enter team invite code"
             required
@@ -71,7 +70,7 @@ export default function InviteCodeForm({
         >
           {isLoggedIn ? "Join Team" : "Continue"}
         </Button>
-        
+
         {!isLoggedIn && (
           <div className="text-center">
             <Link
@@ -82,7 +81,7 @@ export default function InviteCodeForm({
             </Link>
           </div>
         )}
-        
+
         <div className="text-center">
           <Link
             to="/team/create"

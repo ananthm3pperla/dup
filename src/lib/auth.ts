@@ -1,6 +1,5 @@
-
-import bcrypt from 'bcrypt';
-import { database } from './database';
+import bcrypt from "bcrypt";
+import { database } from "./database";
 
 /**
  * Hash a password using bcrypt
@@ -13,7 +12,10 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Verify a password against its hash
  */
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  hashedPassword: string,
+): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }
 
@@ -21,7 +23,10 @@ export async function verifyPassword(password: string, hashedPassword: string): 
  * Generate a random token for password reset or email verification
  */
 export function generateToken(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 /**
@@ -35,32 +40,35 @@ export function isValidEmail(email: string): boolean {
 /**
  * Validate password strength
  */
-export function validatePassword(password: string): { isValid: boolean; errors: string[] } {
+export function validatePassword(password: string): {
+  isValid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
-  
+
   if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
+    errors.push("Password must be at least 8 characters long");
   }
-  
+
   if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
+    errors.push("Password must contain at least one uppercase letter");
   }
-  
+
   if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
+    errors.push("Password must contain at least one lowercase letter");
   }
-  
+
   if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
+    errors.push("Password must contain at least one number");
   }
-  
+
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character');
+    errors.push("Password must contain at least one special character");
   }
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -69,7 +77,7 @@ export function validatePassword(password: string): { isValid: boolean; errors: 
  */
 export async function getCurrentUser() {
   try {
-    const sessionData = localStorage.getItem('hibridge_session');
+    const sessionData = localStorage.getItem("hibridge_session");
     if (!sessionData) {
       return null;
     }
@@ -78,7 +86,7 @@ export async function getCurrentUser() {
     const userData = await database.get(`user_by_id:${userId}`);
     return userData;
   } catch (error) {
-    console.error('Error getting current user:', error);
+    console.error("Error getting current user:", error);
     return null;
   }
 }
@@ -87,7 +95,7 @@ export async function getCurrentUser() {
  * Check if user is authenticated
  */
 export function isAuthenticated(): boolean {
-  const sessionData = localStorage.getItem('hibridge_session');
+  const sessionData = localStorage.getItem("hibridge_session");
   return !!sessionData;
 }
 
@@ -95,7 +103,7 @@ export function isAuthenticated(): boolean {
  * Clear user session
  */
 export function clearSession(): void {
-  localStorage.removeItem('hibridge_session');
+  localStorage.removeItem("hibridge_session");
 }
 
 /**
@@ -110,11 +118,11 @@ export async function createTeam(teamData: {
   const team = {
     id: teamId,
     name: teamData.name,
-    description: teamData.description || '',
+    description: teamData.description || "",
     manager_id: teamData.managerId,
     members: [teamData.managerId],
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
   };
 
   await database.set(`team:${teamId}`, team);
@@ -124,7 +132,7 @@ export async function createTeam(teamData: {
 export async function joinTeam(userId: string, teamId: string) {
   const team = await database.get(`team:${teamId}`);
   if (!team) {
-    throw new Error('Team not found');
+    throw new Error("Team not found");
   }
 
   if (!team.members.includes(userId)) {
@@ -142,7 +150,7 @@ export async function getUserTeams(userId: string) {
     const userTeams = [];
 
     for (const key of teamKeys) {
-      if (key.startsWith('team:')) {
+      if (key.startsWith("team:")) {
         const team = await database.get(key);
         if (team && team.members && team.members.includes(userId)) {
           userTeams.push(team);
@@ -152,7 +160,7 @@ export async function getUserTeams(userId: string) {
 
     return userTeams;
   } catch (error) {
-    console.error('Error getting user teams:', error);
+    console.error("Error getting user teams:", error);
     return [];
   }
 }

@@ -1,10 +1,9 @@
-
 /**
  * Replit Database Integration for Hi-Bridge
  * Uses Replit's built-in key-value database for data persistence
  */
 
-import pkg from '@replit/database';
+import pkg from "@replit/database";
 const Database = pkg.default || pkg;
 
 // Initialize Replit Database
@@ -14,7 +13,7 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
-  role: 'employee' | 'manager' | 'hr';
+  role: "employee" | "manager" | "hr";
   teamId?: string;
   createdAt: string;
   lastActive: string;
@@ -51,7 +50,7 @@ export interface CheckIn {
   id: string;
   userId: string;
   teamId: string;
-  location: 'office' | 'remote';
+  location: "office" | "remote";
   timestamp: string;
   photoUrl?: string;
   verified: boolean;
@@ -69,19 +68,19 @@ export class HiBridgeDatabase {
   }
 
   // User operations
-  async createUser(user: Omit<User, 'id' | 'createdAt'>): Promise<User> {
+  async createUser(user: Omit<User, "id" | "createdAt">): Promise<User> {
     const id = this.generateId();
     const newUser: User = {
       ...user,
       id,
       createdAt: new Date().toISOString(),
       lastActive: new Date().toISOString(),
-      isActive: true
+      isActive: true,
     };
 
     await this.db.set(`user:${id}`, JSON.stringify(newUser));
     await this.db.set(`user:email:${user.email}`, id);
-    
+
     return newUser;
   }
 
@@ -90,7 +89,7 @@ export class HiBridgeDatabase {
       const userData = await this.db.get(`user:${id}`);
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
-      console.error('Error getting user by ID:', error);
+      console.error("Error getting user by ID:", error);
       return null;
     }
   }
@@ -99,10 +98,10 @@ export class HiBridgeDatabase {
     try {
       const userId = await this.db.get(`user:email:${email}`);
       if (!userId) return null;
-      
+
       return await this.getUserById(userId);
     } catch (error) {
-      console.error('Error getting user by email:', error);
+      console.error("Error getting user by email:", error);
       return null;
     }
   }
@@ -115,24 +114,24 @@ export class HiBridgeDatabase {
       const updatedUser = {
         ...user,
         ...updates,
-        lastActive: new Date().toISOString()
+        lastActive: new Date().toISOString(),
       };
 
       await this.db.set(`user:${id}`, JSON.stringify(updatedUser));
       return updatedUser;
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error("Error updating user:", error);
       return null;
     }
   }
 
   // Team operations
-  async createTeam(team: Omit<Team, 'id' | 'createdAt'>): Promise<Team> {
+  async createTeam(team: Omit<Team, "id" | "createdAt">): Promise<Team> {
     const id = this.generateId();
     const newTeam: Team = {
       ...team,
       id,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     await this.db.set(`team:${id}`, JSON.stringify(newTeam));
@@ -144,14 +143,14 @@ export class HiBridgeDatabase {
       const teamData = await this.db.get(`team:${id}`);
       return teamData ? JSON.parse(teamData) : null;
     } catch (error) {
-      console.error('Error getting team by ID:', error);
+      console.error("Error getting team by ID:", error);
       return null;
     }
   }
 
   async getUserTeams(userId: string): Promise<Team[]> {
     try {
-      const keys = await this.db.list('team:');
+      const keys = await this.db.list("team:");
       const teams: Team[] = [];
 
       for (const key of keys) {
@@ -166,27 +165,32 @@ export class HiBridgeDatabase {
 
       return teams;
     } catch (error) {
-      console.error('Error getting user teams:', error);
+      console.error("Error getting user teams:", error);
       return [];
     }
   }
 
   // Pulse check operations
-  async createPulseCheck(pulseCheck: Omit<PulseCheck, 'id' | 'submittedAt'>): Promise<PulseCheck> {
+  async createPulseCheck(
+    pulseCheck: Omit<PulseCheck, "id" | "submittedAt">,
+  ): Promise<PulseCheck> {
     const id = this.generateId();
     const newPulseCheck: PulseCheck = {
       ...pulseCheck,
       id,
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
     };
 
     await this.db.set(`pulse:${id}`, JSON.stringify(newPulseCheck));
     await this.db.set(`pulse:user:${pulseCheck.userId}:${pulseCheck.date}`, id);
-    
+
     return newPulseCheck;
   }
 
-  async getPulseCheck(userId: string, date: string): Promise<PulseCheck | null> {
+  async getPulseCheck(
+    userId: string,
+    date: string,
+  ): Promise<PulseCheck | null> {
     try {
       const pulseId = await this.db.get(`pulse:user:${userId}:${date}`);
       if (!pulseId) return null;
@@ -194,67 +198,84 @@ export class HiBridgeDatabase {
       const pulseData = await this.db.get(`pulse:${pulseId}`);
       return pulseData ? JSON.parse(pulseData) : null;
     } catch (error) {
-      console.error('Error getting pulse check:', error);
+      console.error("Error getting pulse check:", error);
       return null;
     }
   }
 
-  async getTeamPulseChecks(teamId: string, startDate: string, endDate: string): Promise<PulseCheck[]> {
+  async getTeamPulseChecks(
+    teamId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<PulseCheck[]> {
     try {
-      const keys = await this.db.list('pulse:');
+      const keys = await this.db.list("pulse:");
       const pulseChecks: PulseCheck[] = [];
 
       for (const key of keys) {
         const pulseData = await this.db.get(key);
         if (pulseData) {
           const pulse: PulseCheck = JSON.parse(pulseData);
-          if (pulse.teamId === teamId && 
-              pulse.date >= startDate && 
-              pulse.date <= endDate) {
+          if (
+            pulse.teamId === teamId &&
+            pulse.date >= startDate &&
+            pulse.date <= endDate
+          ) {
             pulseChecks.push(pulse);
           }
         }
       }
 
-      return pulseChecks.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return pulseChecks.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
     } catch (error) {
-      console.error('Error getting team pulse checks:', error);
+      console.error("Error getting team pulse checks:", error);
       return [];
     }
   }
 
   // Check-in operations
-  async createCheckIn(checkIn: Omit<CheckIn, 'id'>): Promise<CheckIn> {
+  async createCheckIn(checkIn: Omit<CheckIn, "id">): Promise<CheckIn> {
     const id = this.generateId();
     const newCheckIn: CheckIn = {
       ...checkIn,
-      id
+      id,
     };
 
     await this.db.set(`checkin:${id}`, JSON.stringify(newCheckIn));
     return newCheckIn;
   }
 
-  async getUserCheckIns(userId: string, startDate: string, endDate: string): Promise<CheckIn[]> {
+  async getUserCheckIns(
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<CheckIn[]> {
     try {
-      const keys = await this.db.list('checkin:');
+      const keys = await this.db.list("checkin:");
       const checkIns: CheckIn[] = [];
 
       for (const key of keys) {
         const checkInData = await this.db.get(key);
         if (checkInData) {
           const checkIn: CheckIn = JSON.parse(checkInData);
-          if (checkIn.userId === userId && 
-              checkIn.timestamp >= startDate && 
-              checkIn.timestamp <= endDate) {
+          if (
+            checkIn.userId === userId &&
+            checkIn.timestamp >= startDate &&
+            checkIn.timestamp <= endDate
+          ) {
             checkIns.push(checkIn);
           }
         }
       }
 
-      return checkIns.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      return checkIns.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+      );
     } catch (error) {
-      console.error('Error getting user check-ins:', error);
+      console.error("Error getting user check-ins:", error);
       return [];
     }
   }
@@ -266,7 +287,7 @@ export class HiBridgeDatabase {
       userId,
       createdAt: new Date().toISOString(),
       expiresAt: expiresAt.toISOString(),
-      isActive: true
+      isActive: true,
     };
 
     await this.db.set(`session:${sessionId}`, JSON.stringify(session));
@@ -279,7 +300,7 @@ export class HiBridgeDatabase {
       if (!sessionData) return null;
 
       const session = JSON.parse(sessionData);
-      
+
       // Check if session is expired
       if (new Date(session.expiresAt) < new Date()) {
         await this.db.delete(`session:${sessionId}`);
@@ -288,7 +309,7 @@ export class HiBridgeDatabase {
 
       return session;
     } catch (error) {
-      console.error('Error getting session:', error);
+      console.error("Error getting session:", error);
       return null;
     }
   }
@@ -297,7 +318,7 @@ export class HiBridgeDatabase {
     try {
       await this.db.delete(`session:${sessionId}`);
     } catch (error) {
-      console.error('Error deleting session:', error);
+      console.error("Error deleting session:", error);
     }
   }
 
@@ -313,7 +334,7 @@ export class HiBridgeDatabase {
         await this.db.delete(key);
       }
     } catch (error) {
-      console.error('Error clearing data:', error);
+      console.error("Error clearing data:", error);
     }
   }
 }

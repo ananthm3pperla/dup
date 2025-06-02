@@ -1,10 +1,10 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { addDays, isSameDay, subDays } from 'date-fns';
-import { useNotificationStore } from './notificationStore';
-import { isDemoMode } from '@/lib/demo';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { addDays, isSameDay, subDays } from "date-fns";
+import { useNotificationStore } from "./notificationStore";
+import { isDemoMode } from "@/lib/demo";
 
-export type Mood = 'challenging' | 'neutral' | 'good';
+export type Mood = "challenging" | "neutral" | "good";
 
 export interface DailyPulse {
   mood: Mood;
@@ -23,7 +23,9 @@ interface PulseState {
   pulses: { [date: string]: DailyPulse };
   notificationPreferences: NotificationPreference;
   addPulse: (pulse: DailyPulse) => void;
-  updateNotificationPreferences: (prefs: Partial<NotificationPreference>) => void;
+  updateNotificationPreferences: (
+    prefs: Partial<NotificationPreference>,
+  ) => void;
   getConsecutiveChallengingDays: () => number;
   getWeeklyChallenging: () => number;
   shouldNotifyManager: () => boolean;
@@ -39,42 +41,47 @@ export const usePulseStore = create<PulseState>()(
         consecutiveChallenging: 3,
         challengingPerWeek: 3,
         enabled: true,
-        notifyTeamLeader: true
+        notifyTeamLeader: true,
       },
 
       addPulse: (pulse) => {
-        const date = new Date(pulse.timestamp).toISOString().split('T')[0];
+        const date = new Date(pulse.timestamp).toISOString().split("T")[0];
         set((state) => ({
           pulses: {
             ...state.pulses,
-            [date]: pulse
-          }
+            [date]: pulse,
+          },
         }));
 
         // Check if we should notify the manager
         const { notificationPreferences } = get();
-        if (notificationPreferences.enabled && notificationPreferences.notifyTeamLeader) {
+        if (
+          notificationPreferences.enabled &&
+          notificationPreferences.notifyTeamLeader
+        ) {
           const consecutiveDays = get().getConsecutiveChallengingDays();
           const weeklyCount = get().getWeeklyChallenging();
 
-          if (pulse.mood === 'challenging') {
+          if (pulse.mood === "challenging") {
             // Add notification for consecutive challenging days
-            if (consecutiveDays >= notificationPreferences.consecutiveChallenging) {
+            if (
+              consecutiveDays >= notificationPreferences.consecutiveChallenging
+            ) {
               useNotificationStore.getState().addNotification({
-                type: 'pulse',
-                title: 'Team Member Alert',
+                type: "pulse",
+                title: "Team Member Alert",
                 message: `A team member has reported ${consecutiveDays} consecutive challenging days. Consider checking in with them.`,
-                data: { consecutiveDays }
+                data: { consecutiveDays },
               });
             }
 
             // Add notification for weekly challenging days
             if (weeklyCount >= notificationPreferences.challengingPerWeek) {
               useNotificationStore.getState().addNotification({
-                type: 'pulse',
-                title: 'Weekly Pulse Alert',
+                type: "pulse",
+                title: "Weekly Pulse Alert",
                 message: `A team member has reported ${weeklyCount} challenging days this week.`,
-                data: { weeklyCount }
+                data: { weeklyCount },
               });
             }
           }
@@ -85,8 +92,8 @@ export const usePulseStore = create<PulseState>()(
         set((state) => ({
           notificationPreferences: {
             ...state.notificationPreferences,
-            ...prefs
-          }
+            ...prefs,
+          },
         }));
       },
 
@@ -96,10 +103,10 @@ export const usePulseStore = create<PulseState>()(
         let currentDate = new Date();
 
         while (true) {
-          const dateStr = currentDate.toISOString().split('T')[0];
+          const dateStr = currentDate.toISOString().split("T")[0];
           const pulse = pulses[dateStr];
 
-          if (!pulse || pulse.mood !== 'challenging') {
+          if (!pulse || pulse.mood !== "challenging") {
             break;
           }
 
@@ -114,10 +121,14 @@ export const usePulseStore = create<PulseState>()(
         const { pulses } = get();
         const today = new Date();
         const weekStart = subDays(today, 6); // Last 7 days
-        
+
         return Object.entries(pulses).reduce((count, [dateStr, pulse]) => {
           const pulseDate = new Date(dateStr);
-          if (pulseDate >= weekStart && pulseDate <= today && pulse.mood === 'challenging') {
+          if (
+            pulseDate >= weekStart &&
+            pulseDate <= today &&
+            pulse.mood === "challenging"
+          ) {
             return count + 1;
           }
           return count;
@@ -126,27 +137,32 @@ export const usePulseStore = create<PulseState>()(
 
       shouldNotifyManager: () => {
         const { notificationPreferences } = get();
-        if (!notificationPreferences.enabled || !notificationPreferences.notifyTeamLeader) {
+        if (
+          !notificationPreferences.enabled ||
+          !notificationPreferences.notifyTeamLeader
+        ) {
           return false;
         }
 
         const consecutiveDays = get().getConsecutiveChallengingDays();
         const weeklyCount = get().getWeeklyChallenging();
 
-        return consecutiveDays >= notificationPreferences.consecutiveChallenging ||
-               weeklyCount >= notificationPreferences.challengingPerWeek;
+        return (
+          consecutiveDays >= notificationPreferences.consecutiveChallenging ||
+          weeklyCount >= notificationPreferences.challengingPerWeek
+        );
       },
 
       getLatestPulse: () => {
         const { pulses } = get();
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split("T")[0];
         return pulses[today] || null;
       },
 
       initialize: () => {
         if (isDemoMode()) {
           try {
-            const demoPulseData = sessionStorage.getItem('demoPulseData');
+            const demoPulseData = sessionStorage.getItem("demoPulseData");
             if (demoPulseData) {
               const data = JSON.parse(demoPulseData);
               set({
@@ -155,36 +171,36 @@ export const usePulseStore = create<PulseState>()(
                   consecutiveChallenging: 3,
                   challengingPerWeek: 3,
                   enabled: true,
-                  notifyTeamLeader: true
-                }
+                  notifyTeamLeader: true,
+                },
               });
             } else {
               // Set default demo data
-              const today = new Date().toISOString().split('T')[0];
+              const today = new Date().toISOString().split("T")[0];
               set({
                 pulses: {
                   [today]: {
-                    mood: 'good',
+                    mood: "good",
                     timestamp: new Date().toISOString(),
-                    notes: 'Feeling productive today in demo mode!'
-                  }
-                }
+                    notes: "Feeling productive today in demo mode!",
+                  },
+                },
               });
             }
           } catch (error) {
-            console.error('Error loading demo pulse data:', error);
+            console.error("Error loading demo pulse data:", error);
           }
         }
-      }
+      },
     }),
     {
-      name: 'pulse-store',
+      name: "pulse-store",
       partialize: (state) => ({
         pulses: state.pulses,
-        notificationPreferences: state.notificationPreferences
+        notificationPreferences: state.notificationPreferences,
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Initialize store when in demo mode

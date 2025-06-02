@@ -1,41 +1,41 @@
-import React, { useState } from 'react';
-import { Key, Mail, AlertTriangle } from 'lucide-react';
-import { Card, Button, Alert, Input } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { passwordSchema } from '@/lib/security';
-import PasswordStrengthIndicator from '@/components/ui/PasswordStrengthIndicator';
-import { isDemoMode } from '@/lib/demo';
+import React, { useState } from "react";
+import { Key, Mail, AlertTriangle } from "lucide-react";
+import { Card, Button, Alert, Input } from "@/components/ui";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { z } from "zod";
+import { passwordSchema } from "@/lib/security";
+import PasswordStrengthIndicator from "@/components/ui/PasswordStrengthIndicator";
+import { isDemoMode } from "@/lib/demo";
 
 export default function AccountSettings() {
   const { user, updatePassword } = useAuth();
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // In demo mode, just show success message
     if (isDemoMode()) {
-      toast.success('Password updated successfully (Demo Mode)');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      toast.success("Password updated successfully (Demo Mode)");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
       return;
     }
-    
+
     // Validate passwords
     try {
       // Validate new password
       passwordSchema.parse(newPassword);
-      
+
       // Check if passwords match
       if (newPassword !== confirmPassword) {
         throw new Error("Passwords don't match");
@@ -46,26 +46,28 @@ export default function AccountSettings() {
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Invalid password');
+        setError("Invalid password");
       }
       return;
     }
-    
+
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       await updatePassword(newPassword);
-      toast.success('Password updated successfully');
-      
+      toast.success("Password updated successfully");
+
       // Reset form
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
-      console.error('Error updating password:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update password');
-      toast.error('Failed to update password');
+      console.error("Error updating password:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to update password",
+      );
+      toast.error("Failed to update password");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,22 +76,24 @@ export default function AccountSettings() {
   const handleDeleteAccount = async () => {
     // In demo mode, just show a message
     if (isDemoMode()) {
-      toast.error('Account deletion is not available in demo mode');
+      toast.error("Account deletion is not available in demo mode");
       setShowDeleteConfirm(false);
-      setDeleteConfirmText('');
+      setDeleteConfirmText("");
       return;
     }
-    
+
     // This would be implemented with a call to the backend
-    toast.error('Account deletion is not implemented in this demo');
+    toast.error("Account deletion is not implemented in this demo");
     setShowDeleteConfirm(false);
-    setDeleteConfirmText('');
+    setDeleteConfirmText("");
   };
 
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <h3 className="text-lg font-medium text-default mb-4">Account Information</h3>
+        <h3 className="text-lg font-medium text-default mb-4">
+          Account Information
+        </h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -102,7 +106,7 @@ export default function AccountSettings() {
                 </div>
                 <input
                   type="email"
-                  value={user?.email || ''}
+                  value={user?.email || ""}
                   disabled
                   className="block w-full pl-10 pr-12 py-2 rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 />
@@ -117,7 +121,7 @@ export default function AccountSettings() {
               Your email address cannot be changed
             </p>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Account ID
@@ -125,7 +129,7 @@ export default function AccountSettings() {
             <div className="mt-1">
               <input
                 type="text"
-                value={user?.id || ''}
+                value={user?.id || ""}
                 disabled
                 className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow-sm focus:border-primary focus:ring-primary sm:text-sm font-mono"
               />
@@ -138,11 +142,13 @@ export default function AccountSettings() {
       </Card>
 
       <Card className="p-6">
-        <h3 className="text-lg font-medium text-default mb-4">Change Password</h3>
-        
+        <h3 className="text-lg font-medium text-default mb-4">
+          Change Password
+        </h3>
+
         {error && (
-          <Alert 
-            variant="error" 
+          <Alert
+            variant="error"
             title="Password Update Failed"
             className="mb-4"
             onClose={() => setError(null)}
@@ -150,7 +156,7 @@ export default function AccountSettings() {
             {error}
           </Alert>
         )}
-        
+
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <Input
             label="Current Password"
@@ -160,7 +166,7 @@ export default function AccountSettings() {
             leftIcon={<Key className="h-5 w-5" />}
             required
           />
-          
+
           <Input
             label="New Password"
             type={showPassword ? "text" : "password"}
@@ -169,9 +175,9 @@ export default function AccountSettings() {
             leftIcon={<Key className="h-5 w-5" />}
             required
           />
-          
+
           <PasswordStrengthIndicator password={newPassword} className="mt-2" />
-          
+
           <Input
             label="Confirm New Password"
             type={showPassword ? "text" : "password"}
@@ -180,7 +186,7 @@ export default function AccountSettings() {
             leftIcon={<Key className="h-5 w-5" />}
             required
           />
-          
+
           <div className="flex items-center">
             <input
               id="show-password"
@@ -190,16 +196,24 @@ export default function AccountSettings() {
               onChange={() => setShowPassword(!showPassword)}
               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             />
-            <label htmlFor="show-password" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+            <label
+              htmlFor="show-password"
+              className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+            >
               Show passwords
             </label>
           </div>
-          
+
           <div className="pt-4">
             <Button
               type="submit"
               isLoading={isSubmitting}
-              disabled={isSubmitting || !currentPassword || !newPassword || !confirmPassword}
+              disabled={
+                isSubmitting ||
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword
+              }
             >
               Update Password
             </Button>
@@ -209,7 +223,7 @@ export default function AccountSettings() {
 
       <Card className="p-6">
         <h3 className="text-lg font-medium text-default mb-4">Danger Zone</h3>
-        
+
         {showDeleteConfirm ? (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
             <div className="flex items-start">
@@ -222,10 +236,14 @@ export default function AccountSettings() {
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-red-700 dark:text-red-200">
-                    This action cannot be undone. All your data will be permanently deleted.
+                    This action cannot be undone. All your data will be
+                    permanently deleted.
                   </p>
                   <div className="mt-3">
-                    <label htmlFor="confirm-delete" className="block text-sm font-medium text-red-700 dark:text-red-200">
+                    <label
+                      htmlFor="confirm-delete"
+                      className="block text-sm font-medium text-red-700 dark:text-red-200"
+                    >
                       Type "DELETE" to confirm
                     </label>
                     <input
@@ -241,7 +259,7 @@ export default function AccountSettings() {
                       variant="outline"
                       onClick={() => {
                         setShowDeleteConfirm(false);
-                        setDeleteConfirmText('');
+                        setDeleteConfirmText("");
                       }}
                     >
                       Cancel
@@ -249,7 +267,7 @@ export default function AccountSettings() {
                     <Button
                       variant="outline"
                       className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 border-red-300 dark:border-red-700"
-                      disabled={deleteConfirmText !== 'DELETE'}
+                      disabled={deleteConfirmText !== "DELETE"}
                       onClick={handleDeleteAccount}
                     >
                       Delete Account
@@ -262,7 +280,8 @@ export default function AccountSettings() {
         ) : (
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-              Deleting your account will remove all of your data from our systems. This action cannot be undone.
+              Deleting your account will remove all of your data from our
+              systems. This action cannot be undone.
             </p>
             <Button
               variant="outline"

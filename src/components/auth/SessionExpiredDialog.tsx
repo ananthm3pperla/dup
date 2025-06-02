@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, RefreshCw, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui';
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, RefreshCw, LogOut } from "lucide-react";
+import { Button } from "@/components/ui";
 
 interface SessionExpiredDialogProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ export default function SessionExpiredDialog({
   isOpen,
   onRefresh,
   onLogout,
-  isRefreshing
+  isRefreshing,
 }: SessionExpiredDialogProps) {
   return (
     <AnimatePresence>
@@ -32,7 +32,10 @@ export default function SessionExpiredDialog({
             />
 
             {/* Center dialog */}
-            <span className="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">
+            <span
+              className="hidden sm:inline-block sm:h-screen sm:align-middle"
+              aria-hidden="true"
+            >
               &#8203;
             </span>
 
@@ -53,7 +56,8 @@ export default function SessionExpiredDialog({
                   </h3>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Your session has expired. You need to sign in again to continue using the application.
+                      Your session has expired. You need to sign in again to
+                      continue using the application.
                     </p>
                   </div>
                 </div>

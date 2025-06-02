@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { useTeam } from '@/contexts/TeamContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card } from '@/components/ui';
+import React, { useState, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useTeam } from "@/contexts/TeamContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card } from "@/components/ui";
 
 // Define proper types for our events
 interface CalendarEvent {
@@ -36,18 +36,22 @@ export default function RemoteWorkCalendar() {
 
     const newEvent: CalendarEvent = {
       id: crypto.randomUUID(),
-      title: 'Remote Work',
+      title: "Remote Work",
       start,
       end,
       allDay: selectInfo.allDay,
     };
 
-    setEvents(prev => [...prev, newEvent]);
+    setEvents((prev) => [...prev, newEvent]);
   };
 
   const handleEventClick = (clickInfo: any) => {
-    if (window.confirm(`Are you sure you want to delete this remote work day?`)) {
-      setEvents(prev => prev.filter(event => event.id !== clickInfo.event.id));
+    if (
+      window.confirm(`Are you sure you want to delete this remote work day?`)
+    ) {
+      setEvents((prev) =>
+        prev.filter((event) => event.id !== clickInfo.event.id),
+      );
     }
   };
 
@@ -57,9 +61,9 @@ export default function RemoteWorkCalendar() {
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         headerToolbar={{
-          left: 'prev,next',
-          center: 'title',
-          right: 'dayGridMonth'
+          left: "prev,next",
+          center: "title",
+          right: "dayGridMonth",
         }}
         selectable={true}
         selectMirror={true}

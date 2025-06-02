@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { BackButton } from '@/components/navigation/BackButton';
+import React, { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { BackButton } from "@/components/navigation/BackButton";
 
 interface PageHeaderProps {
   title: string;
@@ -18,19 +18,19 @@ export default function PageHeader({
   action,
   showBackButton = false,
   backButtonTo,
-  backButtonLabel = 'Back',
+  backButtonLabel = "Back",
   className,
 }: PageHeaderProps) {
   return (
     <div className={cn("flex flex-col gap-2 mb-6 sm:mb-8", className)}>
       {showBackButton && (
-        <BackButton 
-          to={backButtonTo} 
+        <BackButton
+          to={backButtonTo}
           label={backButtonLabel}
           className="mb-2"
         />
       )}
-      
+
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -42,11 +42,7 @@ export default function PageHeader({
             </p>
           )}
         </div>
-        {action && (
-          <div className="flex-shrink-0">
-            {action}
-          </div>
-        )}
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
     </div>
   );

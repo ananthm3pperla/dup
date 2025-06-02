@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 
 interface Step {
   id: string;
@@ -15,22 +15,30 @@ interface AccountCreationProgressProps {
   className?: string;
 }
 
-export default function AccountCreationProgress({ steps, className = '' }: AccountCreationProgressProps) {
+export default function AccountCreationProgress({
+  steps,
+  className = "",
+}: AccountCreationProgressProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="overflow-hidden">
         {steps.map((step, stepIdx) => (
-          <div key={step.id} className={`relative ${stepIdx !== steps.length - 1 ? 'pb-8' : ''}`}>
+          <div
+            key={step.id}
+            className={`relative ${stepIdx !== steps.length - 1 ? "pb-8" : ""}`}
+          >
             {stepIdx !== steps.length - 1 ? (
               <div
                 className="absolute inset-0 flex items-center justify-center"
                 aria-hidden="true"
-                style={{ marginTop: '24px', marginLeft: '14px' }}
+                style={{ marginTop: "24px", marginLeft: "14px" }}
               >
-                <div 
+                <div
                   className={`h-full w-0.5 ${
-                    step.completed ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700'
-                  }`} 
+                    step.completed
+                      ? "bg-primary"
+                      : "bg-gray-200 dark:bg-gray-700"
+                  }`}
                 />
               </div>
             ) : null}
@@ -40,19 +48,21 @@ export default function AccountCreationProgress({ steps, className = '' }: Accou
                   animate={step.completed ? { scale: [1, 1.4, 1] } : {}}
                   transition={{ duration: 0.4 }}
                   className={`relative z-10 flex h-7 w-7 items-center justify-center rounded-full ${
-                    step.completed 
-                      ? 'bg-primary' 
-                      : step.current 
-                      ? 'border-2 border-primary bg-white dark:bg-gray-800' 
-                      : 'border-2 border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600'
+                    step.completed
+                      ? "bg-primary"
+                      : step.current
+                        ? "border-2 border-primary bg-white dark:bg-gray-800"
+                        : "border-2 border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600"
                   }`}
                 >
                   {step.completed ? (
                     <Check className="h-5 w-5 text-white" aria-hidden="true" />
                   ) : (
-                    <span 
+                    <span
                       className={`h-5 w-5 flex items-center justify-center text-sm font-medium ${
-                        step.current ? 'text-primary' : 'text-gray-500 dark:text-gray-400'
+                        step.current
+                          ? "text-primary"
+                          : "text-gray-500 dark:text-gray-400"
                       }`}
                     >
                       {stepIdx + 1}

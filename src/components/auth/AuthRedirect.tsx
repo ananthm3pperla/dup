@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { LoadingState } from '@/components/ui';
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoadingState } from "@/components/ui";
 
 interface AuthRedirectProps {
   children: React.ReactNode;
@@ -9,18 +9,18 @@ interface AuthRedirectProps {
   redirectPath?: string;
 }
 
-export default function AuthRedirect({ 
-  children, 
-  redirectAuthenticated = true, 
-  redirectPath = '/dashboard' 
+export default function AuthRedirect({
+  children,
+  redirectAuthenticated = true,
+  redirectPath = "/dashboard",
 }: AuthRedirectProps) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get the intended destination from location state or use default
   const from = (location.state as any)?.from?.pathname || redirectPath;
-  
+
   useEffect(() => {
     if (!loading) {
       if (redirectAuthenticated && user) {
@@ -28,9 +28,9 @@ export default function AuthRedirect({
         navigate(from, { replace: true });
       } else if (!redirectAuthenticated && !user) {
         // Redirect unauthenticated users
-        navigate('/login', { 
+        navigate("/login", {
           replace: true,
-          state: { from: location } 
+          state: { from: location },
         });
       }
     }

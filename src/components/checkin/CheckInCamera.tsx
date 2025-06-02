@@ -1,15 +1,24 @@
-import React, { useRef, useState, useCallback } from 'react';
-import { Camera, X, Image as ImageIcon, AlertCircle, Check } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { motion } from 'framer-motion';
-import { validateCheckInPhoto } from '@/lib/faceRecognition';
+import React, { useRef, useState, useCallback } from "react";
+import {
+  Camera,
+  X,
+  Image as ImageIcon,
+  AlertCircle,
+  Check,
+} from "lucide-react";
+import { Button } from "@/components/ui";
+import { motion } from "framer-motion";
+import { validateCheckInPhoto } from "@/lib/faceRecognition";
 
 interface CheckInCameraProps {
   onCapture: (photo: Blob) => void;
   onCancel: () => void;
 }
 
-export default function CheckInCamera({ onCapture, onCancel }: CheckInCameraProps) {
+export default function CheckInCamera({
+  onCapture,
+  onCancel,
+}: CheckInCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -26,33 +35,35 @@ export default function CheckInCamera({ onCapture, onCancel }: CheckInCameraProp
     try {
       // Stop any existing stream first
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       }
-      
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'user',
+          facingMode: "user",
           width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
+          height: { ideal: 720 },
+        },
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
       setStream(mediaStream);
       setError(null);
     } catch (err) {
-      console.error('Error accessing camera:', err);
-      setError('Unable to access camera. Please ensure camera permissions are granted.');
+      console.error("Error accessing camera:", err);
+      setError(
+        "Unable to access camera. Please ensure camera permissions are granted.",
+      );
     }
   }, []);
 
   const stopCamera = useCallback(() => {
     if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       setStream(null);
-      
+
       // Clear video source
       if (videoRef.current) {
         videoRef.current.srcObject = null;
@@ -64,45 +75,49 @@ export default function CheckInCamera({ onCapture, onCancel }: CheckInCameraProp
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      
+
       // Set canvas dimensions to match video
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      
+
       // Draw video frame to canvas
-      const context = canvas.getContext('2d');
+      const context = canvas.getContext("2d");
       if (context) {
         context.drawImage(video, 0, 0);
-        
+
         // Convert to blob and validate
-        canvas.toBlob((blob) => {
-          if (blob) {
-            setPhoto(URL.createObjectURL(blob));
-            
-            // Validate the photo
-            setIsValidating(true);
-            validateCheckInPhoto(blob)
-              .then(result => {
-                setValidationResult({
-                  isValid: result.isValid,
-                  message: result.message,
-                  confidence: result.confidence
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              setPhoto(URL.createObjectURL(blob));
+
+              // Validate the photo
+              setIsValidating(true);
+              validateCheckInPhoto(blob)
+                .then((result) => {
+                  setValidationResult({
+                    isValid: result.isValid,
+                    message: result.message,
+                    confidence: result.confidence,
+                  });
+
+                  if (result.isValid) {
+                    // Only capture if validation passes
+                    onCapture(blob);
+                  }
+                })
+                .catch((err) => {
+                  setError(`Validation error: ${err.message}`);
+                })
+                .finally(() => {
+                  setIsValidating(false);
                 });
-                
-                if (result.isValid) {
-                  // Only capture if validation passes
-                  onCapture(blob);
-                }
-              })
-              .catch(err => {
-                setError(`Validation error: ${err.message}`);
-              })
-              .finally(() => {
-                setIsValidating(false);
-              });
-            stopCamera();
-          }
-        }, 'image/jpeg', 0.8);
+              stopCamera();
+            }
+          },
+          "image/jpeg",
+          0.8,
+        );
       }
     }
   }, [onCapture, stopCamera]);
@@ -194,9 +209,11 @@ export default function CheckInCamera({ onCapture, onCancel }: CheckInCameraProp
             </div>
           )}
           {validationResult && (
-            <div className={`absolute bottom-0 left-0 right-0 p-3 ${
-              validationResult.isValid ? 'bg-green-500/80' : 'bg-red-500/80'
-            }`}>
+            <div
+              className={`absolute bottom-0 left-0 right-0 p-3 ${
+                validationResult.isValid ? "bg-green-500/80" : "bg-red-500/80"
+              }`}
+            >
               <div className="flex items-center gap-2 text-white">
                 {validationResult.isValid ? (
                   <Check className="h-5 w-5" />
@@ -227,7 +244,7 @@ export default function CheckInCamera({ onCapture, onCancel }: CheckInCameraProp
           </div>
         </motion.div>
       )}
-      
+
       {/* Hidden canvas for photo capture */}
       <canvas ref={canvasRef} className="hidden" />
     </div>

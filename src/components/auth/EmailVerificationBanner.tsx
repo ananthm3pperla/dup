@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { Mail, X, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { Mail, X, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface EmailVerificationBannerProps {
   email: string;
 }
 
-export default function EmailVerificationBanner({ email }: EmailVerificationBannerProps) {
+export default function EmailVerificationBanner({
+  email,
+}: EmailVerificationBannerProps) {
   const { resendVerificationEmail } = useAuth();
   const [isVisible, setIsVisible] = useState(true);
   const [isResending, setIsResending] = useState(false);
@@ -18,16 +20,16 @@ export default function EmailVerificationBanner({ email }: EmailVerificationBann
   // Handle resend verification email
   const handleResend = async () => {
     if (countdown > 0) return;
-    
+
     setIsResending(true);
     try {
       await resendVerificationEmail(email);
-      toast.success('Verification email sent! Please check your inbox.');
+      toast.success("Verification email sent! Please check your inbox.");
       setCountdown(60); // 60 second cooldown
-      
+
       // Start countdown
       const interval = setInterval(() => {
-        setCountdown(prev => {
+        setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
             return 0;
@@ -36,8 +38,8 @@ export default function EmailVerificationBanner({ email }: EmailVerificationBann
         });
       }, 1000);
     } catch (error) {
-      console.error('Error resending verification email:', error);
-      toast.error('Failed to resend verification email');
+      console.error("Error resending verification email:", error);
+      toast.error("Failed to resend verification email");
     } finally {
       setIsResending(false);
     }
@@ -49,7 +51,7 @@ export default function EmailVerificationBanner({ email }: EmailVerificationBann
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: 1, height: 'auto' }}
+        animate={{ opacity: 1, height: "auto" }}
         exit={{ opacity: 0, height: 0 }}
         className="bg-primary/10 dark:bg-primary/20 border-b border-primary/20 dark:border-primary/30"
       >
@@ -60,7 +62,9 @@ export default function EmailVerificationBanner({ email }: EmailVerificationBann
                 <Mail className="h-5 w-5 text-primary" aria-hidden="true" />
               </span>
               <p className="ml-3 font-medium text-primary truncate">
-                <span className="md:hidden">Please verify your email address</span>
+                <span className="md:hidden">
+                  Please verify your email address
+                </span>
                 <span className="hidden md:inline">
                   Please verify your email address. Check your inbox at {email}
                 </span>
@@ -76,7 +80,7 @@ export default function EmailVerificationBanner({ email }: EmailVerificationBann
                 leftIcon={<RefreshCw className="h-4 w-4" />}
                 className="bg-white dark:bg-gray-800"
               >
-                {countdown > 0 ? `Resend in ${countdown}s` : 'Resend Email'}
+                {countdown > 0 ? `Resend in ${countdown}s` : "Resend Email"}
               </Button>
               <button
                 type="button"

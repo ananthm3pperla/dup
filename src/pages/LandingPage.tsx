@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
@@ -10,7 +10,9 @@ export default function LandingPage() {
             Hi-Bridge
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            The hybrid work engagement platform that boosts in-office participation through gamification, pulse checks, and team collaboration.
+            The hybrid work engagement platform that boosts in-office
+            participation through gamification, pulse checks, and team
+            collaboration.
           </p>
 
           <div className="flex gap-4 justify-center">

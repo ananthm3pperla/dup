@@ -1,11 +1,11 @@
-import React from 'react';
-import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
-import { 
+import React from "react";
+import { NavLink, useNavigate, Link, useLocation } from "react-router-dom";
+import {
   Building2,
   LayoutDashboard,
-  Calendar, 
-  Users, 
-  X, 
+  Calendar,
+  Users,
+  X,
   Home,
   User,
   ChevronLeft,
@@ -13,14 +13,14 @@ import {
   MessageSquare,
   Settings,
   HelpCircle,
-  LogOut
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTeam } from '@/contexts/TeamContext';
-import { useSidebar } from '@/contexts/SidebarContext';
-import { isDemoMode, DEMO_USER } from '@/lib/demo';
+  LogOut,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTeam } from "@/contexts/TeamContext";
+import { useSidebar } from "@/contexts/SidebarContext";
+import { isDemoMode, DEMO_USER } from "@/lib/demo";
 
 interface SidebarProps {
   onClose: () => void;
@@ -32,29 +32,44 @@ export default function Sidebar({ onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { currentTeam, isTeamLeader } = useTeam();
   const { sidebarState, toggleSidebar } = useSidebar();
-  const isCollapsed = sidebarState === 'collapsed';
+  const isCollapsed = sidebarState === "collapsed";
   const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, id: 'nav-dashboard' },
-    { name: 'Schedule', href: '/schedule', icon: Calendar, id: 'nav-schedule' },
-    { name: 'Teams', href: '/teams', icon: Users, id: 'nav-teams' },
-    { name: 'Profile', href: `/profile/${user?.id}`, icon: User, id: 'nav-profile' },
-    { name: 'Settings', href: '/settings', icon: Settings, id: 'nav-settings' }
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+      id: "nav-dashboard",
+    },
+    { name: "Schedule", href: "/schedule", icon: Calendar, id: "nav-schedule" },
+    { name: "Teams", href: "/teams", icon: Users, id: "nav-teams" },
+    {
+      name: "Profile",
+      href: `/profile/${user?.id}`,
+      icon: User,
+      id: "nav-profile",
+    },
+    { name: "Settings", href: "/settings", icon: Settings, id: "nav-settings" },
   ];
 
   // Add Team Pulse for team leaders
   if (isTeamLeader) {
-    navigation.splice(4, 0, { name: 'Team Pulse', href: '/team/pulse', icon: MessageSquare, id: 'nav-team-pulse' });
+    navigation.splice(4, 0, {
+      name: "Team Pulse",
+      href: "/team/pulse",
+      icon: MessageSquare,
+      id: "nav-team-pulse",
+    });
   }
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    navigate("/");
   };
 
   return (
-    <div 
+    <div
       className="flex h-full flex-col overflow-y-auto border-r border-default bg-card dark:bg-gray-900 transition-all duration-300 w-full relative"
       role="navigation"
       aria-label="Main navigation"
@@ -65,11 +80,11 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <motion.div
             initial={{ rotate: -10 }}
             animate={{ rotate: 0 }}
-            transition={{ duration: 0.5, type: 'spring' }}
+            transition={{ duration: 0.5, type: "spring" }}
           >
             <Building2 className="h-8 w-8 text-primary" />
           </motion.div>
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -94,13 +109,13 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <motion.div
             initial={{ rotate: -10 }}
             animate={{ rotate: 0 }}
-            transition={{ duration: 0.5, type: 'spring' }}
+            transition={{ duration: 0.5, type: "spring" }}
           >
             <Building2 className="h-8 w-8 text-primary" />
           </motion.div>
           <AnimatePresence>
             {!isCollapsed && (
-              <motion.span 
+              <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
@@ -130,7 +145,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         <div className="mb-4 px-3">
           <AnimatePresence>
             {!isCollapsed && (
-              <motion.h3 
+              <motion.h3
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -152,9 +167,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
               className={({ isActive }) =>
                 `group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
                   isActive
-                    ? 'bg-primary text-white shadow-md dark:bg-primary-dark'
-                    : 'text-muted hover:bg-card-hover hover:text-default dark:hover:bg-gray-800'
-                } ${isCollapsed ? 'justify-center' : ''}`
+                    ? "bg-primary text-white shadow-md dark:bg-primary-dark"
+                    : "text-muted hover:bg-card-hover hover:text-default dark:hover:bg-gray-800"
+                } ${isCollapsed ? "justify-center" : ""}`
               }
               onClick={() => {
                 // Close sidebar on mobile when a navigation item is clicked
@@ -172,16 +187,18 @@ export default function Sidebar({ onClose }: SidebarProps) {
                   >
                     <item.icon
                       className={`h-5 w-5 flex-shrink-0 ${
-                        isActive ? 'text-white' : 'text-muted group-hover:text-default'
+                        isActive
+                          ? "text-white"
+                          : "text-muted group-hover:text-default"
                       }`}
                       aria-hidden="true"
                     />
                   </motion.div>
                   <AnimatePresence>
                     {!isCollapsed && (
-                      <motion.span 
+                      <motion.span
                         initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: 'auto' }}
+                        animate={{ opacity: 1, width: "auto" }}
                         exit={{ opacity: 0, width: 0 }}
                         transition={{ duration: 0.3 }}
                         className="ml-3 flex-1 whitespace-nowrap overflow-hidden"
@@ -208,11 +225,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 exit={{ opacity: 0 }}
                 className="flex items-center justify-between"
               >
-                <p className="text-xs text-muted">
-                  Hi-Bridge v0.1.0
-                </p>
-                <Link 
-                  to="/help" 
+                <p className="text-xs text-muted">Hi-Bridge v0.1.0</p>
+                <Link
+                  to="/help"
                   className="text-xs text-primary hover:text-primary-light"
                   aria-label="Help"
                 >
@@ -222,9 +237,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
             )}
           </AnimatePresence>
 
-          <button 
+          <button
             onClick={handleSignOut}
-            className={`flex items-center ${isCollapsed ? 'justify-center' : ''} gap-3 px-3 py-2 text-sm font-medium rounded-md text-error hover:bg-error/5 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800`}
+            className={`flex items-center ${isCollapsed ? "justify-center" : ""} gap-3 px-3 py-2 text-sm font-medium rounded-md text-error hover:bg-error/5 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800`}
             aria-label="Sign out"
           >
             <LogOut className="h-5 w-5 flex-shrink-0" />

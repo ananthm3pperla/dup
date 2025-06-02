@@ -1,18 +1,18 @@
-import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserRole, hasAnyRole } from '@/lib/rbac';
-import { LoadingState } from '@/components/ui';
-import Layout from '@/components/layout/Layout';
+import React from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserRole, hasAnyRole } from "@/lib/rbac";
+import { LoadingState } from "@/components/ui";
+import Layout from "@/components/layout/Layout";
 
 interface RoleProtectedRouteProps {
   allowedRoles: UserRole[];
   redirectPath?: string;
 }
 
-export default function RoleProtectedRoute({ 
-  allowedRoles, 
-  redirectPath = '/'
+export default function RoleProtectedRoute({
+  allowedRoles,
+  redirectPath = "/",
 }: RoleProtectedRouteProps) {
   const { user, loading } = useAuth();
   const location = useLocation();

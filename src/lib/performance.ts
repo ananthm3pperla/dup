@@ -11,11 +11,13 @@ class PerformanceMonitor {
   private metrics: Map<string, PerformanceMetric> = new Map();
   private isDevelopment = import.meta.env.DEV;
 
-  startTimer(name: string): (result?: { success: boolean; error?: string }) => void {
+  startTimer(
+    name: string,
+  ): (result?: { success: boolean; error?: string }) => void {
     const startTime = performance.now();
     this.metrics.set(name, {
       name,
-      startTime
+      startTime,
     });
 
     return (result = { success: true }) => {
@@ -28,10 +30,13 @@ class PerformanceMonitor {
         metric.error = result.error;
 
         if (this.isDevelopment) {
-          console.log(`[PERFORMANCE] ${name}: ${metric.duration.toFixed(2)}ms`, {
-            success: metric.success,
-            error: metric.error
-          });
+          console.log(
+            `[PERFORMANCE] ${name}: ${metric.duration.toFixed(2)}ms`,
+            {
+              success: metric.success,
+              error: metric.error,
+            },
+          );
         }
       }
     };

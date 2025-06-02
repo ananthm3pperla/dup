@@ -1,14 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Building2, Mail, AlertCircle, CheckCircle, RefreshCw, ChevronLeft } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { motion } from 'framer-motion';
-import { Button, Alert } from '@/components/ui';
-import { database } from '@/lib/database';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Building2,
+  Mail,
+  AlertCircle,
+  CheckCircle,
+  RefreshCw,
+  ChevronLeft,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
+import { Button, Alert } from "@/components/ui";
+import { database } from "@/lib/database";
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
-  const { user, loading, error: authError, resendVerificationEmail } = useAuth();
+  const {
+    user,
+    loading,
+    error: authError,
+    resendVerificationEmail,
+  } = useAuth();
 
   const [countdown, setCountdown] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +30,7 @@ export default function VerifyEmail() {
 
   // Get email from session storage if available
   useEffect(() => {
-    const storedEmail = sessionStorage.getItem('verificationEmail');
+    const storedEmail = sessionStorage.getItem("verificationEmail");
     if (storedEmail) {
       setEmail(storedEmail);
     } else if (user?.email) {
@@ -30,7 +42,7 @@ export default function VerifyEmail() {
   useEffect(() => {
     if (user && !loading) {
       if (user.email_confirmed_at) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     }
   }, [user, loading, navigate]);
@@ -51,12 +63,16 @@ export default function VerifyEmail() {
     setResendSuccess(false);
 
     try {
-      await resendVerificationEmail(email || '');
+      await resendVerificationEmail(email || "");
       setResendSuccess(true);
       setCountdown(60); // 60 second cooldown
     } catch (err) {
-      console.error('Failed to resend verification email:', err);
-      setError(err instanceof Error ? err.message : 'Failed to resend verification email');
+      console.error("Failed to resend verification email:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to resend verification email",
+      );
     } finally {
       setIsResending(false);
     }
@@ -70,7 +86,7 @@ export default function VerifyEmail() {
   return (
     <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <motion.div 
+        <motion.div
           className="flex justify-center"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -78,7 +94,7 @@ export default function VerifyEmail() {
         >
           <Building2 className="h-12 w-12 text-primary" />
         </motion.div>
-        <motion.h2 
+        <motion.h2
           className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -86,7 +102,7 @@ export default function VerifyEmail() {
         >
           Verify your email
         </motion.h2>
-        <motion.p 
+        <motion.p
           className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -96,7 +112,7 @@ export default function VerifyEmail() {
         </motion.p>
       </div>
 
-      <motion.div 
+      <motion.div
         className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -104,19 +120,22 @@ export default function VerifyEmail() {
       >
         <div className="bg-white dark:bg-gray-800 px-4 py-8 shadow sm:rounded-lg sm:px-10">
           {(error || authError) && (
-            <Alert 
+            <Alert
               variant="error"
               title="Error"
               className="mb-4"
               icon={<AlertCircle className="h-5 w-5" />}
               onClose={() => setError(null)}
             >
-              {error || (authError instanceof Error ? authError.message : 'Authentication error')}
+              {error ||
+                (authError instanceof Error
+                  ? authError.message
+                  : "Authentication error")}
             </Alert>
           )}
 
           {resendSuccess && (
-            <Alert 
+            <Alert
               variant="success"
               title="Verification email sent!"
               className="mb-4"
@@ -130,13 +149,17 @@ export default function VerifyEmail() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 mb-4">
               <Mail className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Verify your email address</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              Verify your email address
+            </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              We've sent a verification link to{' '}
+              We've sent a verification link to{" "}
               <span className="font-medium text-gray-900 dark:text-white">
-                {email || 'your email address'}
-              </span>.
-              <br />Click the link to verify your account.
+                {email || "your email address"}
+              </span>
+              .
+              <br />
+              Click the link to verify your account.
             </p>
             <div className="mt-6">
               <Button
@@ -159,17 +182,22 @@ export default function VerifyEmail() {
                 disabled={isResending || countdown > 0}
                 className="text-sm font-medium text-primary hover:text-primary-light dark:hover:text-primary-light disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isResending ? 'Sending...' : 
-                 countdown > 0 ? `Resend in ${countdown}s` : 
-                 'Resend email'}
+                {isResending
+                  ? "Sending..."
+                  : countdown > 0
+                    ? `Resend in ${countdown}s`
+                    : "Resend email"}
               </button>
             </div>
           </div>
 
           <div className="mt-6">
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-              If you continue to have issues, please contact{' '}
-              <a href="mailto:support@hi-bridge.com" className="font-medium text-primary hover:text-primary-light dark:hover:text-primary-light">
+              If you continue to have issues, please contact{" "}
+              <a
+                href="mailto:support@hi-bridge.com"
+                className="font-medium text-primary hover:text-primary-light dark:hover:text-primary-light"
+              >
                 support@hi-bridge.com
               </a>
             </p>

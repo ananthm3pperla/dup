@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Award, X, Check, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui';
-import type { Reward } from './RewardCard';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Award, X, Check, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui";
+import type { Reward } from "./RewardCard";
 
 interface RedemptionDialogProps {
   isOpen: boolean;
@@ -11,29 +11,34 @@ interface RedemptionDialogProps {
   onConfirm: (rewardId: string) => Promise<void>;
 }
 
-export default function RedemptionDialog({ isOpen, onClose, reward, onConfirm }: RedemptionDialogProps) {
+export default function RedemptionDialog({
+  isOpen,
+  onClose,
+  reward,
+  onConfirm,
+}: RedemptionDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleConfirm = async () => {
     if (!reward) return;
-    
+
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       await onConfirm(reward.id);
       setIsSuccess(true);
-      
+
       // Auto-close after success
       setTimeout(() => {
         onClose();
         setIsSuccess(false);
       }, 3000);
     } catch (err) {
-      console.error('Error redeeming reward:', err);
-      setError(err instanceof Error ? err.message : 'Failed to redeem reward');
+      console.error("Error redeeming reward:", err);
+      setError(err instanceof Error ? err.message : "Failed to redeem reward");
     } finally {
       setIsSubmitting(false);
     }
@@ -59,7 +64,8 @@ export default function RedemptionDialog({ isOpen, onClose, reward, onConfirm }:
                   Reward Redeemed!
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-                  Your reward has been successfully redeemed. Check your email for details.
+                  Your reward has been successfully redeemed. Check your email
+                  for details.
                 </p>
                 <Button onClick={onClose} size="sm">
                   Close
@@ -73,7 +79,7 @@ export default function RedemptionDialog({ isOpen, onClose, reward, onConfirm }:
                 >
                   <X className="h-5 w-5 sm:h-6 sm:w-6" />
                 </button>
-                
+
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div className="p-2 sm:p-3 bg-primary/10 rounded-lg">
                     <Award className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -97,17 +103,26 @@ export default function RedemptionDialog({ isOpen, onClose, reward, onConfirm }:
 
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Reward</span>
-                    <span className="text-xs sm:text-sm text-gray-900 dark:text-white font-semibold">{reward.title}</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Reward
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-900 dark:text-white font-semibold">
+                      {reward.title}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Cost</span>
-                    <span className="text-xs sm:text-sm text-primary font-semibold">{reward.pointsCost} points</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Cost
+                    </span>
+                    <span className="text-xs sm:text-sm text-primary font-semibold">
+                      {reward.pointsCost} points
+                    </span>
                   </div>
                 </div>
 
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-6">
-                  Are you sure you want to redeem this reward? This action cannot be undone.
+                  Are you sure you want to redeem this reward? This action
+                  cannot be undone.
                 </p>
 
                 <div className="flex justify-end gap-3">

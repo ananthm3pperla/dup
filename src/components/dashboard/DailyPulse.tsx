@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { MessageSquare, Frown, Meh, Smile, Check, Settings } from 'lucide-react';
-import { format } from 'date-fns';
-import { motion, AnimatePresence } from 'framer-motion';
-import { usePulseStore, type Mood } from '@/lib/store/pulseStore';
-import { useTeam } from '@/contexts/TeamContext';
-import { isDemoMode } from '@/lib/demo';
-import DailyPulseSettings from './DailyPulseSettings';
+import React, { useState, useEffect } from "react";
+import {
+  MessageSquare,
+  Frown,
+  Meh,
+  Smile,
+  Check,
+  Settings,
+} from "lucide-react";
+import { format } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+import { usePulseStore, type Mood } from "@/lib/store/pulseStore";
+import { useTeam } from "@/contexts/TeamContext";
+import { isDemoMode } from "@/lib/demo";
+import DailyPulseSettings from "./DailyPulseSettings";
 
 interface MoodOption {
   value: Mood;
@@ -25,7 +32,7 @@ export default function DailyPulse() {
     getConsecutiveChallengingDays,
     getWeeklyChallenging,
     notificationPreferences,
-    initialize
+    initialize,
   } = usePulseStore();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -41,42 +48,42 @@ export default function DailyPulse() {
 
   const moodOptions: MoodOption[] = [
     {
-      value: 'challenging',
-      label: 'Challenging',
-      description: 'Feeling overwhelmed or stressed',
+      value: "challenging",
+      label: "Challenging",
+      description: "Feeling overwhelmed or stressed",
       icon: Frown,
-      color: '#EF4444',
-      bgColor: '#FEE2E2'
+      color: "#EF4444",
+      bgColor: "#FEE2E2",
     },
     {
-      value: 'neutral',
-      label: 'Neutral',
-      description: 'Getting through the day',
+      value: "neutral",
+      label: "Neutral",
+      description: "Getting through the day",
       icon: Meh,
-      color: '#F59E0B',
-      bgColor: '#FEF3C7'
+      color: "#F59E0B",
+      bgColor: "#FEF3C7",
     },
     {
-      value: 'good',
-      label: 'Good',
-      description: 'Feeling positive and productive',
+      value: "good",
+      label: "Good",
+      description: "Feeling positive and productive",
       icon: Smile,
-      color: '#10B981',
-      bgColor: '#D1FAE5'
-    }
+      color: "#10B981",
+      bgColor: "#D1FAE5",
+    },
   ];
 
   const handleMoodSelect = (mood: Mood) => {
     const submission = {
       mood,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     addPulse(submission);
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 dark:bg-gray-800 dark:border dark:border-gray-700 p-4 sm:p-6 daily-pulse"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -88,14 +95,18 @@ export default function DailyPulse() {
             <MessageSquare className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">My Daily Pulse</h3>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">How are you feeling today?</p>
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
+              My Daily Pulse
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              How are you feeling today?
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {latestPulse && (
             <span className="text-xs sm:text-sm text-muted dark:text-gray-400 hidden sm:inline">
-              Last updated: {format(new Date(latestPulse.timestamp), 'h:mm a')}
+              Last updated: {format(new Date(latestPulse.timestamp), "h:mm a")}
             </span>
           )}
           {isTeamLeader && (
@@ -111,10 +122,10 @@ export default function DailyPulse() {
       </div>
 
       {shouldNotify && isTeamLeader && (
-        <motion.div 
+        <motion.div
           className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-warning/5 border border-warning/10 dark:bg-warning/10 dark:border-warning/20"
           initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 1, height: "auto" }}
           transition={{ duration: 0.3 }}
         >
           <div className="flex items-start gap-3">
@@ -122,13 +133,23 @@ export default function DailyPulse() {
               <Frown className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-semibold text-warning dark:text-warning-light">Team Member Alert</h4>
+              <h4 className="text-xs sm:text-sm font-semibold text-warning dark:text-warning-light">
+                Team Member Alert
+              </h4>
               <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                {getConsecutiveChallengingDays() >= notificationPreferences.consecutiveChallenging && (
-                  <span>A team member has reported {getConsecutiveChallengingDays()} consecutive challenging days. </span>
+                {getConsecutiveChallengingDays() >=
+                  notificationPreferences.consecutiveChallenging && (
+                  <span>
+                    A team member has reported {getConsecutiveChallengingDays()}{" "}
+                    consecutive challenging days.{" "}
+                  </span>
                 )}
-                {getWeeklyChallenging() >= notificationPreferences.challengingPerWeek && (
-                  <span>A team member has reported {getWeeklyChallenging()} challenging days this week. </span>
+                {getWeeklyChallenging() >=
+                  notificationPreferences.challengingPerWeek && (
+                  <span>
+                    A team member has reported {getWeeklyChallenging()}{" "}
+                    challenging days this week.{" "}
+                  </span>
                 )}
                 Consider checking in with them.
               </p>
@@ -138,14 +159,16 @@ export default function DailyPulse() {
       )}
 
       <h4 className="text-lg sm:text-xl font-medium text-gray-900 mb-4 sm:mb-6">
-        <span className="dark:text-white">{latestPulse ? "Today's Selection" : "How are you feeling today?"}</span>
+        <span className="dark:text-white">
+          {latestPulse ? "Today's Selection" : "How are you feeling today?"}
+        </span>
       </h4>
 
       <AnimatePresence mode="wait">
         <div className="space-y-3">
           {latestPulse ? (
             moodOptions
-              .filter(option => option.value === latestPulse.mood)
+              .filter((option) => option.value === latestPulse.mood)
               .map((option) => {
                 const Icon = option.icon;
                 return (
@@ -156,25 +179,29 @@ export default function DailyPulse() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                     className="w-full p-3 sm:p-4 rounded-lg border transition-all duration-200 flex items-center gap-3 sm:gap-4"
-                    style={{ 
+                    style={{
                       borderColor: option.color,
                       backgroundColor: option.bgColor,
-                      boxShadow: `0 0 0 2px ${option.color}20`
+                      boxShadow: `0 0 0 2px ${option.color}20`,
                     }}
                   >
-                    <div 
+                    <div
                       className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{ 
+                      style={{
                         backgroundColor: option.bgColor,
-                        color: option.color
-                      }} 
+                        color: option.color,
+                      }}
                     >
                       <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
                     <div className="text-left flex-1 min-w-0">
-                      <h5 className="font-medium text-default dark:text-white text-sm sm:text-base">{option.label}</h5>
-                      <p className="text-xs sm:text-sm text-muted dark:text-gray-400 truncate">{option.description}</p>
-                      
+                      <h5 className="font-medium text-default dark:text-white text-sm sm:text-base">
+                        {option.label}
+                      </h5>
+                      <p className="text-xs sm:text-sm text-muted dark:text-gray-400 truncate">
+                        {option.description}
+                      </p>
+
                       {latestPulse.notes && (
                         <p className="mt-1 text-xs sm:text-sm italic text-gray-600 dark:text-gray-300">
                           "{latestPulse.notes}"
@@ -184,7 +211,11 @@ export default function DailyPulse() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: 'spring', stiffness: 500 }}
+                      transition={{
+                        delay: 0.2,
+                        type: "spring",
+                        stiffness: 500,
+                      }}
                     >
                       <Check className="h-5 w-5 text-success" />
                     </motion.div>
@@ -192,7 +223,7 @@ export default function DailyPulse() {
                 );
               })
           ) : (
-            <motion.div 
+            <motion.div
               className="space-y-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -204,31 +235,36 @@ export default function DailyPulse() {
                   <motion.button
                     key={option.value}
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ 
-                      opacity: 1, 
+                    animate={{
+                      opacity: 1,
                       y: 0,
-                      transition: { delay: index * 0.1 }
+                      transition: { delay: index * 0.1 },
                     }}
-                    whileHover={{ 
+                    whileHover={{
                       scale: 1.02,
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      boxShadow:
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                     }}
                     onClick={() => handleMoodSelect(option.value)}
                     className="w-full p-3 sm:p-4 rounded-lg border transition-all duration-200 flex items-center gap-3 sm:gap-4 border-default hover:border-primary/50 hover:bg-card-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                     aria-label={`Select mood: ${option.label}`}
                   >
-                    <div 
+                    <div
                       className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
-                      style={{ 
-                        backgroundColor: '#F3F4F6',
-                        color: option.color
-                      }} 
+                      style={{
+                        backgroundColor: "#F3F4F6",
+                        color: option.color,
+                      }}
                     >
                       <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
                     <div className="text-left flex-1 min-w-0">
-                      <h5 className="font-medium text-default dark:text-white text-sm sm:text-base">{option.label}</h5>
-                      <p className="text-xs sm:text-sm text-muted dark:text-gray-400 truncate">{option.description}</p>
+                      <h5 className="font-medium text-default dark:text-white text-sm sm:text-base">
+                        {option.label}
+                      </h5>
+                      <p className="text-xs sm:text-sm text-muted dark:text-gray-400 truncate">
+                        {option.description}
+                      </p>
                     </div>
                   </motion.button>
                 );

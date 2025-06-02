@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface TooltipProps {
   content: React.ReactNode;
   children: React.ReactNode;
-  side?: 'top' | 'right' | 'bottom' | 'left';
-  align?: 'start' | 'center' | 'end';
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
   delay?: number;
   className?: string;
 }
@@ -14,10 +14,10 @@ interface TooltipProps {
 export function Tooltip({
   content,
   children,
-  side = 'top',
-  align = 'center',
+  side = "top",
+  align = "center",
   delay = 200,
-  className
+  className,
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
@@ -42,41 +42,41 @@ export function Tooltip({
 
   const positions = {
     top: {
-      container: 'bottom-full mb-2',
+      container: "bottom-full mb-2",
       align: {
-        start: 'left-0',
-        center: 'left-1/2 -translate-x-1/2',
-        end: 'right-0'
-      }
+        start: "left-0",
+        center: "left-1/2 -translate-x-1/2",
+        end: "right-0",
+      },
     },
     right: {
-      container: 'left-full ml-2',
+      container: "left-full ml-2",
       align: {
-        start: 'top-0',
-        center: 'top-1/2 -translate-y-1/2',
-        end: 'bottom-0'
-      }
+        start: "top-0",
+        center: "top-1/2 -translate-y-1/2",
+        end: "bottom-0",
+      },
     },
     bottom: {
-      container: 'top-full mt-2',
+      container: "top-full mt-2",
       align: {
-        start: 'left-0',
-        center: 'left-1/2 -translate-x-1/2',
-        end: 'right-0'
-      }
+        start: "left-0",
+        center: "left-1/2 -translate-x-1/2",
+        end: "right-0",
+      },
     },
     left: {
-      container: 'right-full mr-2',
+      container: "right-full mr-2",
       align: {
-        start: 'top-0',
-        center: 'top-1/2 -translate-y-1/2',
-        end: 'bottom-0'
-      }
-    }
+        start: "top-0",
+        center: "top-1/2 -translate-y-1/2",
+        end: "bottom-0",
+      },
+    },
   };
 
   return (
-    <div 
+    <div
       className="relative inline-block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -92,10 +92,10 @@ export function Tooltip({
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              'absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg whitespace-nowrap',
+              "absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg whitespace-nowrap",
               positions[side].container,
               positions[side].align[align],
-              className
+              className,
             )}
             role="tooltip"
           >

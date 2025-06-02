@@ -1,4 +1,3 @@
-
 /**
  * Core types for Hi-Bridge application
  * Updated for Replit Database integration
@@ -9,7 +8,7 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
-  role: 'employee' | 'manager' | 'hr';
+  role: "employee" | "manager" | "hr";
   teamId?: string;
   createdAt: string;
   lastActive: string;
@@ -31,7 +30,7 @@ export interface UserProfile extends User {
 
 export interface WorkPreferences {
   preferredWorkDays: string[];
-  preferredLocation: 'office' | 'remote' | 'hybrid';
+  preferredLocation: "office" | "remote" | "hybrid";
   flexibleSchedule: boolean;
   notifications: {
     email: boolean;
@@ -65,7 +64,7 @@ export interface TeamMember {
   id: string;
   userId: string;
   teamId: string;
-  role: 'member' | 'lead' | 'manager';
+  role: "member" | "lead" | "manager";
   joinedAt: string;
   isActive: boolean;
 }
@@ -76,7 +75,7 @@ export interface WorkSchedule {
   userId: string;
   teamId: string;
   date: string;
-  location: 'office' | 'remote' | 'hybrid';
+  location: "office" | "remote" | "hybrid";
   isAnchorDay: boolean;
   isConfirmed: boolean;
   createdAt: string;
@@ -103,15 +102,15 @@ export interface PulseCheck {
   comment?: string;
   date: string;
   submittedAt: string;
-  mood?: 'great' | 'good' | 'okay' | 'poor' | 'terrible';
-  workload?: 'light' | 'moderate' | 'heavy' | 'overwhelming';
+  mood?: "great" | "good" | "okay" | "poor" | "terrible";
+  workload?: "light" | "moderate" | "heavy" | "overwhelming";
   satisfaction?: number; // 1-10 scale
 }
 
 export interface PulseAnalytics {
   averageRating: number;
   totalResponses: number;
-  trendDirection: 'up' | 'down' | 'stable';
+  trendDirection: "up" | "down" | "stable";
   responseRate: number;
   dateRange: {
     start: string;
@@ -124,7 +123,7 @@ export interface CheckIn {
   id: string;
   userId: string;
   teamId: string;
-  location: 'office' | 'remote';
+  location: "office" | "remote";
   timestamp: string;
   photoUrl?: string;
   verified: boolean;
@@ -138,8 +137,8 @@ export interface CheckIn {
 export interface CheckInVerification {
   id: string;
   checkInId: string;
-  method: 'photo' | 'location' | 'manual';
-  status: 'pending' | 'verified' | 'rejected';
+  method: "photo" | "location" | "manual";
+  status: "pending" | "verified" | "rejected";
   verifiedBy?: string;
   verifiedAt?: string;
   reason?: string;
@@ -162,14 +161,14 @@ export interface Badge {
   name: string;
   description: string;
   icon: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  rarity: "common" | "rare" | "epic" | "legendary";
   earnedAt?: string;
 }
 
 export interface Leaderboard {
   id: string;
   teamId: string;
-  period: 'weekly' | 'monthly' | 'quarterly';
+  period: "weekly" | "monthly" | "quarterly";
   entries: LeaderboardEntry[];
   updatedAt: string;
 }
@@ -190,7 +189,7 @@ export interface Reward {
   name: string;
   description: string;
   pointsCost: number;
-  category: 'time_off' | 'perks' | 'recognition' | 'wellness';
+  category: "time_off" | "perks" | "recognition" | "wellness";
   isActive: boolean;
   imageUrl?: string;
   expiryDate?: string;
@@ -204,7 +203,7 @@ export interface RewardRedemption {
   rewardId: string;
   pointsSpent: number;
   redeemedAt: string;
-  status: 'pending' | 'approved' | 'rejected' | 'used';
+  status: "pending" | "approved" | "rejected" | "used";
   notes?: string;
 }
 
@@ -226,9 +225,9 @@ export interface TeamAnalytics {
     averagePointsPerMember: number;
   };
   trends: {
-    attendanceTrend: 'up' | 'down' | 'stable';
-    pulseTrend: 'up' | 'down' | 'stable';
-    engagementTrend: 'up' | 'down' | 'stable';
+    attendanceTrend: "up" | "down" | "stable";
+    pulseTrend: "up" | "down" | "stable";
+    engagementTrend: "up" | "down" | "stable";
   };
 }
 
@@ -255,7 +254,7 @@ export interface Session {
 export interface Notification {
   id: string;
   userId: string;
-  type: 'pulse_reminder' | 'team_update' | 'achievement' | 'system';
+  type: "pulse_reminder" | "team_update" | "achievement" | "system";
   title: string;
   message: string;
   isRead: boolean;
@@ -300,7 +299,7 @@ export interface SignupForm {
   email: string;
   password: string;
   fullName: string;
-  role?: 'employee' | 'manager' | 'hr';
+  role?: "employee" | "manager" | "hr";
   teamCode?: string;
 }
 
@@ -315,13 +314,17 @@ export interface QueryOptions {
   limit?: number;
   offset?: number;
   orderBy?: string;
-  orderDirection?: 'asc' | 'desc';
+  orderDirection?: "asc" | "desc";
   filters?: Record<string, any>;
 }
 
 // Event types for real-time updates
 export interface TeamEvent {
-  type: 'member_joined' | 'member_left' | 'schedule_updated' | 'pulse_submitted';
+  type:
+    | "member_joined"
+    | "member_left"
+    | "schedule_updated"
+    | "pulse_submitted";
   teamId: string;
   userId: string;
   data: any;
@@ -329,9 +332,9 @@ export interface TeamEvent {
 }
 
 export interface SystemEvent {
-  type: 'maintenance' | 'update' | 'announcement';
+  type: "maintenance" | "update" | "announcement";
   message: string;
-  severity: 'info' | 'warning' | 'error';
+  severity: "info" | "warning" | "error";
   timestamp: string;
 }
 
@@ -354,11 +357,11 @@ export interface PaginationState {
 
 // Theme types
 export interface ThemeConfig {
-  mode: 'light' | 'dark' | 'system';
+  mode: "light" | "dark" | "system";
   primaryColor: string;
   accentColor: string;
-  borderRadius: 'none' | 'sm' | 'md' | 'lg';
-  fontSize: 'sm' | 'md' | 'lg';
+  borderRadius: "none" | "sm" | "md" | "lg";
+  fontSize: "sm" | "md" | "lg";
 }
 
 // Configuration types

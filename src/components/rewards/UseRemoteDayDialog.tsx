@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, X, AlertTriangle, Building2, Home, Clock } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTeam } from '@/contexts/TeamContext';
-import { useRewardsStore } from '@/lib/store/rewardsStore';
-import { format, addDays } from 'date-fns';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Calendar,
+  X,
+  AlertTriangle,
+  Building2,
+  Home,
+  Clock,
+} from "lucide-react";
+import { Button } from "@/components/ui";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTeam } from "@/contexts/TeamContext";
+import { useRewardsStore } from "@/lib/store/rewardsStore";
+import { format, addDays } from "date-fns";
+import { toast } from "sonner";
 
 interface UseRemoteDayDialogProps {
   isOpen: boolean;
@@ -17,15 +24,15 @@ interface UseRemoteDayDialogProps {
 export default function UseRemoteDayDialog({
   isOpen,
   onClose,
-  currentBalance
+  currentBalance,
 }: UseRemoteDayDialogProps) {
   const { user } = useAuth();
   const { currentTeam } = useTeam();
   const { requestRemoteDays } = useRewardsStore();
-  
-  const [date, setDate] = useState('');
+
+  const [date, setDate] = useState("");
   const [days, setDays] = useState(1);
-  const [workType, setWorkType] = useState<'remote' | 'flexible'>('remote');
+  const [workType, setWorkType] = useState<"remote" | "flexible">("remote");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,23 +44,20 @@ export default function UseRemoteDayDialog({
     setError(null);
 
     try {
-      await requestRemoteDays(
-        user.id,
-        currentTeam.id,
-        date,
-        days
+      await requestRemoteDays(user.id, currentTeam.id, date, days);
+      toast.success(
+        `Successfully scheduled ${days} ${days === 1 ? "day" : "days"} of ${workType} work`,
       );
-      toast.success(`Successfully scheduled ${days} ${days === 1 ? 'day' : 'days'} of ${workType} work`);
       onClose();
     } catch (err) {
-      console.error('Error using remote days:', err);
-      setError('Unable to schedule remote work. Please try again.');
+      console.error("Error using remote days:", err);
+      setError("Unable to schedule remote work. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const minDate = addDays(new Date(), 1).toISOString().split('T')[0];
+  const minDate = addDays(new Date(), 1).toISOString().split("T")[0];
 
   return (
     <AnimatePresence>
@@ -98,17 +102,20 @@ export default function UseRemoteDayDialog({
 
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <div>
-                  <label htmlFor="workType" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="workType"
+                    className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Work Type
                   </label>
                   <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     <button
                       type="button"
-                      onClick={() => setWorkType('remote')}
+                      onClick={() => setWorkType("remote")}
                       className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border transition-colors ${
-                        workType === 'remote' 
-                          ? 'border-primary bg-primary/10 text-primary' 
-                          : 'border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        workType === "remote"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-700"
                       }`}
                     >
                       <Home className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -116,11 +123,11 @@ export default function UseRemoteDayDialog({
                     </button>
                     <button
                       type="button"
-                      onClick={() => setWorkType('flexible')}
+                      onClick={() => setWorkType("flexible")}
                       className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border transition-colors ${
-                        workType === 'flexible' 
-                          ? 'border-primary bg-primary/10 text-primary' 
-                          : 'border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        workType === "flexible"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-700"
                       }`}
                     >
                       <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -130,7 +137,10 @@ export default function UseRemoteDayDialog({
                 </div>
 
                 <div>
-                  <label htmlFor="date" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="date"
+                    className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Date
                   </label>
                   <input
@@ -146,7 +156,10 @@ export default function UseRemoteDayDialog({
                 </div>
 
                 <div>
-                  <label htmlFor="days" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="days"
+                    className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     Number of Days
                   </label>
                   <select
@@ -156,9 +169,9 @@ export default function UseRemoteDayDialog({
                     onChange={(e) => setDays(Number(e.target.value))}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-xs sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   >
-                    {[0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map(value => (
+                    {[0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((value) => (
                       <option key={value} value={value}>
-                        {value} {value === 1 ? 'day' : 'days'}
+                        {value} {value === 1 ? "day" : "days"}
                       </option>
                     ))}
                   </select>
@@ -176,10 +189,16 @@ export default function UseRemoteDayDialog({
                   <Button
                     type="submit"
                     isLoading={isSubmitting}
-                    disabled={isSubmitting || !date || days <= 0 || days > currentBalance}
+                    disabled={
+                      isSubmitting ||
+                      !date ||
+                      days <= 0 ||
+                      days > currentBalance
+                    }
                     size="sm"
                   >
-                    Schedule {workType === 'remote' ? 'Remote' : 'Flexible'} Work
+                    Schedule {workType === "remote" ? "Remote" : "Flexible"}{" "}
+                    Work
                   </Button>
                 </div>
               </form>

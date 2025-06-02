@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, X, Check, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui';
-import CheckInCamera from './CheckInCamera';
-import { useTeam } from '@/contexts/TeamContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { submitCheckIn } from '@/lib/checkin';
-import { toast } from 'sonner';
-import FocusLock from 'react-focus-lock';
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Camera, X, Check, MapPin } from "lucide-react";
+import { Button } from "@/components/ui";
+import CheckInCamera from "./CheckInCamera";
+import { useTeam } from "@/contexts/TeamContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { submitCheckIn } from "@/lib/checkin";
+import { toast } from "sonner";
+import FocusLock from "react-focus-lock";
 
 interface CheckInDialogProps {
   isOpen: boolean;
@@ -23,18 +23,18 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  
+
   // Refs for accessibility
   const initialFocusRef = useRef<HTMLButtonElement>(null);
   const previousActiveElement = useRef<Element | null>(null);
-  
+
   // Save the currently focused element when dialog opens
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement;
     }
   }, [isOpen]);
-  
+
   // Focus management - focus the close button when dialog opens
   useEffect(() => {
     if (isOpen && initialFocusRef.current) {
@@ -42,25 +42,29 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
         initialFocusRef.current?.focus();
       }, 100);
     }
-    
+
     // Return focus to the previously focused element when dialog closes
     return () => {
-      if (!isOpen && previousActiveElement.current && 'focus' in previousActiveElement.current) {
+      if (
+        !isOpen &&
+        previousActiveElement.current &&
+        "focus" in previousActiveElement.current
+      ) {
         (previousActiveElement.current as HTMLElement).focus();
       }
     };
   }, [isOpen]);
-  
+
   // Handle escape key
   useEffect(() => {
     const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && !isSubmitting && !success) {
+      if (e.key === "Escape" && isOpen && !isSubmitting && !success) {
         onClose();
       }
     };
-    
-    window.addEventListener('keydown', handleEscapeKey);
-    return () => window.removeEventListener('keydown', handleEscapeKey);
+
+    window.addEventListener("keydown", handleEscapeKey);
+    return () => window.removeEventListener("keydown", handleEscapeKey);
   }, [isOpen, isSubmitting, success, onClose]);
 
   const handleCapture = async (photoBlob: Blob) => {
@@ -70,13 +74,17 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
     // Get location if enabled
     if (currentTeam?.checkin_settings?.location_verification) {
       try {
-        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
-        });
+        const position = await new Promise<GeolocationPosition>(
+          (resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          },
+        );
         setLocation(position);
       } catch (err) {
-        console.error('Error getting location:', err);
-        toast.error('Unable to verify location. Please enable location services.');
+        console.error("Error getting location:", err);
+        toast.error(
+          "Unable to verify location. Please enable location services.",
+        );
       }
     }
   };
@@ -88,12 +96,7 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
     setError(null);
 
     try {
-      await submitCheckIn(
-        user.id,
-        currentTeam.id,
-        photo,
-        location?.coords
-      );
+      await submitCheckIn(user.id, currentTeam.id, photo, location?.coords);
 
       setSuccess(true);
       setTimeout(() => {
@@ -103,8 +106,8 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
         setLocation(null);
       }, 2000);
     } catch (err) {
-      console.error('Check-in error:', err);
-      setError('Failed to submit check-in. Please try again.');
+      console.error("Check-in error:", err);
+      setError("Failed to submit check-in. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -121,7 +124,7 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
 
   return (
     <FocusLock returnFocus={true}>
-      <div 
+      <div
         className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm flex items-center justify-center"
         onClick={handleBackdropClick}
         role="dialog"
@@ -137,7 +140,7 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
             className="relative w-full max-w-md sm:max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4 sm:p-6"
           >
             {success ? (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex flex-col items-center justify-center py-6 sm:py-8"
@@ -145,8 +148,15 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
                 <div className="w-14 h-14 sm:w-16 sm:h-16 bg-success/20 rounded-full flex items-center justify-center mb-4">
                   <Check className="h-7 w-7 sm:h-8 sm:w-8 text-success" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-medium text-gray-900 dark:text-white mb-2" id="checkin-dialog-title">Check-in Successful!</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Your office presence has been recorded.</p>
+                <h3
+                  className="text-lg sm:text-xl font-medium text-gray-900 dark:text-white mb-2"
+                  id="checkin-dialog-title"
+                >
+                  Check-in Successful!
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Your office presence has been recorded.
+                </p>
               </motion.div>
             ) : (
               <>
@@ -156,7 +166,10 @@ export default function CheckInDialog({ isOpen, onClose }: CheckInDialogProps) {
                       <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-xl font-medium text-gray-900 dark:text-gray-100" id="checkin-dialog-title">
+                      <h3
+                        className="text-base sm:text-xl font-medium text-gray-900 dark:text-gray-100"
+                        id="checkin-dialog-title"
+                      >
                         My Office Check-in
                       </h3>
                       <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">

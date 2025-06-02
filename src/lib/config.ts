@@ -1,4 +1,3 @@
-
 interface AppConfig {
   api: {
     baseUrl: string;
@@ -48,7 +47,7 @@ class ConfigManager {
   private loadConfig(): AppConfig {
     const defaultConfig: AppConfig = {
       api: {
-        baseUrl: '/api',
+        baseUrl: "/api",
         timeout: 30000,
         retryAttempts: 3,
       },
@@ -58,7 +57,7 @@ class ConfigManager {
       },
       features: {
         enableAnalytics: import.meta.env.PROD,
-        enablePushNotifications: 'Notification' in window,
+        enablePushNotifications: "Notification" in window,
         enableFileUpload: true,
         maxFileSize: 5 * 1024 * 1024, // 5MB
       },
@@ -80,12 +79,17 @@ class ConfigManager {
       api: {
         ...defaultConfig.api,
         baseUrl: import.meta.env.VITE_API_BASE_URL || defaultConfig.api.baseUrl,
-        timeout: Number(import.meta.env.VITE_API_TIMEOUT) || defaultConfig.api.timeout,
+        timeout:
+          Number(import.meta.env.VITE_API_TIMEOUT) || defaultConfig.api.timeout,
       },
       features: {
         ...defaultConfig.features,
-        enableAnalytics: import.meta.env.VITE_ENABLE_ANALYTICS === 'true' || defaultConfig.features.enableAnalytics,
-        maxFileSize: Number(import.meta.env.VITE_MAX_FILE_SIZE) || defaultConfig.features.maxFileSize,
+        enableAnalytics:
+          import.meta.env.VITE_ENABLE_ANALYTICS === "true" ||
+          defaultConfig.features.enableAnalytics,
+        maxFileSize:
+          Number(import.meta.env.VITE_MAX_FILE_SIZE) ||
+          defaultConfig.features.maxFileSize,
       },
     };
   }
@@ -96,7 +100,7 @@ class ConfigManager {
 
   getValue<K extends keyof AppConfig, T extends keyof AppConfig[K]>(
     section: K,
-    key: T
+    key: T,
   ): AppConfig[K][T] {
     return this.config[section][key];
   }
@@ -121,8 +125,8 @@ class ConfigManager {
 export const config = ConfigManager.getInstance();
 
 // Convenience exports
-export const apiConfig = config.get('api');
-export const authConfig = config.get('auth');
-export const featureFlags = config.get('features');
-export const uiConfig = config.get('ui');
-export const performanceConfig = config.get('performance');
+export const apiConfig = config.get("api");
+export const authConfig = config.get("auth");
+export const featureFlags = config.get("features");
+export const uiConfig = config.get("ui");
+export const performanceConfig = config.get("performance");

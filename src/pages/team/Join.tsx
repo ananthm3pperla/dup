@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Users, AlertCircle, Check } from 'lucide-react';
-import { useTeam } from '@/contexts/TeamContext';
-import { useAuth } from '@/contexts/AuthContext';
-import Button from '@/components/ui/Button';
-import LoadingState from '@/components/ui/LoadingState';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Users, AlertCircle, Check } from "lucide-react";
+import { useTeam } from "@/contexts/TeamContext";
+import { useAuth } from "@/contexts/AuthContext";
+import Button from "@/components/ui/Button";
+import LoadingState from "@/components/ui/LoadingState";
 
 export default function TeamJoin() {
   const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
   const { joinTeam, loading, error } = useTeam();
   const { user } = useAuth();
-  
+
   const [isValidating, setIsValidating] = useState(true);
   const [isValid, setIsValid] = useState(false);
   const [teamName, setTeamName] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function TeamJoin() {
   useEffect(() => {
     const validateToken = async () => {
       if (!token) {
-        setJoinError('No invite link provided');
+        setJoinError("No invite link provided");
         setIsValidating(false);
         return;
       }
@@ -30,17 +30,17 @@ export default function TeamJoin() {
         // For demo purposes, we'll just assume it's valid
         const isValid = true;
         setIsValid(isValid);
-        
+
         if (isValid) {
           // Get team details
           const team = await joinTeam(token);
           setTeamName(team.name);
         } else {
-          setJoinError('This invite link has expired');
+          setJoinError("This invite link has expired");
         }
       } catch (err) {
-        console.error('Error validating invite:', err);
-        setJoinError('Invalid invite link');
+        console.error("Error validating invite:", err);
+        setJoinError("Invalid invite link");
       } finally {
         setIsValidating(false);
       }
@@ -51,13 +51,13 @@ export default function TeamJoin() {
 
   const handleJoin = async () => {
     if (!token || !isValid) return;
-    
+
     try {
       await joinTeam(token);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      console.error('Error joining team:', err);
-      setJoinError(err instanceof Error ? err.message : 'Failed to join team');
+      console.error("Error joining team:", err);
+      setJoinError(err instanceof Error ? err.message : "Failed to join team");
     }
   };
 
@@ -73,7 +73,7 @@ export default function TeamJoin() {
         </div>
         <h1 className="mt-4 text-2xl font-bold text-gray-900">Join Team</h1>
         <p className="mt-2 text-gray-600">
-          {isValid 
+          {isValid
             ? "You've been invited to join a team on Hi-Bridge"
             : "This invite link is no longer valid"}
         </p>
@@ -84,7 +84,10 @@ export default function TeamJoin() {
           <div className="mb-6 rounded-md bg-red-50 p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                <AlertCircle
+                  className="h-5 w-5 text-red-400"
+                  aria-hidden="true"
+                />
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">
@@ -110,7 +113,9 @@ export default function TeamJoin() {
                   <Check className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Ready to join</h3>
+                  <h3 className="text-sm font-medium text-gray-900">
+                    Ready to join
+                  </h3>
                   <p className="text-xs text-gray-600">
                     You'll be joining as {user?.email}
                   </p>
@@ -119,10 +124,7 @@ export default function TeamJoin() {
             </div>
 
             <div className="flex items-center justify-end gap-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/teams')}
-              >
+              <Button variant="outline" onClick={() => navigate("/teams")}>
                 Cancel
               </Button>
               <Button
@@ -138,15 +140,15 @@ export default function TeamJoin() {
           <div className="text-center">
             <div className="bg-red-50 rounded-lg p-6 mb-4">
               <AlertCircle className="h-8 w-8 text-red-600 mx-auto mb-2" />
-              <h3 className="text-lg font-medium text-gray-900">Invalid Invite Link</h3>
+              <h3 className="text-lg font-medium text-gray-900">
+                Invalid Invite Link
+              </h3>
               <p className="text-sm text-gray-600 mt-2">
-                This invite link is either invalid or has expired. Please request a new invite link from your team leader.
+                This invite link is either invalid or has expired. Please
+                request a new invite link from your team leader.
               </p>
             </div>
-            <Button
-              onClick={() => navigate('/teams')}
-              variant="outline"
-            >
+            <Button onClick={() => navigate("/teams")} variant="outline">
               Return to Teams
             </Button>
           </div>

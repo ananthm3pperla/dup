@@ -1,15 +1,15 @@
 interface LogLevel {
-  DEBUG: 'debug';
-  INFO: 'info';
-  WARN: 'warn';
-  ERROR: 'error';
+  DEBUG: "debug";
+  INFO: "info";
+  WARN: "warn";
+  ERROR: "error";
 }
 
 const LOG_LEVELS: LogLevel = {
-  DEBUG: 'debug',
-  INFO: 'info',
-  WARN: 'warn',
-  ERROR: 'error'
+  DEBUG: "debug",
+  INFO: "info",
+  WARN: "warn",
+  ERROR: "error",
 };
 
 class Logger {
@@ -17,20 +17,20 @@ class Logger {
 
   debug(message: string, data?: any): void {
     if (this.isDevelopment) {
-      console.debug(`[DEBUG] ${message}`, data || '');
+      console.debug(`[DEBUG] ${message}`, data || "");
     }
   }
 
   info(message: string, data?: any): void {
-    console.info(`[INFO] ${message}`, data || '');
+    console.info(`[INFO] ${message}`, data || "");
   }
 
   warn(message: string, data?: any): void {
-    console.warn(`[WARN] ${message}`, data || '');
+    console.warn(`[WARN] ${message}`, data || "");
   }
 
   error(message: string, error?: Error | any, data?: any): void {
-    console.error(`[ERROR] ${message}`, error || '', data || '');
+    console.error(`[ERROR] ${message}`, error || "", data || "");
   }
 }
 

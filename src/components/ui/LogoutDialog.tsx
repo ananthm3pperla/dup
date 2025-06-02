@@ -1,8 +1,8 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import Button from './Button';
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Button from "./Button";
 
 interface LogoutDialogProps {
   isOpen: boolean;
@@ -12,31 +12,31 @@ interface LogoutDialogProps {
   isDemo?: boolean;
 }
 
-export default function LogoutDialog({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
+export default function LogoutDialog({
+  isOpen,
+  onClose,
+  onConfirm,
   isLoading = false,
-  isDemo = false
+  isDemo = false,
 }: LogoutDialogProps) {
   const navigate = useNavigate();
-  
+
   // Handle escape key
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    
+
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isOpen, onClose]);
 
   const handleConfirm = async () => {
     await onConfirm();
     // After signing out, navigate to landing page
-    navigate('/');
+    navigate("/");
   };
 
   if (!isOpen) return null;
@@ -55,7 +55,9 @@ export default function LogoutDialog({
         />
 
         {/* This element centers the modal contents. */}
-        <span className="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+        <span className="inline-block h-screen align-middle" aria-hidden="true">
+          &#8203;
+        </span>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -73,7 +75,7 @@ export default function LogoutDialog({
                 Sign out
               </h3>
               <p className="mt-2 text-sm text-muted">
-                {isDemo 
+                {isDemo
                   ? "Are you sure you want to exit demo mode? You'll return to the landing page."
                   : "Are you sure you want to sign out? You'll need to sign in again to access your account."}
               </p>

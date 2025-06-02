@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Camera, MapPin, Check } from 'lucide-react';
-import { Card, Button } from '@/components/ui';
-import { CheckInButton } from '@/components/checkin';
-import { format } from 'date-fns';
-import { checkinAPI } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import { motion } from 'framer-motion';
-import { isDemoMode } from '@/lib/demo';
+import React, { useEffect, useState } from "react";
+import { Camera, MapPin, Check } from "lucide-react";
+import { Card, Button } from "@/components/ui";
+import { CheckInButton } from "@/components/checkin";
+import { format } from "date-fns";
+import { checkinAPI } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
+import { isDemoMode } from "@/lib/demo";
 
 interface CheckInCardProps {
   className?: string;
@@ -36,13 +36,15 @@ export default function CheckInCard({ className }: CheckInCardProps) {
         if (isDemoMode()) {
           // Create mock check-in data for demo mode
           const mockCheckIn = {
-            id: 'demo-checkin-1',
+            id: "demo-checkin-1",
             user_id: user.id,
-            team_id: 'demo-team-id',
-            checkin_time: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-            photo_url: 'https://example.com/demo-photo.jpg',
+            team_id: "demo-team-id",
+            checkin_time: new Date(
+              Date.now() - 2 * 60 * 60 * 1000,
+            ).toISOString(), // 2 hours ago
+            photo_url: "https://example.com/demo-photo.jpg",
             location_verified: true,
-            status: 'approved' as const,
+            status: "approved" as const,
             created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           };
 
@@ -56,7 +58,7 @@ export default function CheckInCard({ className }: CheckInCardProps) {
           const checkIns = await checkinAPI.getUserCheckIns(
             user.id,
             startDate.toISOString(),
-            today.toISOString()
+            today.toISOString(),
           );
 
           if (checkIns && checkIns.length > 0) {
@@ -65,31 +67,35 @@ export default function CheckInCard({ className }: CheckInCardProps) {
             setLastCheckIn(null);
           }
         } catch (apiError: any) {
-          console.warn('Check-in API call failed, using fallback:', apiError);
+          console.warn("Check-in API call failed, using fallback:", apiError);
 
           // Create a fallback check-in for demonstration
           const fallbackCheckIn = {
-            id: 'fallback-checkin-1',
-            checkin_time: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-            status: 'approved' as const,
-            location_verified: true
+            id: "fallback-checkin-1",
+            checkin_time: new Date(
+              Date.now() - 2 * 60 * 60 * 1000,
+            ).toISOString(),
+            status: "approved" as const,
+            location_verified: true,
           };
 
           setLastCheckIn(fallbackCheckIn);
         }
       } catch (error: any) {
-        console.error('Error loading check-ins:', error);
+        console.error("Error loading check-ins:", error);
 
         // More graceful error handling - don't fail the entire component
-        setError('Unable to load check-in data.');
+        setError("Unable to load check-in data.");
 
         // Use a fallback check-in
         if (retryCount < 2) {
           const fallbackCheckIn = {
-            id: 'error-fallback-checkin',
-            checkin_time: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-            status: 'approved' as const,
-            location_verified: true
+            id: "error-fallback-checkin",
+            checkin_time: new Date(
+              Date.now() - 2 * 60 * 60 * 1000,
+            ).toISOString(),
+            status: "approved" as const,
+            location_verified: true,
           };
 
           setLastCheckIn(fallbackCheckIn);
@@ -103,11 +109,11 @@ export default function CheckInCard({ className }: CheckInCardProps) {
   }, [user?.id, retryCount]);
 
   const handleRetry = () => {
-    setRetryCount(prev => prev + 1);
+    setRetryCount((prev) => prev + 1);
   };
 
   return (
-    <Card 
+    <Card
       className={`p-4 sm:p-6 ${className} dark:border dark:border-gray-700 check-in-card overflow-hidden`}
       variant="elevated"
     >
@@ -116,20 +122,27 @@ export default function CheckInCard({ className }: CheckInCardProps) {
           <div className="p-2 bg-primary/10 rounded-lg dark:bg-primary/20">
             <Camera className="h-5 w-5 text-primary" />
           </div>
-          <h3 className="text-base sm:text-lg font-medium text-default dark:text-white">Office Check-in</h3>
+          <h3 className="text-base sm:text-lg font-medium text-default dark:text-white">
+            Office Check-in
+          </h3>
         </div>
         {lastCheckIn && (
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             className={`
               px-2 py-1 text-xs font-medium rounded-full
-              ${lastCheckIn.status === 'approved' ? 'bg-success/10 text-success' :
-                lastCheckIn.status === 'rejected' ? 'bg-error/10 text-error' :
-                'bg-warning/10 text-warning'}
+              ${
+                lastCheckIn.status === "approved"
+                  ? "bg-success/10 text-success"
+                  : lastCheckIn.status === "rejected"
+                    ? "bg-error/10 text-error"
+                    : "bg-warning/10 text-warning"
+              }
             `}
           >
-            {lastCheckIn.status.charAt(0).toUpperCase() + lastCheckIn.status.slice(1)}
+            {lastCheckIn.status.charAt(0).toUpperCase() +
+              lastCheckIn.status.slice(1)}
           </motion.span>
         )}
       </div>
@@ -142,17 +155,15 @@ export default function CheckInCard({ className }: CheckInCardProps) {
         </div>
       ) : error ? (
         <div className="text-center py-6">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{error}</p>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleRetry}
-          >
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            {error}
+          </p>
+          <Button variant="outline" size="sm" onClick={handleRetry}>
             Retry
           </Button>
         </div>
       ) : lastCheckIn ? (
-        <motion.div 
+        <motion.div
           className="space-y-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,7 +172,7 @@ export default function CheckInCard({ className }: CheckInCardProps) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted dark:text-gray-400">Last Check-in</span>
             <span className="font-medium text-default dark:text-white">
-              {format(new Date(lastCheckIn.checkin_time), 'h:mm a')}
+              {format(new Date(lastCheckIn.checkin_time), "h:mm a")}
             </span>
           </div>
           {lastCheckIn.location_verified && (
@@ -171,11 +182,13 @@ export default function CheckInCard({ className }: CheckInCardProps) {
               <Check className="h-4 w-4" />
             </div>
           )}
-          <Button 
+          <Button
             className="w-full justify-center bg-primary hover:bg-primary-dark text-white"
             leftIcon={<Camera className="h-4 w-4" />}
             onClick={() => {
-              const checkInButton = document.querySelector('.check-in-card button') as HTMLButtonElement;
+              const checkInButton = document.querySelector(
+                ".check-in-card button",
+              ) as HTMLButtonElement;
               if (checkInButton) checkInButton.click();
             }}
           >
@@ -183,7 +196,7 @@ export default function CheckInCard({ className }: CheckInCardProps) {
           </Button>
         </motion.div>
       ) : (
-        <motion.div 
+        <motion.div
           className="text-center py-6 sm:py-8 dark:text-gray-400"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

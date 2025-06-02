@@ -1,6 +1,6 @@
-import React from 'react';
-import { colorPalette, getContrastRatio } from '@/lib/colors';
-import { Check, AlertTriangle } from 'lucide-react';
+import React from "react";
+import { colorPalette, getContrastRatio } from "@/lib/colors";
+import { Check, AlertTriangle } from "lucide-react";
 
 interface ColorSwatchProps {
   colorName: string;
@@ -9,29 +9,28 @@ interface ColorSwatchProps {
   showContrast?: boolean;
 }
 
-export default function ColorSwatch({ 
-  colorName, 
-  colorValue, 
-  textColor = '#FFFFFF',
-  showContrast = true
+export default function ColorSwatch({
+  colorName,
+  colorValue,
+  textColor = "#FFFFFF",
+  showContrast = true,
 }: ColorSwatchProps) {
-  const contrastRatio = showContrast ? getContrastRatio(textColor, colorValue) : 0;
+  const contrastRatio = showContrast
+    ? getContrastRatio(textColor, colorValue)
+    : 0;
   const meetsAA = contrastRatio >= 4.5;
   const meetsAAA = contrastRatio >= 7;
-  
+
   return (
     <div className="flex flex-col">
-      <div 
+      <div
         className="h-16 rounded-md flex items-center justify-center mb-2 relative"
         style={{ backgroundColor: colorValue }}
       >
-        <span 
-          className="font-medium"
-          style={{ color: textColor }}
-        >
+        <span className="font-medium" style={{ color: textColor }}>
           Aa
         </span>
-        
+
         {showContrast && (
           <div className="absolute bottom-1 right-1 flex items-center gap-1">
             {meetsAAA ? (
@@ -54,13 +53,17 @@ export default function ColorSwatch({
         <p className="font-medium text-default">{colorName}</p>
         <p className="text-muted">{colorValue}</p>
         {showContrast && (
-          <p className={`text-xs ${
-            meetsAAA ? 'text-success' : 
-            meetsAA ? 'text-success' : 
-            'text-error'
-          }`}>
+          <p
+            className={`text-xs ${
+              meetsAAA
+                ? "text-success"
+                : meetsAA
+                  ? "text-success"
+                  : "text-error"
+            }`}
+          >
             {contrastRatio.toFixed(2)}:1
-            {meetsAAA ? ' (AAA)' : meetsAA ? ' (AA)' : ' (Fails)'}
+            {meetsAAA ? " (AAA)" : meetsAA ? " (AA)" : " (Fails)"}
           </p>
         )}
       </div>

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Alert, Button } from '@/components/ui';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { toast } from 'sonner';
-import { isDemoMode } from '@/lib/demo';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Alert, Button } from "@/components/ui";
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
+import { isDemoMode } from "@/lib/demo";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AuthErrorHandler() {
   const [authError, setAuthError] = useState<string | null>(null);
@@ -20,20 +20,20 @@ export default function AuthErrorHandler() {
       }
 
       // Check for invalid session
-      const sessionData = localStorage.getItem('hibridge_session');
+      const sessionData = localStorage.getItem("hibridge_session");
       if (!sessionData && user) {
-        setAuthError('Your session is invalid. Please sign in again.');
+        setAuthError("Your session is invalid. Please sign in again.");
       }
 
       // Listen for storage events (session changes in other tabs)
       const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'hibridge_session' && !e.newValue && user) {
-          setAuthError('You have been signed out in another tab.');
+        if (e.key === "hibridge_session" && !e.newValue && user) {
+          setAuthError("You have been signed out in another tab.");
         }
       };
 
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
+      window.addEventListener("storage", handleStorageChange);
+      return () => window.removeEventListener("storage", handleStorageChange);
     };
 
     return handleAuthErrors();
@@ -43,20 +43,20 @@ export default function AuthErrorHandler() {
     setIsRetrying(true);
     try {
       // Check if session can be restored
-      const sessionData = localStorage.getItem('hibridge_session');
+      const sessionData = localStorage.getItem("hibridge_session");
       if (sessionData) {
         // Session exists, clear error
         setAuthError(null);
-        toast.success('Session restored');
+        toast.success("Session restored");
       } else {
         // No session, redirect to login
         await signOut();
-        navigate('/auth/login');
+        navigate("/auth/login");
       }
     } catch (error) {
-      console.error('Error retrying auth:', error);
-      toast.error('Failed to restore session');
-      navigate('/auth/login');
+      console.error("Error retrying auth:", error);
+      toast.error("Failed to restore session");
+      navigate("/auth/login");
     } finally {
       setIsRetrying(false);
     }
@@ -66,12 +66,12 @@ export default function AuthErrorHandler() {
     try {
       await signOut();
       setAuthError(null);
-      navigate('/auth/login');
+      navigate("/auth/login");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
       // Force sign out even if it fails
-      localStorage.removeItem('hibridge_session');
-      navigate('/auth/login');
+      localStorage.removeItem("hibridge_session");
+      navigate("/auth/login");
     }
   };
 
@@ -97,8 +97,10 @@ export default function AuthErrorHandler() {
               disabled={isRetrying}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
-              <RefreshCw className={`h-4 w-4 mr-1 ${isRetrying ? 'animate-spin' : ''}`} />
-              {isRetrying ? 'Retrying...' : 'Retry'}
+              <RefreshCw
+                className={`h-4 w-4 mr-1 ${isRetrying ? "animate-spin" : ""}`}
+              />
+              {isRetrying ? "Retrying..." : "Retry"}
             </Button>
             <Button
               size="sm"

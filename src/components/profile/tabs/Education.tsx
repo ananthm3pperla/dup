@@ -1,9 +1,16 @@
-import React from 'react';
-import { Plus } from 'lucide-react';
-import { EditableEducation } from '@/components/profile';
-import type { TabComponentProps, Education } from '@/types';
+import React from "react";
+import { Plus } from "lucide-react";
+import { EditableEducation } from "@/components/profile";
+import type { TabComponentProps, Education } from "@/types";
 
-export default function Education({ profile, canEdit = false, isSaving = false, onAdd, onSave, onDelete }: TabComponentProps) {
+export default function Education({
+  profile,
+  canEdit = false,
+  isSaving = false,
+  onAdd,
+  onSave,
+  onDelete,
+}: TabComponentProps) {
   return (
     <div className="bg-card rounded-lg p-6 shadow-md">
       <div className="flex items-center justify-between mb-6">

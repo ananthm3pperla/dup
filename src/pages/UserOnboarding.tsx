@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Building2, AlertCircle, LifeBuoy } from 'lucide-react';
-import { LoadingState, Button, Alert } from '@/components/ui';
-import { toast } from 'sonner';
-import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
-import { AccountSecurity } from '@/components/auth';
-import { isDemoMode } from '@/lib/demo';
-import { userAPI } from '@/lib/api';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Building2, AlertCircle, LifeBuoy } from "lucide-react";
+import { LoadingState, Button, Alert } from "@/components/ui";
+import { toast } from "sonner";
+import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
+import { AccountSecurity } from "@/components/auth";
+import { isDemoMode } from "@/lib/demo";
+import { userAPI } from "@/lib/api";
 
 export default function UserOnboarding() {
   const navigate = useNavigate();
   const { user, enterDemoMode } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stage, setStage] = useState<'profile' | 'security'>('profile');
+  const [stage, setStage] = useState<"profile" | "security">("profile");
   const [hasSeenWalkthrough, setHasSeenWalkthrough] = useState(false);
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       if (!user) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
@@ -36,50 +36,58 @@ export default function UserOnboarding() {
 
         // Check if user has already completed onboarding
         const { data, error: queryError } = await supabase
-          .from('user_onboarding')
-          .select('*')
-          .eq('user_id', user.id)
+          .from("user_onboarding")
+          .select("*")
+          .eq("user_id", user.id)
           .maybeSingle();
 
         if (queryError) {
           // Don't throw on 'no rows returned' (PGRST116)
-          if (queryError.code !== 'PGRST116') {
-            console.error('Error checking onboarding status:', queryError);
+          if (queryError.code !== "PGRST116") {
+            console.error("Error checking onboarding status:", queryError);
 
-            if (queryError.code === 'PGRST406') {
+            if (queryError.code === "PGRST406") {
               // Permission error - likely RLS issue
-              throw new Error('Permission denied accessing onboarding data. This may be a temporary issue with our database.');
+              throw new Error(
+                "Permission denied accessing onboarding data. This may be a temporary issue with our database.",
+              );
             } else {
-              throw new Error('Failed to check onboarding status');
+              throw new Error("Failed to check onboarding status");
             }
           }
 
           // If no onboarding record exists, create one
           const { error: insertError } = await supabase
-            .from('user_onboarding')
+            .from("user_onboarding")
             .insert({
               user_id: user.id,
-              onboarding_completed: false
+              onboarding_completed: false,
             });
 
           if (insertError) {
-            console.error('Error creating onboarding record:', insertError);
-            if (insertError.code === 'PGRST406') {
-              throw new Error('Permission denied creating onboarding data. This may be a temporary issue with our database.');
+            console.error("Error creating onboarding record:", insertError);
+            if (insertError.code === "PGRST406") {
+              throw new Error(
+                "Permission denied creating onboarding data. This may be a temporary issue with our database.",
+              );
             }
-            throw new Error('Failed to create onboarding record');
+            throw new Error("Failed to create onboarding record");
           }
         } else if (data?.onboarding_completed) {
           // If user already completed onboarding, redirect to dashboard
-          navigate('/dashboard');
+          navigate("/dashboard");
           return;
         }
 
         // Check if user has seen the walkthrough
-        setHasSeenWalkthrough(!!localStorage.getItem('hasSeenWalkthrough'));
+        setHasSeenWalkthrough(!!localStorage.getItem("hasSeenWalkthrough"));
       } catch (err) {
-        console.error('Error in onboarding check:', err);
-        setError(err instanceof Error ? err.message : 'There was an error checking your onboarding status');
+        console.error("Error in onboarding check:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "There was an error checking your onboarding status",
+        );
       } finally {
         setLoading(false);
       }
@@ -89,7 +97,7 @@ export default function UserOnboarding() {
   }, [user, navigate]);
 
   const handleProfileComplete = () => {
-    setStage('security');
+    setStage("security");
   };
 
   const handleSecurityComplete = async () => {
@@ -102,35 +110,42 @@ export default function UserOnboarding() {
 
       // In demo mode, just navigate to dashboard
       if (isDemoMode()) {
-        toast.success('Setup complete! Welcome to Hi-Bridge');
+        toast.success("Setup complete! Welcome to Hi-Bridge");
 
         // Set walkthrough flag for first-time users
         if (!hasSeenWalkthrough) {
-          localStorage.setItem('hasSeenWalkthrough', 'true');
+          localStorage.setItem("hasSeenWalkthrough", "true");
         }
 
-        navigate('/dashboard');
+        navigate("/dashboard");
         return;
       }
 
       // Update user's onboarding status
       const { data, error } = await supabase
-        .from('user_onboarding')
-        .upsert({ 
-          user_id: user.id,
-          onboarding_completed: true,
-          onboarding_completed_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
-        }).select().single();
+        .from("user_onboarding")
+        .upsert(
+          {
+            user_id: user.id,
+            onboarding_completed: true,
+            onboarding_completed_at: new Date().toISOString(),
+          },
+          {
+            onConflict: "user_id",
+          },
+        )
+        .select()
+        .single();
 
       if (error) {
-        if (error.code === 'PGRST406') {
+        if (error.code === "PGRST406") {
           // Handle permission error
-          console.error('Permission error completing onboarding:', error);
+          console.error("Permission error completing onboarding:", error);
           // We'll just proceed to dashboard anyway
-          toast.warning('Your preferences have been saved but there was an issue updating your profile. Some features might be limited.');
-          navigate('/dashboard');
+          toast.warning(
+            "Your preferences have been saved but there was an issue updating your profile. Some features might be limited.",
+          );
+          navigate("/dashboard");
           return;
         }
         throw error;
@@ -138,31 +153,31 @@ export default function UserOnboarding() {
 
       // Set walkthrough flag for first-time users
       if (!hasSeenWalkthrough) {
-        localStorage.setItem('hasSeenWalkthrough', 'true');
+        localStorage.setItem("hasSeenWalkthrough", "true");
       }
 
-      toast.success('Setup complete! Welcome to Hi-Bridge');
-      navigate('/dashboard');
+      toast.success("Setup complete! Welcome to Hi-Bridge");
+      navigate("/dashboard");
     } catch (err) {
-      console.error('Error completing onboarding:', err);
-      toast.error('Failed to complete setup. Please try again.');
-      setError('Failed to complete onboarding');
+      console.error("Error completing onboarding:", err);
+      toast.error("Failed to complete setup. Please try again.");
+      setError("Failed to complete onboarding");
     }
   };
 
   const handleTryDemoMode = async () => {
     try {
       await enterDemoMode();
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      console.error('Error entering demo mode:', err);
-      toast.error('Failed to enter demo mode');
+      console.error("Error entering demo mode:", err);
+      toast.error("Failed to enter demo mode");
     }
   };
 
   const handleContactSupport = () => {
     // In a real implementation, this would open a support chat or email
-    window.open('mailto:support@hi-bridge.com', '_blank');
+    window.open("mailto:support@hi-bridge.com", "_blank");
   };
 
   if (loading) {
@@ -188,8 +203,8 @@ export default function UserOnboarding() {
             >
               <p className="mb-4">{error}</p>
               <div className="flex flex-wrap gap-3 justify-center mt-2">
-                <Button 
-                  onClick={() => navigate('/dashboard')}
+                <Button
+                  onClick={() => navigate("/dashboard")}
                   variant="primary"
                   size="sm"
                 >
@@ -224,12 +239,12 @@ export default function UserOnboarding() {
     );
   }
 
-  if (stage === 'profile') {
+  if (stage === "profile") {
     return (
       <OnboardingFlow
-        userId={user?.id || ''}
-        userEmail={user?.email || ''}
-        initialName={user?.user_metadata?.full_name || ''}
+        userId={user?.id || ""}
+        userEmail={user?.email || ""}
+        initialName={user?.user_metadata?.full_name || ""}
         onComplete={handleProfileComplete}
       />
     );
@@ -238,8 +253,8 @@ export default function UserOnboarding() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <AccountSecurity 
-          userId={user?.id || ''}
+        <AccountSecurity
+          userId={user?.id || ""}
           onComplete={handleSecurityComplete}
         />
       </div>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { User, Mail, Building2, MapPin, Briefcase } from 'lucide-react';
-import { Button, Input, Alert } from '@/components/ui';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import { User, Mail, Building2, MapPin, Briefcase } from "lucide-react";
+import { Button, Input, Alert } from "@/components/ui";
+import { motion } from "framer-motion";
 
 interface ProfileData {
   fullName: string;
@@ -17,59 +17,67 @@ interface ProfileSetupProps {
   onSkip?: () => void;
 }
 
-export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: ProfileSetupProps) {
+export default function ProfileSetup({
+  initialData = {},
+  onComplete,
+  onSkip,
+}: ProfileSetupProps) {
   const [formData, setFormData] = useState<ProfileData>({
-    fullName: initialData.fullName || '',
-    companyName: initialData.companyName || '',
-    jobTitle: initialData.jobTitle || '',
-    department: initialData.department || '',
-    officeLocation: initialData.officeLocation || ''
+    fullName: initialData.fullName || "",
+    companyName: initialData.companyName || "",
+    jobTitle: initialData.jobTitle || "",
+    department: initialData.department || "",
+    officeLocation: initialData.officeLocation || "",
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof ProfileData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ProfileData, string>>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error when typing
     if (errors[name as keyof ProfileData]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
   const validateForm = () => {
     const newErrors: Partial<Record<keyof ProfileData, string>> = {};
-    
+
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+      newErrors.fullName = "Full name is required";
     }
-    
+
     if (!formData.companyName.trim()) {
-      newErrors.companyName = 'Company name is required';
+      newErrors.companyName = "Company name is required";
     }
-    
+
     if (!formData.jobTitle.trim()) {
-      newErrors.jobTitle = 'Job title is required';
+      newErrors.jobTitle = "Job title is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       onComplete(formData);
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error("Error saving profile:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -77,15 +85,17 @@ export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: P
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Tell us about yourself</h2>
-      
-      <Alert 
-        variant="info" 
-        className="mb-6"
-      >
-        <p className="text-sm">This information helps us personalize your experience and connect you with your team.</p>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+        Tell us about yourself
+      </h2>
+
+      <Alert variant="info" className="mb-6">
+        <p className="text-sm">
+          This information helps us personalize your experience and connect you
+          with your team.
+        </p>
       </Alert>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <Input
           label="Full Name"
@@ -97,7 +107,7 @@ export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: P
           error={errors.fullName}
           helperText="This is how your name will appear to team members"
         />
-        
+
         <Input
           label="Company Name"
           name="companyName"
@@ -107,7 +117,7 @@ export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: P
           required
           error={errors.companyName}
         />
-        
+
         <Input
           label="Job Title"
           name="jobTitle"
@@ -117,9 +127,12 @@ export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: P
           required
           error={errors.jobTitle}
         />
-        
+
         <div>
-          <label htmlFor="department" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label
+            htmlFor="department"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
             Department
           </label>
           <div className="relative">
@@ -148,10 +161,12 @@ export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: P
             </select>
           </div>
           {errors.department && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.department}</p>
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+              {errors.department}
+            </p>
           )}
         </div>
-        
+
         <Input
           label="Office Location"
           name="officeLocation"
@@ -161,17 +176,17 @@ export default function ProfileSetup({ initialData = {}, onComplete, onSkip }: P
           placeholder="City, State"
           error={errors.officeLocation}
         />
-        
+
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full sm:w-auto sm:flex-1"
             isLoading={isSubmitting}
             disabled={isSubmitting}
           >
             Continue
           </Button>
-          
+
           {onSkip && (
             <Button
               type="button"

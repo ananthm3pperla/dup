@@ -1,7 +1,7 @@
-import React from 'react';
-import { Plus } from 'lucide-react';
-import { EditableWorkHistory } from '@/components/profile';
-import type { WorkHistory } from '@/types';
+import React from "react";
+import { Plus } from "lucide-react";
+import { EditableWorkHistory } from "@/components/profile";
+import type { WorkHistory } from "@/types";
 
 interface ExperienceProps {
   profile: any;
@@ -18,7 +18,7 @@ export default function Experience({
   isSaving = false,
   onAdd,
   onSave,
-  onDelete
+  onDelete,
 }: ExperienceProps) {
   return (
     <div className="bg-card rounded-lg p-6 shadow-md">
@@ -36,22 +36,27 @@ export default function Experience({
         )}
       </div>
       <div className="space-y-6">
-        {profile.member_work_history && profile.member_work_history.length > 0 ? (
-          profile.member_work_history.map((work: WorkHistory, index: number) => (
-            <EditableWorkHistory
-              key={index}
-              work={work}
-              index={index}
-              onSave={onSave}
-              onDelete={onDelete}
-              canEdit={canEdit}
-            />
-          ))
+        {profile.member_work_history &&
+        profile.member_work_history.length > 0 ? (
+          profile.member_work_history.map(
+            (work: WorkHistory, index: number) => (
+              <EditableWorkHistory
+                key={index}
+                work={work}
+                index={index}
+                onSave={onSave}
+                onDelete={onDelete}
+                canEdit={canEdit}
+              />
+            ),
+          )
         ) : (
           <div className="text-center py-8 text-muted">
             {canEdit ? (
               <div>
-                <p className="mb-4">No work history available. Add your professional experience.</p>
+                <p className="mb-4">
+                  No work history available. Add your professional experience.
+                </p>
                 <button
                   onClick={onAdd}
                   disabled={isSaving}

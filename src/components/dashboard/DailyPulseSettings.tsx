@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { Settings, Bell, Save, X, AlertCircle } from 'lucide-react';
-import { usePulseStore } from '@/lib/store/pulseStore';
+import React, { useState } from "react";
+import { Settings, Bell, Save, X, AlertCircle } from "lucide-react";
+import { usePulseStore } from "@/lib/store/pulseStore";
 
 interface DailyPulseSettingsProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function DailyPulseSettings({ isOpen, onClose }: DailyPulseSettingsProps) {
-  const { notificationPreferences, updateNotificationPreferences } = usePulseStore();
+export default function DailyPulseSettings({
+  isOpen,
+  onClose,
+}: DailyPulseSettingsProps) {
+  const { notificationPreferences, updateNotificationPreferences } =
+    usePulseStore();
   const [prefs, setPrefs] = useState(notificationPreferences);
 
   if (!isOpen) return null;
@@ -21,7 +25,7 @@ export default function DailyPulseSettings({ isOpen, onClose }: DailyPulseSettin
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div 
+        <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
         />
@@ -42,10 +46,14 @@ export default function DailyPulseSettings({ isOpen, onClose }: DailyPulseSettin
                       <input
                         type="checkbox"
                         checked={prefs.enabled}
-                        onChange={(e) => setPrefs(p => ({ ...p, enabled: e.target.checked }))}
+                        onChange={(e) =>
+                          setPrefs((p) => ({ ...p, enabled: e.target.checked }))
+                        }
                         className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                       />
-                      <span className="ml-2 text-sm text-gray-900">Enable notifications</span>
+                      <span className="ml-2 text-sm text-gray-900">
+                        Enable notifications
+                      </span>
                     </label>
                     <p className="mt-1 text-xs text-gray-500 ml-6">
                       Receive notifications based on team members' daily pulses
@@ -59,13 +67,21 @@ export default function DailyPulseSettings({ isOpen, onClose }: DailyPulseSettin
                           <input
                             type="checkbox"
                             checked={prefs.notifyTeamLeader}
-                            onChange={(e) => setPrefs(p => ({ ...p, notifyTeamLeader: e.target.checked }))}
+                            onChange={(e) =>
+                              setPrefs((p) => ({
+                                ...p,
+                                notifyTeamLeader: e.target.checked,
+                              }))
+                            }
                             className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           />
-                          <span className="ml-2 text-sm text-gray-900">Notify team leader</span>
+                          <span className="ml-2 text-sm text-gray-900">
+                            Notify team leader
+                          </span>
                         </label>
                         <p className="mt-1 text-xs text-gray-500 ml-6">
-                          Send notifications to team leader when thresholds are met
+                          Send notifications to team leader when thresholds are
+                          met
                         </p>
                       </div>
 
@@ -76,11 +92,18 @@ export default function DailyPulseSettings({ isOpen, onClose }: DailyPulseSettin
                           </label>
                           <select
                             value={prefs.consecutiveChallenging}
-                            onChange={(e) => setPrefs(p => ({ ...p, consecutiveChallenging: Number(e.target.value) }))}
+                            onChange={(e) =>
+                              setPrefs((p) => ({
+                                ...p,
+                                consecutiveChallenging: Number(e.target.value),
+                              }))
+                            }
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                           >
-                            {[2, 3, 4, 5].map(n => (
-                              <option key={n} value={n}>{n} days</option>
+                            {[2, 3, 4, 5].map((n) => (
+                              <option key={n} value={n}>
+                                {n} days
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -91,11 +114,18 @@ export default function DailyPulseSettings({ isOpen, onClose }: DailyPulseSettin
                           </label>
                           <select
                             value={prefs.challengingPerWeek}
-                            onChange={(e) => setPrefs(p => ({ ...p, challengingPerWeek: Number(e.target.value) }))}
+                            onChange={(e) =>
+                              setPrefs((p) => ({
+                                ...p,
+                                challengingPerWeek: Number(e.target.value),
+                              }))
+                            }
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                           >
-                            {[2, 3, 4, 5].map(n => (
-                              <option key={n} value={n}>{n} days per week</option>
+                            {[2, 3, 4, 5].map((n) => (
+                              <option key={n} value={n}>
+                                {n} days per week
+                              </option>
                             ))}
                           </select>
                         </div>

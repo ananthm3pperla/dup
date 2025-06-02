@@ -3,6 +3,7 @@
 ## Account Security Measures
 
 ### Password Policy
+
 - **Minimum Requirements**:
   - At least 8 characters
   - At least one uppercase letter
@@ -18,6 +19,7 @@
   - Unique salt for each password
 
 ### Multi-Factor Authentication
+
 - **Types Supported**:
   - Authenticator apps (TOTP)
   - Email verification codes
@@ -28,6 +30,7 @@
   - Session persistence configurable by security policy
 
 ### Account Recovery Options
+
 - **Email Recovery**:
   - Time-limited, single-use links
   - Rate-limited to prevent abuse
@@ -38,6 +41,7 @@
   - Answers stored with one-way hashing
 
 ### Session Management
+
 - **Token Handling**:
   - Short-lived access tokens (1 hour)
   - Longer refresh tokens (2 weeks maximum)
@@ -54,6 +58,7 @@
 ## User Data Protection
 
 ### Data Encryption
+
 - **In Transit**:
   - TLS 1.3 for all communications
   - Strict transport security (HSTS)
@@ -64,6 +69,7 @@
   - Key rotation policy
 
 ### Privacy Controls
+
 - **User Data Access**:
   - Self-service profile management
   - Data export capability
@@ -74,6 +80,7 @@
   - Explicit consent mechanisms
 
 ### Row Level Security
+
 - **Database Protection**:
   - Supabase RLS policies for all tables
   - Users can only access their own data
@@ -86,6 +93,7 @@
 ## Infrastructure Security
 
 ### Application Security
+
 - **Dependency Management**:
   - Regular dependency updates
   - Automated vulnerability scanning
@@ -96,6 +104,7 @@
   - Regular security reviews
 
 ### Monitoring and Logging
+
 - **Activity Logging**:
   - Authentication events
   - Critical data modifications
@@ -106,6 +115,7 @@
   - Geolocation changes
 
 ### Incident Response
+
 - **Security Alerts**:
   - Real-time notification for suspicious activities
   - Escalation procedures
@@ -118,6 +128,7 @@
 ## User Security Education
 
 ### In-App Guidance
+
 - **Security Settings Discoverability**:
   - Prominent security menu
   - Security status indicators
@@ -128,6 +139,7 @@
   - Visual guides for complex security setup
 
 ### Security Notifications
+
 - **Proactive Alerts**:
   - New device logins
   - Password changes
@@ -140,6 +152,7 @@
 ## Demo Mode Considerations
 
 ### Security Simulation
+
 - **Demo Authentication**:
   - Clearly labeled as demo mode
   - No real data stored
@@ -150,6 +163,7 @@
   - No real email verification
 
 ### Education Value
+
 - **Security Awareness**:
   - Demonstrates security best practices
   - Shows proper authentication workflows

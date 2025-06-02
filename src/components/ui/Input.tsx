@@ -1,7 +1,7 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { cn } from "@/lib/utils";
 
-export interface InputProps 
+export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   label?: string;
@@ -12,23 +12,41 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, error, label, helperText, leftIcon, rightIcon, fullWidth = true, required, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      type,
+      error,
+      label,
+      helperText,
+      leftIcon,
+      rightIcon,
+      fullWidth = true,
+      required,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
     // Sanitize input value to prevent XSS
     const sanitizeValue = (value: unknown): unknown => {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         return value
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#039;');
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
       }
       return value;
     };
 
     // Handle value sanitization for controlled inputs
     const sanitizedProps = Object.keys(props).reduce((acc, key) => {
-      if (key === 'value') {
-        return { ...acc, [key]: sanitizeValue(props[key as keyof typeof props]) };
+      if (key === "value") {
+        return {
+          ...acc,
+          [key]: sanitizeValue(props[key as keyof typeof props]),
+        };
       }
       return { ...acc, [key]: props[key as keyof typeof props] };
     }, {});
@@ -39,12 +57,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("relative", fullWidth ? "w-full" : "")}>
         {label && (
-          <label 
-            htmlFor={id} 
+          <label
+            htmlFor={id}
             className="block text-sm font-medium text-default dark:text-gray-300 mb-1"
           >
             {label}
-            {required && <span className="text-error ml-1" aria-hidden="true">*</span>}
+            {required && (
+              <span className="text-error ml-1" aria-hidden="true">
+                *
+              </span>
+            )}
           </label>
         )}
         <div className="relative">
@@ -58,19 +80,25 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={type}
             className={cn(
-              'flex h-10 rounded-md border border-default bg-card px-3 py-2 text-sm ring-offset-background',
-              'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-              'placeholder:text-muted dark:placeholder:text-gray-500',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-              'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800',
-              leftIcon && 'pl-10',
-              rightIcon && 'pr-10',
-              error && 'border-error focus-visible:ring-error',
-              fullWidth && 'w-full',
-              className
+              "flex h-10 rounded-md border border-default bg-card px-3 py-2 text-sm ring-offset-background",
+              "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+              "placeholder:text-muted dark:placeholder:text-gray-500",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+              "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800",
+              leftIcon && "pl-10",
+              rightIcon && "pr-10",
+              error && "border-error focus-visible:ring-error",
+              fullWidth && "w-full",
+              className,
             )}
             aria-invalid={!!error}
-            aria-describedby={error ? `${id}-error` : helperText ? `${id}-description` : undefined}
+            aria-describedby={
+              error
+                ? `${id}-error`
+                : helperText
+                  ? `${id}-description`
+                  : undefined
+            }
             required={required}
             disabled={disabled}
             {...sanitizedProps}
@@ -82,8 +110,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p 
-            className="mt-1 text-sm text-error animate-shake" 
+          <p
+            className="mt-1 text-sm text-error animate-shake"
             id={`${id}-error`}
             aria-live="polite"
           >
@@ -91,7 +119,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
         {helperText && !error && (
-          <p 
+          <p
             className="mt-1 text-xs text-muted dark:text-gray-400"
             id={`${id}-description`}
           >
@@ -100,11 +128,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
-Input.displayName = 'Input';
+Input.displayName = "Input";
 
 export default Input;
 
-export { Input }
+export { Input };

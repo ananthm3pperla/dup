@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Calendar, Clock, Users, Sparkles } from 'lucide-react';
-import { suggestMeetingTimes } from '../../lib/openai';
+import React, { useState } from "react";
+import { Card } from "../ui/Card";
+import { Button } from "../ui/Button";
+import { Calendar, Clock, Users, Sparkles } from "lucide-react";
+import { suggestMeetingTimes } from "../../lib/openai";
 
 interface SmartSchedulingProps {
   teamSchedule?: any;
@@ -20,7 +19,7 @@ export function SmartScheduling({ teamSchedule }: SmartSchedulingProps) {
       const result = await suggestMeetingTimes(teamSchedule, meetingDuration);
       setSuggestions(result);
     } catch (error) {
-      console.error('Error generating suggestions:', error);
+      console.error("Error generating suggestions:", error);
     } finally {
       setLoading(false);
     }
@@ -58,14 +57,19 @@ export function SmartScheduling({ teamSchedule }: SmartSchedulingProps) {
           leftIcon={<Sparkles className="h-4 w-4" />}
           className="w-full"
         >
-          {loading ? 'Generating...' : 'Get AI Suggestions'}
+          {loading ? "Generating..." : "Get AI Suggestions"}
         </Button>
 
         {suggestions?.suggestions && (
           <div className="space-y-3 mt-4">
-            <h4 className="font-medium text-gray-900 dark:text-white">Recommended Times:</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white">
+              Recommended Times:
+            </h4>
             {suggestions.suggestions.map((suggestion: any, index: number) => (
-              <div key={index} className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <div
+                key={index}
+                className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-blue-600" />
@@ -77,7 +81,9 @@ export function SmartScheduling({ teamSchedule }: SmartSchedulingProps) {
                     {suggestion.attendanceRate}% attendance
                   </span>
                 </div>
-                <p className="text-sm text-blue-700 dark:text-blue-300">{suggestion.reason}</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {suggestion.reason}
+                </p>
               </div>
             ))}
           </div>

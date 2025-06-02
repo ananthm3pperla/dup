@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Camera } from 'lucide-react';
-import { Button } from '@/components/ui';
-import CheckInDialog from './CheckInDialog';
+import React, { useState } from "react";
+import { Camera } from "lucide-react";
+import { Button } from "@/components/ui";
+import CheckInDialog from "./CheckInDialog";
 
 interface CheckInButtonProps {
   className?: string;

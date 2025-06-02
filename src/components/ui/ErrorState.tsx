@@ -1,5 +1,5 @@
-import React from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import React from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface ErrorStateProps {
   message: string;

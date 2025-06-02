@@ -3,6 +3,7 @@
 ## Overview
 
 Hi-Bridge implements a secure, multi-step authentication system that includes:
+
 - Email/Password authentication
 - Social login (Google, Microsoft)
 - Two-factor authentication
@@ -12,6 +13,7 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 ## Account Creation Flow
 
 ### Step 1: Initial Registration
+
 - User fills out basic information:
   - Full Name
   - Email
@@ -25,12 +27,14 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
   - Realtime visual feedback on password strength
 
 ### Step 2: Email Verification
+
 - Verification email sent automatically
 - User must click link in email to verify account
 - Banner shows for unverified accounts with option to resend verification
 - Access to all features is limited until verification is complete
 
 ### Step 3: User Onboarding
+
 - After email verification, users complete profile setup:
   - Personal information
   - Role selection (Manager or Individual Contributor)
@@ -38,6 +42,7 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
   - Work preferences
 
 ### Step 4: Security Setup (Optional)
+
 - Two-factor authentication setup
 - Security questions for account recovery
 - Device management
@@ -45,16 +50,19 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 ## Login Process
 
 ### Standard Login
+
 - Email/Password authentication
 - "Remember Me" option for persistent sessions
 - Password reset functionality
 
 ### Social Login
+
 - One-click login via Google or Microsoft
 - Proper OAuth flow with secure token management
 - Account linking for existing users
 
 ### Two-Factor Authentication (2FA)
+
 - Optional second factor after password verification
 - Support for:
   - Authenticator apps (TOTP)
@@ -65,12 +73,14 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 ## Security Features
 
 ### Password Handling
+
 - Passwords are never stored in plaintext
 - Strength requirements enforced
 - Regular password change reminders
 - Breach detection and notification
 
 ### Session Management
+
 - JWT token-based authentication
 - Automatic session refresh
 - Session timeout detection and handling
@@ -78,6 +88,7 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 - Ability to revoke sessions remotely
 
 ### Account Recovery
+
 - Password reset via email
 - Security questions as backup
 - Admin-assisted recovery for enterprise accounts
@@ -85,17 +96,20 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 ## Error Handling
 
 ### Login Errors
+
 - Generic error messages that don't leak security information
 - Rate limiting for failed attempts
 - Temporary lockout after multiple failures
 - Notification for suspicious activity
 
 ### Registration Errors
+
 - Clear validation messages
 - Duplicate email detection
 - Graceful handling of service unavailability
 
 ## Demo Mode
+
 - Fallback when database or authentication services are unavailable
 - Simulated authentication with mock data
 - Clear indication to user that they are in demo mode
@@ -103,12 +117,14 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 ## Technical Implementation
 
 ### Database Schema
+
 - `users` - Core user information
 - `profiles` - Extended user profile data
 - `user_security` - 2FA settings, security questions (hashed)
 - `sessions` - Active user sessions
 
 ### API Endpoints
+
 - `/auth/signup` - Create new user account
 - `/auth/login` - Authenticate existing users
 - `/auth/verify` - Verify email address
@@ -116,6 +132,7 @@ Hi-Bridge implements a secure, multi-step authentication system that includes:
 - `/auth/2fa` - Two-factor authentication endpoints
 
 ### Security Considerations
+
 - HTTPS for all communications
 - CSRF protection
 - XSS prevention

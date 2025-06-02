@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Users, Award, Menu, Settings, User } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import {
+  Home,
+  Calendar,
+  Users,
+  Award,
+  Menu,
+  Settings,
+  User,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MobileNavBarProps {
   onMenuClick: () => void;
@@ -23,20 +31,20 @@ export default function MobileNavBar({ onMenuClick }: MobileNavBarProps) {
     checkMobile();
 
     // Add event listener for resize
-    window.addEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
 
     // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   if (!isMobile) return null;
 
   return (
-    <motion.div 
+    <motion.div
       className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-2 z-40 lg:hidden"
-      initial={{ y: '100%' }}
+      initial={{ y: "100%" }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.3, type: 'spring' }}
+      transition={{ duration: 0.3, type: "spring" }}
       role="navigation"
       aria-label="Mobile navigation"
     >
@@ -45,9 +53,11 @@ export default function MobileNavBar({ onMenuClick }: MobileNavBarProps) {
           to="/dashboard"
           className={({ isActive }) => `
             flex flex-col items-center justify-center p-2 rounded-lg
-            ${isActive 
-              ? 'text-primary' 
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+            ${
+              isActive
+                ? "text-primary"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            }
           `}
           aria-label="Dashboard"
         >
@@ -59,9 +69,11 @@ export default function MobileNavBar({ onMenuClick }: MobileNavBarProps) {
           to="/schedule"
           className={({ isActive }) => `
             flex flex-col items-center justify-center p-2 rounded-lg
-            ${isActive 
-              ? 'text-primary' 
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+            ${
+              isActive
+                ? "text-primary"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            }
           `}
           aria-label="Schedule"
         >
@@ -73,9 +85,11 @@ export default function MobileNavBar({ onMenuClick }: MobileNavBarProps) {
           to="/teams"
           className={({ isActive }) => `
             flex flex-col items-center justify-center p-2 rounded-lg
-            ${isActive 
-              ? 'text-primary' 
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+            ${
+              isActive
+                ? "text-primary"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            }
           `}
           aria-label="Teams"
         >
@@ -87,30 +101,34 @@ export default function MobileNavBar({ onMenuClick }: MobileNavBarProps) {
           to="/rewards"
           className={({ isActive }) => `
             flex flex-col items-center justify-center p-2 rounded-lg
-            ${isActive 
-              ? 'text-primary' 
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+            ${
+              isActive
+                ? "text-primary"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            }
           `}
           aria-label="Rewards"
         >
           <Award className="h-6 w-6" />
           <span className="text-xs mt-1">Rewards</span>
         </NavLink>
-        
+
         <NavLink
-          to={user ? `/profile/${user.id}` : '/settings'}
+          to={user ? `/profile/${user.id}` : "/settings"}
           className={({ isActive }) => `
             flex flex-col items-center justify-center p-2 rounded-lg
-            ${isActive 
-              ? 'text-primary' 
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}
+            ${
+              isActive
+                ? "text-primary"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            }
           `}
           aria-label="Profile"
         >
           <User className="h-6 w-6" />
           <span className="text-xs mt-1">Profile</span>
         </NavLink>
-        
+
         <button
           onClick={onMenuClick}
           className="flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"

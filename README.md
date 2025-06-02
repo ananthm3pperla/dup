@@ -1,5 +1,7 @@
 # github-3kpsmupx
+
 Repository created by Bolt to GitHub extension
+
 # Hi-Bridge - Hybrid Work Engagement Platform
 
 Hi-Bridge is a comprehensive web-based platform designed to encourage in-office participation through gamification, team competitions, and engagement tracking. The platform has been fully migrated from Supabase to run natively on Replit's infrastructure.
@@ -7,11 +9,13 @@ Hi-Bridge is a comprehensive web-based platform designed to encourage in-office 
 ## 🚀 Key Features
 
 ### User Roles & Permissions
+
 - **Employees**: Daily pulse checks, office check-ins, points earning, schedule management
-- **Managers**: Team analytics, anchor day scheduling, engagement heatmaps 
+- **Managers**: Team analytics, anchor day scheduling, engagement heatmaps
 - **HR Leaders**: Policy compliance, attendance analytics, configuration tools
 
 ### Core Functionality
+
 - **Anchor Day Scheduling**: Managers set team anchor days; employees vote on preferred days
 - **Daily Pulse Checks**: Employee feedback surveys to track morale and engagement
 - **Gamification System**: Points for participation with team leaderboards
@@ -19,6 +23,7 @@ Hi-Bridge is a comprehensive web-based platform designed to encourage in-office 
 - **Analytics Dashboards**: Role-specific insights and reporting
 
 ### Hi-Bridge Games (Beta)
+
 - Team photo competitions
 - Bonus point challenges
 - Local business-sponsored rewards
@@ -27,12 +32,14 @@ Hi-Bridge is a comprehensive web-based platform designed to encourage in-office 
 ## 🛠️ Architecture
 
 ### Backend
+
 - **Express.js** server with session-based authentication
 - **Replit Database** for data persistence (Key-Value store)
 - **Multer** for file upload handling
 - **bcryptjs** for password hashing
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **Vite** for build tooling
 - **Tailwind CSS** for styling
@@ -42,11 +49,13 @@ Hi-Bridge is a comprehensive web-based platform designed to encourage in-office 
 ## 🔧 Development Setup
 
 1. **Install Dependencies**
+
    ```bash
    npm install
    ```
 
 2. **Start Development Server**
+
    ```bash
    npm run dev
    ```
@@ -92,12 +101,14 @@ The application uses Replit's Key-Value database with the following key patterns
 ## 🎮 Gamification System
 
 ### Point Structure
+
 - Daily pulse check: 10 points
 - Office check-in: 20 points
 - Team participation bonuses
 - Hi-Bridge Games rewards
 
 ### Leaderboards
+
 - Team-based rankings
 - Individual achievement tracking
 - Monthly competitions
@@ -114,6 +125,7 @@ The application is designed to run on Replit's infrastructure:
 ## 🧪 Testing
 
 Run the test suite:
+
 ```bash
 npm test
 ```
@@ -121,17 +133,20 @@ npm test
 ## 📝 API Documentation
 
 ### Authentication Endpoints
+
 - `POST /api/auth/signup` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/me` - Get current user
 
 ### Team Management
+
 - `POST /api/teams` - Create team (Manager/HR only)
 - `POST /api/teams/join` - Join team with invite code
 - `GET /api/teams/my` - Get user's team
 
 ### Engagement Features
+
 - `POST /api/pulse` - Submit daily pulse check
 - `GET /api/pulse/today` - Get today's pulse check
 - `POST /api/checkins` - Submit office check-in
@@ -139,6 +154,7 @@ npm test
 - `GET /api/schedule` - Get schedule data
 
 ### Analytics
+
 - `GET /api/analytics/team` - Team analytics (Manager/HR only)
 - `GET /api/leaderboard` - Team leaderboard
 

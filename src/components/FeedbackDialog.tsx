@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { toast } from 'sonner';
-import TextareaAutosize from 'react-textarea-autosize';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MessageSquare, X } from "lucide-react";
+import { Button } from "@/components/ui";
+import { toast } from "sonner";
+import TextareaAutosize from "react-textarea-autosize";
 
 interface FeedbackDialogProps {
   isOpen: boolean;
@@ -14,17 +14,17 @@ interface FeedbackDialogProps {
   placeholder?: string;
 }
 
-export default function FeedbackDialog({ 
-  isOpen, 
-  onClose, 
+export default function FeedbackDialog({
+  isOpen,
+  onClose,
   onSubmit,
   title = "Share Feedback with Your Manager",
   description = "Your feedback helps improve team collaboration and work arrangements.",
-  placeholder = "Share your thoughts on team collaboration, work arrangements, or any concerns you'd like to discuss..."
+  placeholder = "Share your thoughts on team collaboration, work arrangements, or any concerns you'd like to discuss...",
 }: FeedbackDialogProps) {
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedbackCategory, setFeedbackCategory] = useState<string>('general');
+  const [feedbackCategory, setFeedbackCategory] = useState<string>("general");
   const [rating, setRating] = useState<number | null>(null);
 
   const handleSubmit = async () => {
@@ -36,16 +36,16 @@ export default function FeedbackDialog({
         await onSubmit(feedback);
       } else {
         // Simulated API call if no onSubmit provided
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      
-      toast.success('Thank you for your feedback!');
-      setFeedback('');
-      setFeedbackCategory('general');
+
+      toast.success("Thank you for your feedback!");
+      setFeedback("");
+      setFeedbackCategory("general");
       setRating(null);
       onClose();
     } catch (error) {
-      toast.error('Failed to submit feedback. Please try again.');
+      toast.error("Failed to submit feedback. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -61,18 +61,20 @@ export default function FeedbackDialog({
   // Handle escape key
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    
+
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isOpen, onClose]);
 
   const renderStarRating = () => (
     <div className="space-y-2">
-      <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Rating</p>
+      <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+        Rating
+      </p>
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -80,9 +82,9 @@ export default function FeedbackDialog({
             type="button"
             onClick={() => setRating(star)}
             className={`text-2xl ${
-              (rating && star <= rating) 
-                ? 'text-yellow-400' 
-                : 'text-gray-300 dark:text-gray-600 hover:text-yellow-400'
+              rating && star <= rating
+                ? "text-yellow-400"
+                : "text-gray-300 dark:text-gray-600 hover:text-yellow-400"
             } transition-colors`}
           >
             ★
@@ -90,11 +92,15 @@ export default function FeedbackDialog({
         ))}
         {rating && (
           <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-            {rating === 1 ? 'Poor' : 
-             rating === 2 ? 'Fair' : 
-             rating === 3 ? 'Good' : 
-             rating === 4 ? 'Very Good' : 
-             'Excellent'}
+            {rating === 1
+              ? "Poor"
+              : rating === 2
+                ? "Fair"
+                : rating === 3
+                  ? "Good"
+                  : rating === 4
+                    ? "Very Good"
+                    : "Excellent"}
           </span>
         )}
       </div>
@@ -122,16 +128,16 @@ export default function FeedbackDialog({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ 
+              transition={{
                 type: "spring",
                 stiffness: 300,
-                damping: 30
+                damping: 30,
               }}
               className="relative w-full max-w-3xl p-4 sm:p-8 mx-auto text-left bg-white dark:bg-gray-800 rounded-xl shadow-xl transform transition-all border border-gray-200 dark:border-gray-700"
             >
               <div className="flex items-center justify-between mb-4 sm:mb-8">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <motion.div 
+                  <motion.div
                     initial={{ rotate: -30, scale: 0.9 }}
                     animate={{ rotate: 0, scale: 1 }}
                     className="p-2 sm:p-3 bg-primary/10 dark:bg-primary/20 rounded-lg"
@@ -161,15 +167,15 @@ export default function FeedbackDialog({
                     Feedback Category
                   </label>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {['general', 'ui/ux', 'feature', 'bug'].map((category) => (
+                    {["general", "ui/ux", "feature", "bug"].map((category) => (
                       <button
                         key={category}
                         type="button"
                         onClick={() => setFeedbackCategory(category)}
                         className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
                           feedbackCategory === category
-                            ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light border-primary/20'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                            ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light border-primary/20"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                         }`}
                       >
                         {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -193,8 +199,19 @@ export default function FeedbackDialog({
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 gap-4">
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
                     </svg>
                     Your response will be anonymous
                   </p>

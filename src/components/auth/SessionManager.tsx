@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import SessionExpiredDialog from './SessionExpiredDialog';
-import { isDemoMode } from '@/lib/demo';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import SessionExpiredDialog from "./SessionExpiredDialog";
+import { isDemoMode } from "@/lib/demo";
 
 // Time in milliseconds
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
@@ -16,7 +16,9 @@ interface SessionManagerProps {
 
 export default function SessionManager({ children }: SessionManagerProps) {
   const [sessionExpired, setSessionExpired] = useState(false);
-  const [sessionExpiryTime, setSessionExpiryTime] = useState<number | null>(null);
+  const [sessionExpiryTime, setSessionExpiryTime] = useState<number | null>(
+    null,
+  );
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,7 +35,7 @@ export default function SessionManager({ children }: SessionManagerProps) {
         }
 
         // Check local session
-        const sessionData = localStorage.getItem('hibridge_session');
+        const sessionData = localStorage.getItem("hibridge_session");
         if (!sessionData) {
           setSessionExpired(true);
           return;
@@ -55,11 +57,12 @@ export default function SessionManager({ children }: SessionManagerProps) {
         // Show warning if session is about to expire
         const timeUntilExpiry = expiryTime - Date.now();
         if (timeUntilExpiry <= WARNING_BEFORE_EXPIRY && timeUntilExpiry > 0) {
-          toast.warning('Your session will expire soon. Please save your work.');
+          toast.warning(
+            "Your session will expire soon. Please save your work.",
+          );
         }
-
       } catch (error) {
-        console.error('Error checking session:', error);
+        console.error("Error checking session:", error);
         setSessionExpired(true);
       }
     };
@@ -81,17 +84,17 @@ export default function SessionManager({ children }: SessionManagerProps) {
       // Update session timestamp
       const sessionData = {
         userId: user.id,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
-      localStorage.setItem('hibridge_session', JSON.stringify(sessionData));
+      localStorage.setItem("hibridge_session", JSON.stringify(sessionData));
       setSessionExpired(false);
       setSessionExpiryTime(Date.now() + SESSION_DURATION);
 
-      toast.success('Session refreshed successfully');
+      toast.success("Session refreshed successfully");
     } catch (error) {
-      console.error('Error refreshing session:', error);
-      toast.error('Failed to refresh session');
+      console.error("Error refreshing session:", error);
+      toast.error("Failed to refresh session");
     }
   };
 
@@ -99,15 +102,15 @@ export default function SessionManager({ children }: SessionManagerProps) {
   const handleSessionExpired = async () => {
     try {
       await signOut();
-      navigate('/auth/login', { 
-        state: { 
+      navigate("/auth/login", {
+        state: {
           from: location.pathname,
-          message: 'Your session has expired. Please sign in again.' 
-        }
+          message: "Your session has expired. Please sign in again.",
+        },
       });
     } catch (error) {
-      console.error('Error handling session expiry:', error);
-      navigate('/auth/login');
+      console.error("Error handling session expiry:", error);
+      navigate("/auth/login");
     }
   };
 

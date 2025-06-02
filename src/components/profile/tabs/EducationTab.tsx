@@ -1,7 +1,7 @@
-import React from 'react';
-import { Plus } from 'lucide-react';
-import EditableEducation from '@/components/profile/EditableEducation';
-import type { Education } from '@/types';
+import React from "react";
+import { Plus } from "lucide-react";
+import EditableEducation from "@/components/profile/EditableEducation";
+import type { Education } from "@/types";
 
 interface EducationTabProps {
   profile: any;
@@ -18,7 +18,7 @@ export default function EducationTab({
   isSaving = false,
   onAdd,
   onSave,
-  onDelete
+  onDelete,
 }: EducationTabProps) {
   return (
     <div className="bg-card rounded-lg p-6 shadow-md">
@@ -51,7 +51,10 @@ export default function EducationTab({
           <div className="text-center py-8 text-muted">
             {canEdit ? (
               <div>
-                <p className="mb-4">No education history available. Add your educational background.</p>
+                <p className="mb-4">
+                  No education history available. Add your educational
+                  background.
+                </p>
                 <button
                   onClick={onAdd}
                   disabled={isSaving}

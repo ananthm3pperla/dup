@@ -1,28 +1,29 @@
-
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true // Only for demo - in production, use server-side
+  dangerouslyAllowBrowser: true, // Only for demo - in production, use server-side
 });
 
 /**
  * Analyze team pulse data to generate insights
  */
-export async function analyzePulseData(pulseData: Array<{
-  rating: number;
-  comment?: string;
-  date: string;
-  userId: string;
-}>) {
+export async function analyzePulseData(
+  pulseData: Array<{
+    rating: number;
+    comment?: string;
+    date: string;
+    userId: string;
+  }>,
+) {
   try {
     const comments = pulseData
-      .filter(p => p.comment && p.comment.trim())
-      .map(p => p.comment)
-      .join('\n');
+      .filter((p) => p.comment && p.comment.trim())
+      .map((p) => p.comment)
+      .join("\n");
 
-    const ratings = pulseData.map(p => p.rating);
+    const ratings = pulseData.map((p) => p.rating);
     const avgRating = ratings.reduce((a, b) => a + b, 0) / ratings.length;
 
     const prompt = `
@@ -48,15 +49,15 @@ Provide insights in JSON format:
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 500
+      max_tokens: 500,
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error('No response from OpenAI');
+    if (!content) throw new Error("No response from OpenAI");
 
     return JSON.parse(content);
   } catch (error) {
-    console.error('Error analyzing pulse data:', error);
+    console.error("Error analyzing pulse data:", error);
     return null;
   }
 }
@@ -64,7 +65,10 @@ Provide insights in JSON format:
 /**
  * Generate meeting schedule suggestions
  */
-export async function suggestMeetingTimes(teamSchedule: any, meetingDuration: number = 60) {
+export async function suggestMeetingTimes(
+  teamSchedule: any,
+  meetingDuration: number = 60,
+) {
   try {
     const prompt = `
 Based on this team's hybrid work schedule, suggest 3 optimal meeting times for a ${meetingDuration}-minute meeting:
@@ -88,15 +92,15 @@ Provide suggestions in JSON format:
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 300
+      max_tokens: 300,
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error('No response from OpenAI');
+    if (!content) throw new Error("No response from OpenAI");
 
     return JSON.parse(content);
   } catch (error) {
-    console.error('Error suggesting meeting times:', error);
+    console.error("Error suggesting meeting times:", error);
     return null;
   }
 }
@@ -104,15 +108,18 @@ Provide suggestions in JSON format:
 /**
  * Generate personalized work recommendations
  */
-export async function generateWorkRecommendations(userProfile: any, teamData: any) {
+export async function generateWorkRecommendations(
+  userProfile: any,
+  teamData: any,
+) {
   try {
     const prompt = `
 Generate personalized hybrid work recommendations for this user:
 
 User Profile:
 - Role: ${userProfile.role}
-- Work Style: ${userProfile.workStyle || 'Not specified'}
-- Team Size: ${teamData.memberCount || 'Unknown'}
+- Work Style: ${userProfile.workStyle || "Not specified"}
+- Team Size: ${teamData.memberCount || "Unknown"}
 
 Provide 3 actionable recommendations in JSON format:
 {
@@ -130,15 +137,15 @@ Provide 3 actionable recommendations in JSON format:
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.5,
-      max_tokens: 400
+      max_tokens: 400,
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error('No response from OpenAI');
+    if (!content) throw new Error("No response from OpenAI");
 
     return JSON.parse(content);
   } catch (error) {
-    console.error('Error generating recommendations:', error);
+    console.error("Error generating recommendations:", error);
     return null;
   }
 }

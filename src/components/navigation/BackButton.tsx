@@ -1,7 +1,7 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface BackButtonProps {
   to?: string;
@@ -9,7 +9,11 @@ interface BackButtonProps {
   className?: string;
 }
 
-export function BackButton({ to, label = 'Back', className = '' }: BackButtonProps) {
+export function BackButton({
+  to,
+  label = "Back",
+  className = "",
+}: BackButtonProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Shield, X, Check, AlertTriangle } from 'lucide-react';
-import { Button, Alert } from '@/components/ui';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Shield, X, Check, AlertTriangle } from "lucide-react";
+import { Button, Alert } from "@/components/ui";
 
 interface SecurityQuestionsProps {
   isOpen: boolean;
@@ -14,13 +14,13 @@ export default function SecurityQuestions({
   isOpen,
   onClose,
   onVerify,
-  questions
+  questions,
 }: SecurityQuestionsProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  
+
   // Reset state when dialog opens
   React.useEffect(() => {
     if (isOpen) {
@@ -29,34 +29,36 @@ export default function SecurityQuestions({
       setSuccess(false);
     }
   }, [isOpen]);
-  
+
   // Handle input change
   const handleChange = (questionId: string, value: string) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: value
+      [questionId]: value,
     }));
-    
+
     // Clear error
     if (error) setError(null);
   };
-  
+
   // Handle submit
   const handleSubmit = async () => {
     // Check if all questions are answered
-    const unansweredQuestions = questions.filter(q => !answers[q.id] || answers[q.id].trim() === '');
-    
+    const unansweredQuestions = questions.filter(
+      (q) => !answers[q.id] || answers[q.id].trim() === "",
+    );
+
     if (unansweredQuestions.length > 0) {
-      setError('Please answer all security questions');
+      setError("Please answer all security questions");
       return;
     }
-    
+
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       const isValid = await onVerify(answers);
-      
+
       if (isValid) {
         setSuccess(true);
         // Close after a delay
@@ -64,18 +66,18 @@ export default function SecurityQuestions({
           onClose();
         }, 1500);
       } else {
-        setError('One or more answers are incorrect. Please try again.');
+        setError("One or more answers are incorrect. Please try again.");
       }
     } catch (err) {
-      console.error('Error verifying answers:', err);
-      setError(err instanceof Error ? err.message : 'Failed to verify answers');
+      console.error("Error verifying answers:", err);
+      setError(err instanceof Error ? err.message : "Failed to verify answers");
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-sm flex items-center justify-center">
       <motion.div
@@ -93,7 +95,7 @@ export default function SecurityQuestions({
         >
           <X className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
-        
+
         {/* Header */}
         <div className="flex items-center gap-3 sm:gap-4 mb-6">
           <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-lg">
@@ -108,7 +110,7 @@ export default function SecurityQuestions({
             </p>
           </div>
         </div>
-        
+
         {/* Success state */}
         {success ? (
           <motion.div
@@ -119,7 +121,9 @@ export default function SecurityQuestions({
             <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mb-4">
               <Check className="h-8 w-8 text-success" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Verification Successful</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Verification Successful
+            </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
               Your identity has been successfully verified.
             </p>
@@ -128,8 +132,8 @@ export default function SecurityQuestions({
           <>
             {/* Error message */}
             {error && (
-              <Alert 
-                variant="error" 
+              <Alert
+                variant="error"
                 title="Verification Failed"
                 className="mb-4"
                 icon={<AlertTriangle className="h-5 w-5" />}
@@ -138,7 +142,7 @@ export default function SecurityQuestions({
                 {error}
               </Alert>
             )}
-            
+
             {/* Questions */}
             <div className="space-y-4 mb-6">
               {questions.map((q) => (
@@ -148,15 +152,15 @@ export default function SecurityQuestions({
                   </label>
                   <input
                     type="text"
-                    value={answers[q.id] || ''}
-                    onChange={e => handleChange(q.id, e.target.value)}
+                    value={answers[q.id] || ""}
+                    onChange={(e) => handleChange(q.id, e.target.value)}
                     className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:bg-gray-700 dark:text-white"
                     disabled={isSubmitting}
                   />
                 </div>
               ))}
             </div>
-            
+
             {/* Actions */}
             <div className="flex justify-end gap-3">
               <Button

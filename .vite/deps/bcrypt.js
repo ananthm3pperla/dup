@@ -1,35 +1,54 @@
-import {
-  require_fs
-} from "./chunk-MG562XKQ.js";
-import {
-  __commonJS,
-  __require
-} from "./chunk-624QZG55.js";
+import { require_fs } from "./chunk-MG562XKQ.js";
+import { __commonJS, __require } from "./chunk-624QZG55.js";
 
 // browser-external:path
 var require_path = __commonJS({
   "browser-external:path"(exports, module) {
-    module.exports = Object.create(new Proxy({}, {
-      get(_, key) {
-        if (key !== "__esModule" && key !== "__proto__" && key !== "constructor" && key !== "splice") {
-          console.warn(`Module "path" has been externalized for browser compatibility. Cannot access "path.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`);
-        }
-      }
-    }));
-  }
+    module.exports = Object.create(
+      new Proxy(
+        {},
+        {
+          get(_, key) {
+            if (
+              key !== "__esModule" &&
+              key !== "__proto__" &&
+              key !== "constructor" &&
+              key !== "splice"
+            ) {
+              console.warn(
+                `Module "path" has been externalized for browser compatibility. Cannot access "path.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`,
+              );
+            }
+          },
+        },
+      ),
+    );
+  },
 });
 
 // browser-external:os
 var require_os = __commonJS({
   "browser-external:os"(exports, module) {
-    module.exports = Object.create(new Proxy({}, {
-      get(_, key) {
-        if (key !== "__esModule" && key !== "__proto__" && key !== "constructor" && key !== "splice") {
-          console.warn(`Module "os" has been externalized for browser compatibility. Cannot access "os.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`);
-        }
-      }
-    }));
-  }
+    module.exports = Object.create(
+      new Proxy(
+        {},
+        {
+          get(_, key) {
+            if (
+              key !== "__esModule" &&
+              key !== "__proto__" &&
+              key !== "constructor" &&
+              key !== "splice"
+            ) {
+              console.warn(
+                `Module "os" has been externalized for browser compatibility. Cannot access "os.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`,
+              );
+            }
+          },
+        },
+      ),
+    );
+  },
 });
 
 // node_modules/node-gyp-build/node-gyp-build.js
@@ -38,42 +57,45 @@ var require_node_gyp_build = __commonJS({
     var fs = require_fs();
     var path = require_path();
     var os = require_os();
-    var runtimeRequire = typeof __webpack_require__ === "function" ? __non_webpack_require__ : __require;
-    var vars = process.config && process.config.variables || {};
+    var runtimeRequire =
+      typeof __webpack_require__ === "function"
+        ? __non_webpack_require__
+        : __require;
+    var vars = (process.config && process.config.variables) || {};
     var prebuildsOnly = !!process.env.PREBUILDS_ONLY;
     var abi = process.versions.modules;
     var runtime = isElectron() ? "electron" : isNwjs() ? "node-webkit" : "node";
     var arch = process.env.npm_config_arch || os.arch();
     var platform = process.env.npm_config_platform || os.platform();
     var libc = process.env.LIBC || (isAlpine(platform) ? "musl" : "glibc");
-    var armv = process.env.ARM_VERSION || (arch === "arm64" ? "8" : vars.arm_version) || "";
+    var armv =
+      process.env.ARM_VERSION ||
+      (arch === "arm64" ? "8" : vars.arm_version) ||
+      "";
     var uv = (process.versions.uv || "").split(".")[0];
     module.exports = load;
     function load(dir) {
       return runtimeRequire(load.resolve(dir));
     }
-    load.resolve = load.path = function(dir) {
+    load.resolve = load.path = function (dir) {
       dir = path.resolve(dir || ".");
       try {
-        var name = runtimeRequire(path.join(dir, "package.json")).name.toUpperCase().replace(/-/g, "_");
+        var name = runtimeRequire(path.join(dir, "package.json"))
+          .name.toUpperCase()
+          .replace(/-/g, "_");
         if (process.env[name + "_PREBUILD"])
           dir = process.env[name + "_PREBUILD"];
-      } catch (err) {
-      }
+      } catch (err) {}
       if (!prebuildsOnly) {
         var release = getFirst(path.join(dir, "build/Release"), matchBuild);
-        if (release)
-          return release;
+        if (release) return release;
         var debug = getFirst(path.join(dir, "build/Debug"), matchBuild);
-        if (debug)
-          return debug;
+        if (debug) return debug;
       }
       var prebuild = resolve(dir);
-      if (prebuild)
-        return prebuild;
+      if (prebuild) return prebuild;
       var nearby = resolve(path.dirname(process.execPath));
-      if (nearby)
-        return nearby;
+      if (nearby) return nearby;
       var target = [
         "platform=" + platform,
         "arch=" + arch,
@@ -83,22 +105,32 @@ var require_node_gyp_build = __commonJS({
         armv ? "armv=" + armv : "",
         "libc=" + libc,
         "node=" + process.versions.node,
-        process.versions.electron ? "electron=" + process.versions.electron : "",
-        typeof __webpack_require__ === "function" ? "webpack=true" : ""
+        process.versions.electron
+          ? "electron=" + process.versions.electron
+          : "",
+        typeof __webpack_require__ === "function" ? "webpack=true" : "",
         // eslint-disable-line
-      ].filter(Boolean).join(" ");
-      throw new Error("No native build was found for " + target + "\n    loaded from: " + dir + "\n");
+      ]
+        .filter(Boolean)
+        .join(" ");
+      throw new Error(
+        "No native build was found for " +
+          target +
+          "\n    loaded from: " +
+          dir +
+          "\n",
+      );
       function resolve(dir2) {
         var tuples = readdirSync(path.join(dir2, "prebuilds")).map(parseTuple);
-        var tuple = tuples.filter(matchTuple(platform, arch)).sort(compareTuples)[0];
-        if (!tuple)
-          return;
+        var tuple = tuples
+          .filter(matchTuple(platform, arch))
+          .sort(compareTuples)[0];
+        if (!tuple) return;
         var prebuilds = path.join(dir2, "prebuilds", tuple.name);
         var parsed = readdirSync(prebuilds).map(parseTags);
         var candidates = parsed.filter(matchTags(runtime, abi));
         var winner = candidates.sort(compareTags(runtime))[0];
-        if (winner)
-          return path.join(prebuilds, winner.file);
+        if (winner) return path.join(prebuilds, winner.file);
       }
     };
     function readdirSync(dir) {
@@ -117,24 +149,18 @@ var require_node_gyp_build = __commonJS({
     }
     function parseTuple(name) {
       var arr = name.split("-");
-      if (arr.length !== 2)
-        return;
+      if (arr.length !== 2) return;
       var platform2 = arr[0];
       var architectures = arr[1].split("+");
-      if (!platform2)
-        return;
-      if (!architectures.length)
-        return;
-      if (!architectures.every(Boolean))
-        return;
+      if (!platform2) return;
+      if (!architectures.length) return;
+      if (!architectures.every(Boolean)) return;
       return { name, platform: platform2, architectures };
     }
     function matchTuple(platform2, arch2) {
-      return function(tuple) {
-        if (tuple == null)
-          return false;
-        if (tuple.platform !== platform2)
-          return false;
+      return function (tuple) {
+        if (tuple == null) return false;
+        if (tuple.platform !== platform2) return false;
         return tuple.architectures.includes(arch2);
       };
     }
@@ -145,8 +171,7 @@ var require_node_gyp_build = __commonJS({
       var arr = file.split(".");
       var extension = arr.pop();
       var tags = { file, specificity: 0 };
-      if (extension !== "node")
-        return;
+      if (extension !== "node") return;
       for (var i = 0; i < arr.length; i++) {
         var tag = arr[i];
         if (tag === "node" || tag === "electron" || tag === "node-webkit") {
@@ -169,19 +194,14 @@ var require_node_gyp_build = __commonJS({
       return tags;
     }
     function matchTags(runtime2, abi2) {
-      return function(tags) {
-        if (tags == null)
-          return false;
+      return function (tags) {
+        if (tags == null) return false;
         if (tags.runtime && tags.runtime !== runtime2 && !runtimeAgnostic(tags))
           return false;
-        if (tags.abi && tags.abi !== abi2 && !tags.napi)
-          return false;
-        if (tags.uv && tags.uv !== uv)
-          return false;
-        if (tags.armv && tags.armv !== armv)
-          return false;
-        if (tags.libc && tags.libc !== libc)
-          return false;
+        if (tags.abi && tags.abi !== abi2 && !tags.napi) return false;
+        if (tags.uv && tags.uv !== uv) return false;
+        if (tags.armv && tags.armv !== armv) return false;
+        if (tags.libc && tags.libc !== libc) return false;
         return true;
       };
     }
@@ -189,7 +209,7 @@ var require_node_gyp_build = __commonJS({
       return tags.runtime === "node" && tags.napi;
     }
     function compareTags(runtime2) {
-      return function(a, b) {
+      return function (a, b) {
         if (a.runtime !== b.runtime) {
           return a.runtime === runtime2 ? -1 : 1;
         } else if (a.abi !== b.abi) {
@@ -205,11 +225,13 @@ var require_node_gyp_build = __commonJS({
       return !!(process.versions && process.versions.nw);
     }
     function isElectron() {
-      if (process.versions && process.versions.electron)
-        return true;
-      if (process.env.ELECTRON_RUN_AS_NODE)
-        return true;
-      return typeof window !== "undefined" && window.process && window.process.type === "renderer";
+      if (process.versions && process.versions.electron) return true;
+      if (process.env.ELECTRON_RUN_AS_NODE) return true;
+      return (
+        typeof window !== "undefined" &&
+        window.process &&
+        window.process.type === "renderer"
+      );
     }
     function isAlpine(platform2) {
       return platform2 === "linux" && fs.existsSync("/etc/alpine-release");
@@ -220,32 +242,47 @@ var require_node_gyp_build = __commonJS({
     load.parseTuple = parseTuple;
     load.matchTuple = matchTuple;
     load.compareTuples = compareTuples;
-  }
+  },
 });
 
 // node_modules/node-gyp-build/index.js
 var require_node_gyp_build2 = __commonJS({
   "node_modules/node-gyp-build/index.js"(exports, module) {
-    var runtimeRequire = typeof __webpack_require__ === "function" ? __non_webpack_require__ : __require;
+    var runtimeRequire =
+      typeof __webpack_require__ === "function"
+        ? __non_webpack_require__
+        : __require;
     if (typeof runtimeRequire.addon === "function") {
       module.exports = runtimeRequire.addon.bind(runtimeRequire);
     } else {
       module.exports = require_node_gyp_build();
     }
-  }
+  },
 });
 
 // browser-external:crypto
 var require_crypto = __commonJS({
   "browser-external:crypto"(exports, module) {
-    module.exports = Object.create(new Proxy({}, {
-      get(_, key) {
-        if (key !== "__esModule" && key !== "__proto__" && key !== "constructor" && key !== "splice") {
-          console.warn(`Module "crypto" has been externalized for browser compatibility. Cannot access "crypto.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`);
-        }
-      }
-    }));
-  }
+    module.exports = Object.create(
+      new Proxy(
+        {},
+        {
+          get(_, key) {
+            if (
+              key !== "__esModule" &&
+              key !== "__proto__" &&
+              key !== "constructor" &&
+              key !== "splice"
+            ) {
+              console.warn(
+                `Module "crypto" has been externalized for browser compatibility. Cannot access "crypto.${key}" in client code. See https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`,
+              );
+            }
+          },
+        },
+      ),
+    );
+  },
 });
 
 // node_modules/bcrypt/promises.js
@@ -279,9 +316,9 @@ var require_promises = __commonJS({
     module.exports = {
       promise,
       reject,
-      use
+      use,
     };
-  }
+  },
 });
 
 // node_modules/bcrypt/bcrypt.js
@@ -321,7 +358,7 @@ var require_bcrypt = __commonJS({
         rounds = 10;
       } else if (typeof rounds !== "number") {
         error = new Error("rounds must be a number");
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           cb(error);
         });
       }
@@ -329,11 +366,11 @@ var require_bcrypt = __commonJS({
         minor = "b";
       } else if (minor !== "b" && minor !== "a") {
         error = new Error('minor must be either "a" or "b"');
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           cb(error);
         });
       }
-      crypto.randomBytes(16, function(error2, randomBytes) {
+      crypto.randomBytes(16, function (error2, randomBytes) {
         if (error2) {
           cb(error2);
           return;
@@ -345,8 +382,13 @@ var require_bcrypt = __commonJS({
       if (data == null || salt == null) {
         throw new Error("data and salt arguments required");
       }
-      if (!(typeof data === "string" || data instanceof Buffer) || typeof salt !== "string" && typeof salt !== "number") {
-        throw new Error("data must be a string or Buffer and salt must either be a salt string or a number of rounds");
+      if (
+        !(typeof data === "string" || data instanceof Buffer) ||
+        (typeof salt !== "string" && typeof salt !== "number")
+      ) {
+        throw new Error(
+          "data must be a string or Buffer and salt must either be a salt string or a number of rounds",
+        );
       }
       if (typeof salt === "number") {
         salt = module.exports.genSaltSync(salt);
@@ -356,37 +398,48 @@ var require_bcrypt = __commonJS({
     function hash(data, salt, cb) {
       let error;
       if (typeof data === "function") {
-        error = new Error("data must be a string or Buffer and salt must either be a salt string or a number of rounds");
-        return process.nextTick(function() {
+        error = new Error(
+          "data must be a string or Buffer and salt must either be a salt string or a number of rounds",
+        );
+        return process.nextTick(function () {
           data(error);
         });
       }
       if (typeof salt === "function") {
-        error = new Error("data must be a string or Buffer and salt must either be a salt string or a number of rounds");
-        return process.nextTick(function() {
+        error = new Error(
+          "data must be a string or Buffer and salt must either be a salt string or a number of rounds",
+        );
+        return process.nextTick(function () {
           salt(error);
         });
       }
       if (cb && typeof cb !== "function") {
-        return promises.reject(new Error("cb must be a function or null to return a Promise"));
+        return promises.reject(
+          new Error("cb must be a function or null to return a Promise"),
+        );
       }
       if (!cb) {
         return promises.promise(hash, this, [data, salt]);
       }
       if (data == null || salt == null) {
         error = new Error("data and salt arguments required");
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           cb(error);
         });
       }
-      if (!(typeof data === "string" || data instanceof Buffer) || typeof salt !== "string" && typeof salt !== "number") {
-        error = new Error("data must be a string or Buffer and salt must either be a salt string or a number of rounds");
-        return process.nextTick(function() {
+      if (
+        !(typeof data === "string" || data instanceof Buffer) ||
+        (typeof salt !== "string" && typeof salt !== "number")
+      ) {
+        error = new Error(
+          "data must be a string or Buffer and salt must either be a salt string or a number of rounds",
+        );
+        return process.nextTick(function () {
           cb(error);
         });
       }
       if (typeof salt === "number") {
-        return module.exports.genSalt(salt, function(err, salt2) {
+        return module.exports.genSalt(salt, function (err, salt2) {
           return bindings.encrypt(data, salt2, cb);
         });
       }
@@ -396,8 +449,13 @@ var require_bcrypt = __commonJS({
       if (data == null || hash2 == null) {
         throw new Error("data and hash arguments required");
       }
-      if (!(typeof data === "string" || data instanceof Buffer) || typeof hash2 !== "string") {
-        throw new Error("data must be a string or Buffer and hash must be a string");
+      if (
+        !(typeof data === "string" || data instanceof Buffer) ||
+        typeof hash2 !== "string"
+      ) {
+        throw new Error(
+          "data must be a string or Buffer and hash must be a string",
+        );
       }
       return bindings.compare_sync(data, hash2);
     }
@@ -405,31 +463,36 @@ var require_bcrypt = __commonJS({
       let error;
       if (typeof data === "function") {
         error = new Error("data and hash arguments required");
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           data(error);
         });
       }
       if (typeof hash2 === "function") {
         error = new Error("data and hash arguments required");
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           hash2(error);
         });
       }
       if (cb && typeof cb !== "function") {
-        return promises.reject(new Error("cb must be a function or null to return a Promise"));
+        return promises.reject(
+          new Error("cb must be a function or null to return a Promise"),
+        );
       }
       if (!cb) {
         return promises.promise(compare, this, [data, hash2]);
       }
       if (data == null || hash2 == null) {
         error = new Error("data and hash arguments required");
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           cb(error);
         });
       }
-      if (!(typeof data === "string" || data instanceof Buffer) || typeof hash2 !== "string") {
+      if (
+        !(typeof data === "string" || data instanceof Buffer) ||
+        typeof hash2 !== "string"
+      ) {
         error = new Error("data and hash must be strings");
-        return process.nextTick(function() {
+        return process.nextTick(function () {
           cb(error);
         });
       }
@@ -451,9 +514,9 @@ var require_bcrypt = __commonJS({
       hash,
       compareSync,
       compare,
-      getRounds
+      getRounds,
     };
-  }
+  },
 });
 export default require_bcrypt();
 //# sourceMappingURL=bcrypt.js.map

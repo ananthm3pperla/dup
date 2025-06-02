@@ -1,14 +1,18 @@
-import React from 'react';
-import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { captureError } from '@/lib/errorReporting';
+import React from "react";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { Button } from "@/components/ui";
+import { captureError } from "@/lib/errorReporting";
 
 interface ErrorFallbackProps extends FallbackProps {
   errorCode?: number;
 }
 
-function ErrorFallback({ error, resetErrorBoundary, errorCode }: ErrorFallbackProps) {
+function ErrorFallback({
+  error,
+  resetErrorBoundary,
+  errorCode,
+}: ErrorFallbackProps) {
   // Safe navigation hook that doesn't throw outside Router context
   const safeNavigate = (path: string) => {
     try {
@@ -24,7 +28,7 @@ function ErrorFallback({ error, resetErrorBoundary, errorCode }: ErrorFallbackPr
 
   const handleNavigateHome = () => {
     // Use window.location for safety
-    safeNavigate('/');
+    safeNavigate("/");
   };
 
   // Log the error details
@@ -45,11 +49,11 @@ function ErrorFallback({ error, resetErrorBoundary, errorCode }: ErrorFallbackPr
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {errorCode === 404 ? 'Page Not Found' : 'Something went wrong'}
+              {errorCode === 404 ? "Page Not Found" : "Something went wrong"}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {errorCode === 404 
-                ? "We couldn't find the page you're looking for" 
+              {errorCode === 404
+                ? "We couldn't find the page you're looking for"
                 : "We've encountered an unexpected error"}
             </p>
           </div>
@@ -57,7 +61,7 @@ function ErrorFallback({ error, resetErrorBoundary, errorCode }: ErrorFallbackPr
 
         <div className="bg-error/10 dark:bg-error/20 rounded-lg p-4 mb-6">
           <p className="text-sm text-error dark:text-error-light font-mono whitespace-pre-wrap break-words">
-            {error.message || 'An unexpected error occurred'}
+            {error.message || "An unexpected error occurred"}
           </p>
         </div>
 
@@ -91,7 +95,7 @@ export default function AppErrorBoundary({ children }: AppErrorBoundaryProps) {
       FallbackComponent={ErrorFallback}
       onReset={() => {
         // Reset any state that might have caused the error
-        window.sessionStorage.removeItem('error_state');
+        window.sessionStorage.removeItem("error_state");
       }}
     >
       {children}

@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { Search, Filter, Award, ChevronDown, ChevronUp, Zap } from 'lucide-react';
-import { Button, Card } from '@/components/ui';
-import RewardCard, { Reward } from './RewardCard';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from "react";
+import {
+  Search,
+  Filter,
+  Award,
+  ChevronDown,
+  ChevronUp,
+  Zap,
+} from "lucide-react";
+import { Button, Card } from "@/components/ui";
+import RewardCard, { Reward } from "./RewardCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MarketplaceProps {
   userPoints: number;
@@ -11,35 +18,48 @@ interface MarketplaceProps {
   className?: string;
 }
 
-type SortOption = 'popular' | 'newest' | 'points-low' | 'points-high';
-type CategoryFilter = 'all' | string;
+type SortOption = "popular" | "newest" | "points-low" | "points-high";
+type CategoryFilter = "all" | string;
 
-export default function Marketplace({ userPoints, rewards, onRedeem, className = '' }: MarketplaceProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('popular');
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
+export default function Marketplace({
+  userPoints,
+  rewards,
+  onRedeem,
+  className = "",
+}: MarketplaceProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("popular");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [showFilters, setShowFilters] = useState(false);
 
   // Get unique categories
-  const categories = ['all', ...new Set(rewards.map(reward => reward.category))];
+  const categories = [
+    "all",
+    ...new Set(rewards.map((reward) => reward.category)),
+  ];
 
   // Filter and sort rewards
   const filteredRewards = rewards
-    .filter(reward => {
-      const matchesSearch = reward.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           reward.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = categoryFilter === 'all' || reward.category === categoryFilter;
+    .filter((reward) => {
+      const matchesSearch =
+        reward.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        reward.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        categoryFilter === "all" || reward.category === categoryFilter;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'points-low':
+        case "points-low":
           return a.pointsCost - b.pointsCost;
-        case 'points-high':
+        case "points-high":
           return b.pointsCost - a.pointsCost;
-        case 'newest':
-          return new Date(b.expiresAt || '').getTime() - new Date(a.expiresAt || '').getTime();
-        case 'popular':
+        case "newest":
+          return (
+            new Date(b.expiresAt || "").getTime() -
+            new Date(a.expiresAt || "").getTime()
+          );
+        case "popular":
         default:
           // For demo purposes, we'll use the remaining count as a proxy for popularity
           const aRemaining = a.remainingCount || 0;
@@ -58,9 +78,14 @@ export default function Marketplace({ userPoints, rewards, onRedeem, className =
               <Award className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Your Reward Balance</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
+                Your Reward Balance
+              </h3>
               <p className="text-xl sm:text-3xl font-bold text-primary">
-                {userPoints} <span className="text-sm sm:text-base font-normal text-gray-500 dark:text-gray-400">points</span>
+                {userPoints}{" "}
+                <span className="text-sm sm:text-base font-normal text-gray-500 dark:text-gray-400">
+                  points
+                </span>
               </p>
             </div>
           </div>
@@ -96,7 +121,11 @@ export default function Marketplace({ userPoints, rewards, onRedeem, className =
           >
             <Filter className="h-4 w-4" />
             <span className="hidden sm:inline">Filters</span>
-            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showFilters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
           <select
             value={sortBy}
@@ -116,7 +145,7 @@ export default function Marketplace({ userPoints, rewards, onRedeem, className =
         {showFilters && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
@@ -124,7 +153,9 @@ export default function Marketplace({ userPoints, rewards, onRedeem, className =
             <Card className="p-4">
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categories</h4>
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Categories
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
                       <button
@@ -132,11 +163,11 @@ export default function Marketplace({ userPoints, rewards, onRedeem, className =
                         onClick={() => setCategoryFilter(category)}
                         className={`px-3 py-1.5 text-xs sm:text-sm rounded-full transition-colors ${
                           categoryFilter === category
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                            ? "bg-primary text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                         }`}
                       >
-                        {category === 'all' ? 'All Categories' : category}
+                        {category === "all" ? "All Categories" : category}
                       </button>
                     ))}
                   </div>
@@ -163,7 +194,9 @@ export default function Marketplace({ userPoints, rewards, onRedeem, className =
             <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <Award className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">No rewards found</h3>
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No rewards found
+            </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {searchQuery
                 ? "No rewards match your search criteria"

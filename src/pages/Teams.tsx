@@ -1,26 +1,35 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTeam } from '@/contexts/TeamContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Users, Plus, Copy, Check, Settings, ArrowRight, Building2, Clock, AlertCircle } from 'lucide-react';
-import { Button, LoadingState, PageHeader } from '@/components/ui';
-import { createNewTeam, getUserTeams } from '@/lib/team';
-import { toast } from 'sonner';
-import { isDemoMode } from '@/lib/demo';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTeam } from "@/contexts/TeamContext";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Users,
+  Plus,
+  Copy,
+  Check,
+  Settings,
+  ArrowRight,
+  Building2,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
+import { Button, LoadingState, PageHeader } from "@/components/ui";
+import { createNewTeam, getUserTeams } from "@/lib/team";
+import { toast } from "sonner";
+import { isDemoMode } from "@/lib/demo";
 
 export default function Teams() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { teams, joinTeam, loading, error: teamError } = useTeam();
-  const [joinCode, setJoinCode] = useState('');
+  const [joinCode, setJoinCode] = useState("");
   const [copiedTeam, setCopiedTeam] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [showCopiedTooltip, setShowCopiedTooltip] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [createTeamName, setCreateTeamName] = useState('');
-  const [createTeamDescription, setCreateTeamDescription] = useState('');
+  const [createTeamName, setCreateTeamName] = useState("");
+  const [createTeamDescription, setCreateTeamDescription] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   const handleCopyInviteLink = (teamId: string, inviteCode: string) => {
@@ -28,7 +37,7 @@ export default function Teams() {
     navigator.clipboard.writeText(inviteLink);
     setCopiedTeam(teamId);
     setShowCopiedTooltip(true);
-    toast.success('Invite link copied to clipboard');
+    toast.success("Invite link copied to clipboard");
     setTimeout(() => {
       setCopiedTeam(null);
       setShowCopiedTooltip(false);
@@ -37,9 +46,9 @@ export default function Teams() {
 
   const handleJoinTeam = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!joinCode.trim()) {
-      setJoinError('Please enter an invite code');
+      setJoinError("Please enter an invite code");
       return;
     }
 
@@ -48,10 +57,11 @@ export default function Teams() {
 
     try {
       await joinTeam(joinCode.trim());
-      setJoinCode('');
-      toast.success('Successfully joined team!');
+      setJoinCode("");
+      toast.success("Successfully joined team!");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to join team';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to join team";
       setJoinError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -61,9 +71,9 @@ export default function Teams() {
 
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!createTeamName.trim()) {
-      toast.error('Please enter a team name');
+      toast.error("Please enter a team name");
       return;
     }
 
@@ -72,13 +82,13 @@ export default function Teams() {
     try {
       const result = await createNewTeam({
         name: createTeamName.trim(),
-        description: createTeamDescription.trim() || undefined
+        description: createTeamDescription.trim() || undefined,
       });
 
       if (result.success) {
         toast.success(result.message);
-        setCreateTeamName('');
-        setCreateTeamDescription('');
+        setCreateTeamName("");
+        setCreateTeamDescription("");
         setShowCreateForm(false);
         // Refresh teams list
         window.location.reload();
@@ -86,8 +96,8 @@ export default function Teams() {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error('Error creating team:', error);
-      toast.error('Failed to create team');
+      console.error("Error creating team:", error);
+      toast.error("Failed to create team");
     } finally {
       setIsCreating(false);
     }
@@ -121,7 +131,10 @@ export default function Teams() {
         </h2>
         <form onSubmit={handleJoinTeam} className="space-y-4">
           <div>
-            <label htmlFor="joinCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="joinCode"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               Invite Code
             </label>
             <input
@@ -129,7 +142,9 @@ export default function Teams() {
               type="text"
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
-              placeholder={isDemoMode() ? "Try DEMO123" : "Enter team invite code"}
+              placeholder={
+                isDemoMode() ? "Try DEMO123" : "Enter team invite code"
+              }
               className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:bg-gray-700 dark:text-white"
               disabled={isJoining}
             />
@@ -168,7 +183,10 @@ export default function Teams() {
         {showCreateForm && (
           <form onSubmit={handleCreateTeam} className="space-y-4">
             <div>
-              <label htmlFor="teamName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="teamName"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Team Name *
               </label>
               <input
@@ -183,7 +201,10 @@ export default function Teams() {
               />
             </div>
             <div>
-              <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="teamDescription"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Description (Optional)
               </label>
               <textarea
@@ -210,8 +231,8 @@ export default function Teams() {
                 variant="outline"
                 onClick={() => {
                   setShowCreateForm(false);
-                  setCreateTeamName('');
-                  setCreateTeamDescription('');
+                  setCreateTeamName("");
+                  setCreateTeamDescription("");
                 }}
                 disabled={isCreating}
               >
@@ -250,11 +271,12 @@ export default function Teams() {
                     )}
                     <div className="flex items-center gap-4 mt-1">
                       <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                        {team.role || 'Member'}
+                        {team.role || "Member"}
                       </span>
                       {team.member_count && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {team.member_count} member{team.member_count !== 1 ? 's' : ''}
+                          {team.member_count} member
+                          {team.member_count !== 1 ? "s" : ""}
                         </span>
                       )}
                     </div>
@@ -266,14 +288,22 @@ export default function Teams() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleCopyInviteLink(team.id, team.invite_code)}
-                      leftIcon={copiedTeam === team.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      onClick={() =>
+                        handleCopyInviteLink(team.id, team.invite_code)
+                      }
+                      leftIcon={
+                        copiedTeam === team.id ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )
+                      }
                       className="relative"
                     >
-                      {copiedTeam === team.id ? 'Copied!' : 'Copy Invite'}
+                      {copiedTeam === team.id ? "Copied!" : "Copy Invite"}
                     </Button>
                   )}
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -282,10 +312,10 @@ export default function Teams() {
                   >
                     Settings
                   </Button>
-                  
+
                   <Button
                     size="sm"
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate("/dashboard")}
                     leftIcon={<ArrowRight className="h-4 w-4" />}
                   >
                     View Dashboard

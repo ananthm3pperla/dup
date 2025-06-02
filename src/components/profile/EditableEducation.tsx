@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Pencil, X, Plus } from 'lucide-react';
-import { Education } from '../../types';
-import { Button } from '@/components/ui';
+import React, { useState } from "react";
+import { Pencil, X, Plus } from "lucide-react";
+import { Education } from "../../types";
+import { Button } from "@/components/ui";
 
 interface EditableEducationProps {
   education: Education;
@@ -11,12 +11,12 @@ interface EditableEducationProps {
   canEdit: boolean;
 }
 
-export default function EditableEducation({ 
-  education, 
-  index, 
-  onSave, 
-  onDelete, 
-  canEdit 
+export default function EditableEducation({
+  education,
+  index,
+  onSave,
+  onDelete,
+  canEdit,
 }: EditableEducationProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedEducation, setEditedEducation] = useState(education);
@@ -30,50 +30,76 @@ export default function EditableEducation({
     return (
       <div className="border-l-2 border-primary/20 pl-4 space-y-4 bg-card-hover p-4 rounded-lg">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-default">School/University</label>
+          <label className="block text-sm font-medium text-default">
+            School/University
+          </label>
           <input
             type="text"
             value={editedEducation.school}
-            onChange={(e) => setEditedEducation({ ...editedEducation, school: e.target.value })}
+            onChange={(e) =>
+              setEditedEducation({ ...editedEducation, school: e.target.value })
+            }
             className="block w-full rounded-md border-default bg-card text-default shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
             placeholder="School"
           />
-          
-          <label className="block text-sm font-medium text-default mt-3">Degree</label>
+
+          <label className="block text-sm font-medium text-default mt-3">
+            Degree
+          </label>
           <input
             type="text"
             value={editedEducation.degree}
-            onChange={(e) => setEditedEducation({ ...editedEducation, degree: e.target.value })}
+            onChange={(e) =>
+              setEditedEducation({ ...editedEducation, degree: e.target.value })
+            }
             className="block w-full rounded-md border-default bg-card text-default shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
             placeholder="Degree"
           />
-          
-          <label className="block text-sm font-medium text-default mt-3">Field of Study</label>
+
+          <label className="block text-sm font-medium text-default mt-3">
+            Field of Study
+          </label>
           <input
             type="text"
             value={editedEducation.field}
-            onChange={(e) => setEditedEducation({ ...editedEducation, field: e.target.value })}
+            onChange={(e) =>
+              setEditedEducation({ ...editedEducation, field: e.target.value })
+            }
             className="block w-full rounded-md border-default bg-card text-default shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
             placeholder="Field of Study"
           />
-          
+
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-default">Start Year</label>
+              <label className="block text-sm font-medium text-default">
+                Start Year
+              </label>
               <input
                 type="number"
                 value={editedEducation.startYear}
-                onChange={(e) => setEditedEducation({ ...editedEducation, startYear: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setEditedEducation({
+                    ...editedEducation,
+                    startYear: parseInt(e.target.value),
+                  })
+                }
                 className="block w-full rounded-md border-default bg-card text-default shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 placeholder="Start Year"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-default">End Year</label>
+              <label className="block text-sm font-medium text-default">
+                End Year
+              </label>
               <input
                 type="number"
                 value={editedEducation.endYear}
-                onChange={(e) => setEditedEducation({ ...editedEducation, endYear: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setEditedEducation({
+                    ...editedEducation,
+                    endYear: parseInt(e.target.value),
+                  })
+                }
                 className="block w-full rounded-md border-default bg-card text-default shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 placeholder="End Year (or leave blank if current)"
               />
@@ -81,7 +107,9 @@ export default function EditableEducation({
           </div>
         </div>
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-default">Honors & Awards</label>
+          <label className="block text-sm font-medium text-default">
+            Honors & Awards
+          </label>
           {editedEducation.honors?.map((honor, i) => (
             <div key={i} className="flex gap-2">
               <input
@@ -97,7 +125,9 @@ export default function EditableEducation({
               />
               <button
                 onClick={() => {
-                  const newHonors = editedEducation.honors?.filter((_, index) => index !== i);
+                  const newHonors = editedEducation.honors?.filter(
+                    (_, index) => index !== i,
+                  );
                   setEditedEducation({ ...editedEducation, honors: newHonors });
                 }}
                 className="p-2 text-error hover:bg-error/10 rounded-md"
@@ -108,10 +138,12 @@ export default function EditableEducation({
             </div>
           ))}
           <button
-            onClick={() => setEditedEducation({
-              ...editedEducation,
-              honors: [...(editedEducation.honors || []), '']
-            })}
+            onClick={() =>
+              setEditedEducation({
+                ...editedEducation,
+                honors: [...(editedEducation.honors || []), ""],
+              })
+            }
             className="flex items-center gap-1 text-sm text-primary hover:text-primary-light"
           >
             <Plus className="h-4 w-4" /> Add Honor
@@ -125,10 +157,7 @@ export default function EditableEducation({
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            size="sm"
-          >
+          <Button onClick={handleSave} size="sm">
             Save
           </Button>
           <Button
@@ -148,11 +177,18 @@ export default function EditableEducation({
     <div className="border-l-2 border-primary/20 pl-4 group p-4 rounded-lg hover:bg-card-hover transition-all duration-200">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-base font-medium text-default">{education.school || 'Not specified'}</h3>
-          <p className="text-sm text-muted mb-1">{education.degree || 'Not specified'}</p>
-          <p className="text-xs text-muted mb-2">{education.field || 'Not specified'}</p>
+          <h3 className="text-base font-medium text-default">
+            {education.school || "Not specified"}
+          </h3>
+          <p className="text-sm text-muted mb-1">
+            {education.degree || "Not specified"}
+          </p>
+          <p className="text-xs text-muted mb-2">
+            {education.field || "Not specified"}
+          </p>
           <p className="text-xs text-muted mb-3">
-            {education.startYear || 'Not specified'} - {education.endYear || 'Present'}
+            {education.startYear || "Not specified"} -{" "}
+            {education.endYear || "Present"}
           </p>
         </div>
         {canEdit && (
