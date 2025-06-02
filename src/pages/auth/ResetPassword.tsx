@@ -5,12 +5,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { Button, Alert, PasswordStrengthIndicator } from '@/components/ui';
+import { database } from '@/lib/database';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { updatePassword, error: authError } = useAuth();
-  
+
   const [token, setToken] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -63,16 +64,16 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm() || !token) return;
 
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       await updatePassword(password);
       setIsSuccess(true);
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
         navigate('/login');
@@ -190,7 +191,7 @@ export default function ResetPassword() {
                       )}
                     </button>
                   </div>
-                  
+
                   {/* Password Strength Indicator */}
                   <PasswordStrengthIndicator password={password} className="mt-2" />
                 </div>

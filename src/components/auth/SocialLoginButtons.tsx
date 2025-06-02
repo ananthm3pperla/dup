@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface SocialLoginButtonsProps {
   onGoogleLogin: () => Promise<void>;
@@ -35,7 +36,7 @@ export default function SocialLoginButtons({
         </svg>
         Continue with Google
       </motion.button>
-      
+
       <motion.button
         whileHover={{ y: -2 }}
         whileTap={{ y: 0 }}

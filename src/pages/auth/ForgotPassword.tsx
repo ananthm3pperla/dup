@@ -5,11 +5,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { Button, Alert } from '@/components/ui';
+import { database } from '@/lib/database';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const { resetPassword, error: authError } = useAuth();
-  
+
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +34,7 @@ export default function ForgotPassword() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateEmail(email)) {
       setError('Please enter a valid email address');
       return;
@@ -41,7 +42,7 @@ export default function ForgotPassword() {
 
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       await resetPassword(email);
       setIsSuccess(true);

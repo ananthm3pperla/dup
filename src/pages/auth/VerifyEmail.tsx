@@ -4,17 +4,18 @@ import { Building2, Mail, AlertCircle, CheckCircle, RefreshCw, ChevronLeft } fro
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Button, Alert } from '@/components/ui';
+import { database } from '@/lib/database';
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
   const { user, loading, error: authError, resendVerificationEmail } = useAuth();
-  
+
   const [countdown, setCountdown] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
-  
+
   // Get email from session storage if available
   useEffect(() => {
     const storedEmail = sessionStorage.getItem('verificationEmail');
@@ -24,7 +25,7 @@ export default function VerifyEmail() {
       setEmail(user.email);
     }
   }, [user]);
-  
+
   // Redirect if user is already verified
   useEffect(() => {
     if (user && !loading) {
@@ -44,11 +45,11 @@ export default function VerifyEmail() {
 
   const handleResendEmail = async () => {
     if (countdown > 0) return;
-    
+
     setError(null);
     setIsResending(true);
     setResendSuccess(false);
-    
+
     try {
       await resendVerificationEmail(email || '');
       setResendSuccess(true);
