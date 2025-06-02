@@ -147,6 +147,14 @@ export const ScheduleProvider: React.FC<ScheduleProviderProps> = ({
   const [state, dispatch] = useReducer(scheduleReducer, initialState);
   const { user } = useAuth();
 
+  // Load initial data when user changes
+  useEffect(() => {
+    if (user?.teamId) {
+      loadAnchorDays(user.teamId);
+      loadSchedules();
+    }
+  }, [user?.teamId]);
+
   /**
    * Load user schedules within a date range
    */

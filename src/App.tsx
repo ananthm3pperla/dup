@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthContext } from "./contexts/AuthContext";
-import { ThemeContext } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
@@ -18,8 +18,8 @@ import { AppErrorBoundary } from "./components/error/AppErrorBoundary";
 function App() {
   return (
     <AppErrorBoundary>
-      <ThemeContext>
-        <AuthContext>
+      <ThemeProvider>
+        <AuthProvider>
           <Router>
             <Routes>
               {/* Public routes */}
@@ -87,8 +87,8 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
-        </AuthContext>
-      </ThemeContext>
+        </AuthProvider>
+      </ThemeProvider>
     </AppErrorBoundary>
   );
 }
