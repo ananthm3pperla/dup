@@ -1,4 +1,10 @@
-import { supabase } from './supabase';
+/**
+ * Team management functions for Hi-Bridge
+ * Uses Replit Database through API endpoints
+ */
+
+import { teamAPI } from './supabase';
+import { isDemoMode } from './demo';
 
 // Validate a team invite code
 export async function validateTeamInvite(inviteCode: string): Promise<{
@@ -11,20 +17,30 @@ export async function validateTeamInvite(inviteCode: string): Promise<{
   message?: string;
 }> {
   try {
-    // FIX: Use a simplified query to avoid RLS recursion
-    // Direct database query that doesn't trigger complex RLS evaluations
-    const { data, error } = await supabase
-      .from('teams')
-      .select('id, name, description')
-      .eq('invite_code', inviteCode)
-      .single();
-    
-    if (error) {
-      console.error('Error validating team invite:', error);
-      return { valid: false, message: 'Invalid invite code' };
+    if (isDemoMode()) {
+      // Mock validation for demo
+      if (inviteCode === 'DEMO123') {
+        return {
+          valid: true,
+          team: {
+            id: 'demo-team',
+            name: 'Demo Team',
+            description: 'A demo team for testing'
+          }
+        };
+      }
+      return { valid: false, message: 'Invalid demo invite code. Try DEMO123' };
     }
-    
-    return { valid: true, team: data };
+
+    // Use API to validate invite
+    const response = await fetch(`/api/teams/validate-invite?code=${inviteCode}`);
+    const result = await response.json();
+
+    if (!result.success) {
+      return { valid: false, message: result.error || 'Invalid invite code' };
+    }
+
+    return { valid: true, team: result.data };
   } catch (error) {
     console.error('Error validating team invite:', error);
     return { valid: false, message: 'Failed to validate invite code' };
@@ -41,67 +57,126 @@ export async function joinTeamWithInvite(userId: string, inviteCode: string): Pr
   message: string;
 }> {
   try {
-    // FIX: Use a simplified approach with explicit, separate queries
-    
-    // Step 1: Get team by invite code (simple query)
-    const { data: team, error: teamError } = await supabase
-      .from('teams')
-      .select('id, name')
-      .eq('invite_code', inviteCode)
-      .single();
-    
-    if (teamError || !team) {
-      return { success: false, message: 'Invalid invite code' };
+    if (isDemoMode()) {
+      // Mock joining for demo
+      if (inviteCode === 'DEMO123') {
+        return {
+          success: true,
+          team: {
+            id: 'demo-team',
+            name: 'Demo Team'
+          },
+          message: 'Successfully joined demo team'
+        };
+      }
+      return { success: false, message: 'Invalid demo invite code' };
     }
-    
-    // Step 2: Check if user is already a member (direct query)
-    const { data: existingMember, error: memberError } = await supabase
-      .from('team_members')
-      .select('id')
-      .eq('team_id', team.id)
-      .eq('user_id', userId)
-      .maybeSingle();
-    
-    if (memberError) {
-      console.error('Error checking team membership:', memberError);
-      return { success: false, message: 'Error checking team membership' };
-    }
-    
-    if (existingMember) {
+
+    // Use teamAPI to join team
+    const result = await teamAPI.joinTeam(inviteCode);
+
+    if (!result.success) {
       return { 
-        success: true, 
-        team, 
-        message: 'You are already a member of this team' 
+        success: false, 
+        message: result.error || 'Failed to join team' 
       };
     }
-    
-    // Step 3: Add user to team (direct insert)
-    const { error: joinError } = await supabase
-      .from('team_members')
-      .insert({
-        team_id: team.id,
-        user_id: userId,
-        role: 'member',
-      });
-    
-    if (joinError) {
-      console.error('Error joining team:', joinError);
-      return { success: false, message: 'Failed to join team' };
-    }
-    
-    return { 
-      success: true, 
-      team,
-      message: 'Successfully joined team' 
+
+    return {
+      success: true,
+      team: result.data,
+      message: 'Successfully joined team'
     };
-  } catch (err) {
-    console.error('Error joining team with invite:', err);
-    return { 
-      success: false, 
-      message: err instanceof Error ? err.message : 'Failed to join team' 
-    };
+  } catch (error) {
+    console.error('Error joining team:', error);
+    return { success: false, message: 'Failed to join team' };
   }
 }
+
+// Create a new team
+export async function createNewTeam(teamData: {
+  name: string;
+  description?: string;
+}): Promise<{
+  success: boolean;
+  team?: any;
+  message: string;
+}> {
+  try {
+    if (isDemoMode()) {
+      return {
+        success: true,
+        team: {
+          id: 'demo-team-new',
+          name: teamData.name,
+          description: teamData.description,
+          invite_code: 'DEMO456'
+        },
+        message: 'Demo team created successfully'
+      };
+    }
+
+    const result = await teamAPI.createTeam(teamData);
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || 'Failed to create team'
+      };
+    }
+
+    return {
+      success: true,
+      team: result.data,
+      message: 'Team created successfully'
+    };
+  } catch (error) {
+    console.error('Error creating team:', error);
+    return { success: false, message: 'Failed to create team' };
+  }
+}
+
+// Get user's teams
+export async function getUserTeams(): Promise<{
+  success: boolean;
+  teams?: any[];
+  message?: string;
+}> {
+  try {
+    if (isDemoMode()) {
+      return {
+        success: true,
+        teams: [
+          {
+            id: 'demo-team',
+            name: 'Demo Team',
+            description: 'A demo team for testing',
+            role: 'member',
+            invite_code: 'DEMO123'
+          }
+        ]
+      };
+    }
+
+    const result = await teamAPI.getMyTeams();
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || 'Failed to get teams'
+      };
+    }
+
+    return {
+      success: true,
+      teams: result.data
+    };
+  } catch (error) {
+    console.error('Error getting user teams:', error);
+    return { success: false, message: 'Failed to get teams' };
+  }
+}
+
 interface Team {
   id: string;
   name: string;

@@ -1,10 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTeam } from '@/contexts/TeamContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Users, Plus, Copy, Check, Settings, ArrowRight, Building2, Clock, AlertCircle } from 'lucide-react';
 import { Button, LoadingState, PageHeader } from '@/components/ui';
-import { createTeam, getUserTeams } from '@/lib/supabase';
+import { createNewTeam, getUserTeams } from '@/lib/team';
+import { toast } from 'sonner';
+import { isDemoMode } from '@/lib/demo';
 
 export default function Teams() {
   const navigate = useNavigate();
@@ -15,204 +18,294 @@ export default function Teams() {
   const [isJoining, setIsJoining] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [showCopiedTooltip, setShowCopiedTooltip] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createTeamName, setCreateTeamName] = useState('');
+  const [createTeamDescription, setCreateTeamDescription] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const handleCopyInviteLink = (teamId: string) => {
-    const inviteLink = generateInviteLink(teamId);
+  const handleCopyInviteLink = (teamId: string, inviteCode: string) => {
+    const inviteLink = `${window.location.origin}/join-team?code=${inviteCode}`;
     navigator.clipboard.writeText(inviteLink);
     setCopiedTeam(teamId);
     setShowCopiedTooltip(true);
+    toast.success('Invite link copied to clipboard');
     setTimeout(() => {
       setCopiedTeam(null);
       setShowCopiedTooltip(false);
     }, 2000);
   };
 
-  const handleJoin = async () => {
-    if (!joinCode.trim()) return;
+  const handleJoinTeam = async (e: React.FormEvent) => {
+    e.preventDefault();
     
+    if (!joinCode.trim()) {
+      setJoinError('Please enter an invite code');
+      return;
+    }
+
     setIsJoining(true);
     setJoinError(null);
-    
+
     try {
       await joinTeam(joinCode.trim());
       setJoinCode('');
-    } catch (err) {
-      console.error('Error joining team:', err);
-      setJoinError(err instanceof Error ? err.message : 'Failed to join team. Please check the invite code.');
+      toast.success('Successfully joined team!');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to join team';
+      setJoinError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsJoining(false);
     }
   };
 
+  const handleCreateTeam = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!createTeamName.trim()) {
+      toast.error('Please enter a team name');
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      const result = await createNewTeam({
+        name: createTeamName.trim(),
+        description: createTeamDescription.trim() || undefined
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        setCreateTeamName('');
+        setCreateTeamDescription('');
+        setShowCreateForm(false);
+        // Refresh teams list
+        window.location.reload();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error('Error creating team:', error);
+      toast.error('Failed to create team');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   if (loading) {
-    return <LoadingState message="Loading teams..." />;
+    return <LoadingState message="Loading your teams..." />;
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <PageHeader 
-        title="My Teams"
-        description="Manage your teams or join existing ones"
-        action={
-          <div className="flex gap-2">
-            <Button
-              onClick={() => navigate('/team/create')}
-              leftIcon={<Plus className="h-4 w-4" />}
-              className="bg-primary hover:bg-primary-light"
-            >
-              Create Team
-            </Button>
-            <Button
-              onClick={() => navigate('/join-team')}
-              variant="outline"
-              className="bg-white hover:bg-gray-50"
-              leftIcon={<ArrowRight className="h-4 w-4" />}
-            >
-              Join Team
-            </Button>
-          </div>
-        }
+    <div className="max-w-4xl mx-auto space-y-6">
+      <PageHeader
+        title="Teams"
+        subtitle="Join teams or create your own to start collaborating"
       />
 
-      {/* Join Team Section */}
-      <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 rounded-xl p-6 shadow-sm">
-        <div className="max-w-2xl">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Join a Team</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            Have an invite link? Enter it below to join your team.
-          </p>
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={joinCode}
-                onChange={(e) => {
-                  setJoinCode(e.target.value);
-                  setJoinError(null);
-                }}
-                placeholder="Paste invite link here"
-                className={`block w-full rounded-lg border ${
-                  joinError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 
-                  'border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-primary'
-                } bg-white dark:bg-gray-800 px-4 py-2.5 shadow-sm focus:outline-none sm:text-sm`}
-              />
-              {joinError && (
-                <p className="absolute left-0 top-full mt-1 text-xs text-red-600 dark:text-red-400">
-                  {joinError}
-                </p>
-              )}
-            </div>
-            <Button
-              onClick={handleJoin}
-              disabled={!joinCode.trim() || isJoining}
-              isLoading={isJoining}
-              rightIcon={<ArrowRight className="h-4 w-4" />}
-              className="whitespace-nowrap"
-            >
-              Join Team
-            </Button>
+      {teamError && (
+        <div className="bg-error/10 border border-error/20 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-error" />
+            <p className="text-error font-medium">Error loading teams</p>
           </div>
+          <p className="text-error/80 text-sm mt-1">{teamError}</p>
         </div>
-      </div>
-      
-      {teams.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mb-4">
-            <Users className="h-8 w-8 text-primary" />
+      )}
+
+      {/* Join Team Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Join a Team
+        </h2>
+        <form onSubmit={handleJoinTeam} className="space-y-4">
+          <div>
+            <label htmlFor="joinCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Invite Code
+            </label>
+            <input
+              id="joinCode"
+              type="text"
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value)}
+              placeholder={isDemoMode() ? "Try DEMO123" : "Enter team invite code"}
+              className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:bg-gray-700 dark:text-white"
+              disabled={isJoining}
+            />
+            {joinError && (
+              <p className="text-error text-sm mt-1">{joinError}</p>
+            )}
           </div>
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Teams Yet</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
-            Create your first team or join an existing one using an invite link to start managing hybrid work schedules.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Button
+            type="submit"
+            isLoading={isJoining}
+            disabled={isJoining || !joinCode.trim()}
+            leftIcon={<Users className="h-4 w-4" />}
+          >
+            Join Team
+          </Button>
+        </form>
+      </div>
+
+      {/* Create Team Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Create a Team
+          </h2>
+          {!showCreateForm && (
             <Button
-              onClick={() => navigate('/team/create')}
+              variant="outline"
+              onClick={() => setShowCreateForm(true)}
               leftIcon={<Plus className="h-4 w-4" />}
             >
               Create New Team
             </Button>
-            <Button
-              onClick={() => navigate('/join-team')}
-              variant="outline"
-              leftIcon={<ArrowRight className="h-4 w-4" />}
-            >
-              Join with Invite
-            </Button>
-          </div>
+          )}
         </div>
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">Your Teams</h2>
-          </div>
-          <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+
+        {showCreateForm && (
+          <form onSubmit={handleCreateTeam} className="space-y-4">
+            <div>
+              <label htmlFor="teamName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Team Name *
+              </label>
+              <input
+                id="teamName"
+                type="text"
+                value={createTeamName}
+                onChange={(e) => setCreateTeamName(e.target.value)}
+                placeholder="Enter team name"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:bg-gray-700 dark:text-white"
+                disabled={isCreating}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Description (Optional)
+              </label>
+              <textarea
+                id="teamDescription"
+                value={createTeamDescription}
+                onChange={(e) => setCreateTeamDescription(e.target.value)}
+                placeholder="Describe your team"
+                rows={3}
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:bg-gray-700 dark:text-white"
+                disabled={isCreating}
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                isLoading={isCreating}
+                disabled={isCreating || !createTeamName.trim()}
+                leftIcon={<Plus className="h-4 w-4" />}
+              >
+                Create Team
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setCreateTeamName('');
+                  setCreateTeamDescription('');
+                }}
+                disabled={isCreating}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* My Teams Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          My Teams
+        </h2>
+
+        {teams && teams.length > 0 ? (
+          <div className="space-y-4">
             {teams.map((team) => (
-              <li key={team.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
-                <div className="flex items-center justify-between flex-wrap gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                      <span className="text-xl font-medium text-primary">{team.name.substring(0, 2).toUpperCase()}</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">{team.name}</h3>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="flex items-center gap-1.5">
-                          <Users className="h-4 w-4" />
-                          {team.created_by === user?.id ? 'Team Leader' : 'Team Member'}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <Building2 className="h-4 w-4" />
-                          {team.rto_policy.required_days} days/week in office
-                        </span>
-                        {team.rto_policy.core_hours && (
-                          <span className="flex items-center gap-1.5">
-                            <Clock className="h-4 w-4" />
-                            Core hours: {team.rto_policy.core_hours.start} - {team.rto_policy.core_hours.end}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+              <div
+                key={team.id}
+                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary/30 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center">
+                    <Building2 className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="flex items-center gap-4">
-                    <button
-                      type="button"
-                      onClick={() => handleCopyInviteLink(team.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                        copiedTeam === team.id 
-                          ? 'bg-success/10 text-success' 
-                          : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      {copiedTeam === team.id ? (
-                        <>
-                          <Check className="h-4 w-4" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-4 w-4" />
-                          Copy Invite Link
-                        </>
-                      )}
-                    </button>
-                    
-                    {team.created_by === user?.id && (
-                      <Button
-                        size="sm"
-                        onClick={() => navigate('/team/settings')}
-                        leftIcon={<Settings className="h-4 w-4" />}
-                        variant="outline"
-                      >
-                        Settings
-                      </Button>
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white">
+                      {team.name}
+                    </h3>
+                    {team.description && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {team.description}
+                      </p>
                     )}
+                    <div className="flex items-center gap-4 mt-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                        {team.role || 'Member'}
+                      </span>
+                      {team.member_count && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {team.member_count} member{team.member_count !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </li>
+
+                <div className="flex items-center gap-2">
+                  {team.invite_code && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopyInviteLink(team.id, team.invite_code)}
+                      leftIcon={copiedTeam === team.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      className="relative"
+                    >
+                      {copiedTeam === team.id ? 'Copied!' : 'Copy Invite'}
+                    </Button>
+                  )}
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/team/${team.id}/settings`)}
+                    leftIcon={<Settings className="h-4 w-4" />}
+                  >
+                    Settings
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    onClick={() => navigate('/dashboard')}
+                    leftIcon={<ArrowRight className="h-4 w-4" />}
+                  >
+                    View Dashboard
+                  </Button>
+                </div>
+              </div>
             ))}
-          </ul>
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              No teams yet
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Join a team using an invite code or create your own team.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
