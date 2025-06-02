@@ -229,36 +229,72 @@ export const checkinAPI = {
  * Schedule API functions
  */
 export const scheduleAPI = {
-  async updateSchedule(scheduleData: {
-    date: string;
-    workType?: string;
-    preference?: string;
-    userId?: string;
-    notes?: string;
-  }): Promise<ApiResponse> {
+  getSchedule: async (teamId?: string) => {
+    if (isDemoMode()) {
+      return { success: true, data: [] };
+    }
+
     try {
-      const response = await fetch("/api/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(scheduleData),
+      const url = teamId ? `/api/schedule?teamId=${teamId}` : "/api/schedule";
+      const response = await fetch(url, {
+        headers: getAuthHeaders(),
       });
-      return await response.json();
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
     } catch (error) {
-      return { success: false, error: "Failed to update schedule" };
+      console.error("Error fetching schedule:", error);
+      return { success: false, error: error.message };
     }
   },
 
-  async getSchedule(
-    startDate: string,
-    endDate: string,
-  ): Promise<ApiResponse> {
+  getTodaySchedule: async () => {
+    if (isDemoMode()) {
+      return { success: true, data: [] };
+    }
+
     try {
-      const response = await fetch(
-        `/api/schedule?start=${startDate}&end=${endDate}`,
-      );
-      return await response.json();
+      const response = await fetch("/api/schedule/today", {
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
     } catch (error) {
-      return { success: false, error: "Failed to get schedule" };
+      console.error("Error fetching today's schedule:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  updateSchedule: async (scheduleData: any) => {
+    if (isDemoMode()) {
+      return { success: true, data: scheduleData };
+    }
+
+    try {
+      const response = await fetch("/api/schedule", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(scheduleData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+      return { success: false, error: error.message };
     }
   },
 };
@@ -267,109 +303,87 @@ export const scheduleAPI = {
  * Analytics API functions
  */
 export const analyticsAPI = {
-  async getTeamAnalytics(): Promise<ApiResponse> {
-    try {
-      const response = await fetch("/api/analytics/team");
-      return await response.json();
-    } catch (error) {
-      return { success: false, error: "Failed to get team analytics" };
-    }
-  },
-};
-
-// Legacy compatibility exports - these will throw errors to help identify remaining Supabase usage
-// Supabase compatibility layer removed - use direct API calls
-
-/**
- * Games API for Hi-Bridge Games beta mode
- */
-export const gamesAPI = {
-  /**
-   * Get player's game statistics
-   */
-  async getPlayerStats() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/games/stats`, {
-        headers: await getAuthHeaders(),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch player stats: ${response.statusText}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching player stats:", error);
-      return { success: false, error: error.message };
-    }
-  },
-
-  /**
-   * Get team leaderboard
-   */
-  async getLeaderboard() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/games/leaderboard`, {
-        headers: await getAuthHeaders(),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch leaderboard: ${response.statusText}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      return { success: false, error: error.message };
-    }
-  },
-
-  /**
-   * Upload office photo for points
-   */
-  async uploadPhoto(photoData: { image: File; description?: string; location?: string }) {
-    try {
-      const formData = new FormData();
-      formData.append('image', photoData.image);
-      if (photoData.description) formData.append('description', photoData.description);
-      if (photoData.location) formData.append('location', photoData.location);
-
-      const response = await fetch(`${API_BASE_URL}/games/photo-upload`, {
-        method: 'POST',
-        headers: {
-          ...await getAuthHeaders(),
-          // Don't set Content-Type for FormData, let the browser set it
+  getTeamMetrics: async (teamId: string, timeRange: string = "week") => {
+    if (isDemoMode()) {
+      return {
+        success: true,
+        data: {
+          attendance: 85,
+          engagement: 78,
+          pulseScore: 4.2,
+          participationRate: 92,
         },
-        body: formData,
-      });
-      
+      };
+    }
+
+    try {
+      const response = await fetch(
+        `/api/analytics/team/${teamId}?range=${timeRange}`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
+
       if (!response.ok) {
-        throw new Error(`Failed to upload photo: ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      return await response.json();
+
+      const data = await response.json();
+      return { success: true, data };
     } catch (error) {
-      console.error("Error uploading photo:", error);
+      console.error("Error fetching team metrics:", error);
       return { success: false, error: error.message };
     }
   },
 
-  /**
-   * Get player's photo history
-   */
-  async getPhotoHistory() {
+  getPersonalMetrics: async (timeRange: string = "week") => {
+    if (isDemoMode()) {
+      return {
+        success: true,
+        data: {
+          officeVisits: 3,
+          pulseAverage: 4.1,
+          pointsEarned: 150,
+          streakDays: 5,
+        },
+      };
+    }
+
     try {
-      const response = await fetch(`${API_BASE_URL}/games/photos`, {
-        headers: await getAuthHeaders(),
+      const response = await fetch(`/api/analytics/personal?range=${timeRange}`, {
+        headers: getAuthHeaders(),
       });
-      
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch photo history: ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      return await response.json();
+
+      const data = await response.json();
+      return { success: true, data };
     } catch (error) {
-      console.error("Error fetching photo history:", error);
+      console.error("Error fetching personal metrics:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  getAIInsights: async () => {
+    if (isDemoMode()) {
+      return { success: true, data: [] };
+    }
+
+    try {
+      const response = await fetch("/api/analytics/insights", {
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error) {
+      console.error("Error fetching AI insights:", error);
       return { success: false, error: error.message };
     }
   },
