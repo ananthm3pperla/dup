@@ -7,17 +7,6 @@ import { User } from '@/lib/types';
  * Used when running without a backend or for testing
  */
 
-// Check if we're in demo mode
-export const isDemoMode = (): boolean => {
-  // Check multiple conditions for demo mode
-  const envDemo = import.meta.env.VITE_DEMO_MODE === 'true';
-  const urlDemo = window.location.search.includes('demo=true');
-  const localDemo = localStorage.getItem('hibridge_demo_mode') === 'true';
-
-  // Default to demo mode if no backend is detected
-  return envDemo || urlDemo || localDemo || true;
-};
-
 /**
  * Check if the application is running in demo mode
  */
@@ -26,7 +15,8 @@ export function isDemoMode(): boolean {
   return (
     localStorage.getItem('hi-bridge-demo-mode') === 'true' ||
     import.meta.env.VITE_DEMO_MODE === 'true' ||
-    window.location.search.includes('demo=true')
+    window.location.search.includes('demo=true') ||
+    true // Default to demo mode if no backend is detected
   );
 }
 

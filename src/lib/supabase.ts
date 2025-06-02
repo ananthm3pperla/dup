@@ -275,41 +275,6 @@ export const analyticsAPI = {
       return { success: false, error: "Failed to get team analytics" };
     }
   },
-
-  async logout(): Promise<ApiResponse> {
-    try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      return await response.json();
-    } catch (error) {
-      return { success: false, error: "Logout failed" };
-    }
-  },
-
-  async getCurrentUser(): Promise<ApiResponse<User>> {
-    try {
-      const response = await fetch("/api/auth/me", {
-        headers: { "Content-Type": "application/json" },
-      });
-      return await response.json();
-    } catch (error) {
-      return { success: false, error: "Failed to get current user" };
-    }
-  },
-
-  async refreshSession(): Promise<ApiResponse<any>> {
-    try {
-      const response = await fetch("/api/auth/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      return await response.json();
-    } catch (error) {
-      return { success: false, error: "Session refresh failed" };
-    }
-  },
 };
 
 // Legacy compatibility exports - these will throw errors to help identify remaining Supabase usage
