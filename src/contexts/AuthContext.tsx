@@ -216,4 +216,3 @@ export function AuthProvider({ children }: AuthProviderProps) {
 }
 
 export { AuthProvider, useAuth };
-export default AuthContext;
