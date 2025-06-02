@@ -3,7 +3,7 @@
  * Uses Replit Database through API endpoints
  */
 
-import { teamAPI } from "./supabase";
+import { teamAPI } from "./api";
 import { isDemoMode } from "./demo";
 
 // Validate a team invite code

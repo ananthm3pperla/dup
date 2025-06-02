@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { authAPI, userAPI, teamAPI, pulseAPI } from "../supabase";
+import { authAPI, userAPI, teamAPI, pulseAPI } from "../api";
 
 describe("Database Integrity Tests", () => {
   let testUserId: string;

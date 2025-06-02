@@ -108,7 +108,7 @@ export default function WeeklyCalendar({
               }
             }
 
-            // Work around Supabase API calls
+            // Use fallback schedule data
             userSchedule.splice(0, userSchedule.length, ...fallbackSchedules);
           }
         }

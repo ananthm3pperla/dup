@@ -7,7 +7,7 @@ import ProfileTabs from "@/components/profile/ProfileTabs";
 import { TabType } from "@/lib/types";
 import { LoadingState, ErrorState, Button, EmptyState } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { userAPI } from "@/lib/api";
 import { ChevronLeft, UserPlus, FileEdit } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -57,32 +57,34 @@ export default function Profile() {
 
       try {
         if (currentTab === "experience") {
-          // Save work history
-          const { error } = await supabase.from("user_work_history").upsert({
-            id: data.id || undefined,
-            user_id: user.id,
-            company: data.company,
-            role: data.role,
-            start_date: data.startDate,
-            end_date: data.endDate || null,
-            description: data.highlights?.join("\n") || "",
+          // Save work history via API
+          const result = await userAPI.updateProfile({
+            work_history: [{
+              id: data.id,
+              company: data.company,
+              role: data.role,
+              start_date: data.startDate,
+              end_date: data.endDate || null,
+              description: data.highlights?.join("\n") || "",
+            }]
           });
 
-          if (error) throw error;
+          if (!result.success) throw new Error(result.error);
         } else if (currentTab === "education") {
-          // Save education
-          const { error } = await supabase.from("user_education").upsert({
-            id: data.id || undefined,
-            user_id: user.id,
-            institution: data.school,
-            degree: data.degree,
-            field_of_study: data.field,
-            start_year: data.startYear,
-            end_year: data.endYear || null,
-            honors: data.honors || [],
+          // Save education via API
+          const result = await userAPI.updateProfile({
+            education: [{
+              id: data.id,
+              institution: data.school,
+              degree: data.degree,
+              field_of_study: data.field,
+              start_year: data.startYear,
+              end_year: data.endYear || null,
+              honors: data.honors || [],
+            }]
           });
 
-          if (error) throw error;
+          if (!result.success) throw new Error(result.error);
         }
 
         // Refresh the profile data
@@ -105,28 +107,30 @@ export default function Profile() {
 
     try {
       if (currentTab === "experience") {
-        // Add new work history
-        const { error } = await supabase.from("user_work_history").insert({
-          user_id: user.id,
-          company: "New Company",
-          role: "New Role",
-          start_date: new Date().toISOString().split("T")[0],
-          description: "",
+        // Add new work history via API
+        const result = await userAPI.updateProfile({
+          work_history: [{
+            company: "New Company",
+            role: "New Role",
+            start_date: new Date().toISOString().split("T")[0],
+            description: "",
+          }]
         });
 
-        if (error) throw error;
+        if (!result.success) throw new Error(result.error);
       } else if (currentTab === "education") {
-        // Add new education
-        const { error } = await supabase.from("user_education").insert({
-          user_id: user.id,
-          institution: "New Institution",
-          degree: "New Degree",
-          field_of_study: "New Field",
-          start_year: new Date().getFullYear() - 4,
-          end_year: new Date().getFullYear(),
+        // Add new education via API
+        const result = await userAPI.updateProfile({
+          education: [{
+            institution: "New Institution",
+            degree: "New Degree",
+            field_of_study: "New Field",
+            start_year: new Date().getFullYear() - 4,
+            end_year: new Date().getFullYear(),
+          }]
         });
 
-        if (error) throw error;
+        if (!result.success) throw new Error(result.error);
       }
 
       // Refresh the profile data
@@ -151,26 +155,24 @@ export default function Profile() {
           currentTab === "experience" &&
           profile.member_work_history?.[index]
         ) {
-          // Delete work history
+          // Delete work history via API
           const workItem = profile.member_work_history[index];
-          const { error } = await supabase
-            .from("user_work_history")
-            .delete()
-            .eq("id", workItem.id);
+          const result = await userAPI.updateProfile({
+            delete_work_history: workItem.id
+          });
 
-          if (error) throw error;
+          if (!result.success) throw new Error(result.error);
         } else if (
           currentTab === "education" &&
           profile.member_education?.[index]
         ) {
-          // Delete education
+          // Delete education via API
           const eduItem = profile.member_education[index];
-          const { error } = await supabase
-            .from("user_education")
-            .delete()
-            .eq("id", eduItem.id);
+          const result = await userAPI.updateProfile({
+            delete_education: eduItem.id
+          });
 
-          if (error) throw error;
+          if (!result.success) throw new Error(result.error);
         }
 
         // Refresh the profile data
