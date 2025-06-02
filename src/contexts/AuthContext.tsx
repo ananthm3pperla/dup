@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../lib/types';
 import { authAPI } from '../lib/api';
@@ -158,7 +157,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const initializeAuth = async () => {
       try {
         setLoading(true);
-        
+
         // Check if already in demo mode
         if (isDemoMode()) {
           setUser(getDemoUser());
@@ -216,4 +215,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 }
 
-export { AuthContext };
+export { AuthProvider, useAuth };
+export default AuthContext;

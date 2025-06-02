@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { CheckInButton } from "../checkin";
 import { Button } from "@/components/ui";
 import { motion } from "framer-motion";
-import { isDemoMode, getConsistentMockData, DEMO_USER } from "@/lib/demo";
+import { isDemoMode, getDemoUser, getConsistentMockData, DEMO_USER } from "@/lib/demo";
 
 interface DashboardHeaderProps {
   firstName: string;
