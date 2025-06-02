@@ -1,4 +1,3 @@
-
 // Placeholder supabase module for Hi-Bridge
 // This app uses Replit Database instead of Supabase
 
@@ -32,7 +31,7 @@ const createMockClient = () => ({
     select: () => Promise.resolve({ data: [], error: null }),
     insert: () => Promise.resolve({ data: null, error: null }),
     update: () => Promise.resolve({ data: null, error: null }),
-    delete: () => Promise.resolve({ data: null, error: null }),
+    delete: () => Promise.resolve({ data: [], error: null }),
     eq: () => ({ data: [], error: null }),
     order: () => ({ data: [], error: null }),
     limit: () => ({ data: [], error: null }),
@@ -48,8 +47,8 @@ export const supabase = createMockClient();
 
 // Placeholder exports for backward compatibility
 export const refreshSession = async () => {
-  console.warn('refreshSession called but using Replit backend');
-  return null;
+  console.log('Mock refresh session called');
+  return { data: { session: null }, error: null };
 };
 
 export const getSession = async () => {
