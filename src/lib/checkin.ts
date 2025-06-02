@@ -5,6 +5,12 @@ export interface LastCheckIn {
   checkin_time: string;
   status: 'pending' | 'approved' | 'rejected';
   location_verified: boolean;
+  ai_analysis?: {
+    confidence: number;
+    is_person_detected: boolean;
+    office_environment: boolean;
+    analysis_notes: string;
+  };
 }
 
 export async function submitCheckIn(
@@ -39,7 +45,7 @@ export async function submitCheckIn(
     formData.append('photo', photo);
     formData.append('userId', userId);
     formData.append('teamId', teamId);
-    
+
     if (location) {
       formData.append('location', JSON.stringify({
         latitude: location.latitude,
@@ -52,11 +58,11 @@ export async function submitCheckIn(
       method: 'POST',
       body: formData
     });
-    
+
     const result = await response.json();
-    
+
     if (!response.ok) throw new Error(result.error);
-    
+
     return result;
 
     // Create check-in record
@@ -198,7 +204,7 @@ export async function getUserCheckIns(
     // Return mock data for demo user
     const now = new Date();
     const twoHoursAgo = new Date(now.getTime() - (2 * 60 * 60 * 1000));
-    
+
     return [
       {
         id: 'demo-checkin-1',
@@ -236,7 +242,7 @@ export async function getUserCheckIns(
       // Fallback to demo data
       const now = new Date();
       const twoHoursAgo = new Date(now.getTime() - (2 * 60 * 60 * 1000));
-      
+
       return [
         {
           id: 'fallback-checkin-1',
@@ -249,7 +255,7 @@ export async function getUserCheckIns(
         }
       ];
     }
-    
+
     return data || [];
   } catch (error) {
     console.error('Error fetching user check-ins:', error);

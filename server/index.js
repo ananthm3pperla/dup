@@ -1,4 +1,3 @@
-
 import express from 'express';
 import path from 'path';
 import session from 'express-session';
@@ -9,7 +8,7 @@ import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import pkg from '@replit/database';
-const { Database } = pkg;
+const Database = pkg.default || pkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -129,7 +128,7 @@ app.post('/api/auth/register', async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
     const userId = generateId();
-    
+
     const user = {
       id: userId,
       email,
@@ -163,7 +162,7 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     const userId = await db.get(`user:email:${email}`);
     if (!userId) {
       return res.status(401).json({ message: 'Invalid credentials' });
@@ -171,7 +170,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     const userData = await db.get(`user:${userId}`);
     const storedHash = await db.get(`user:password:${userId}`);
-    
+
     if (!userData || !storedHash) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -297,11 +296,11 @@ app.get('/api/teams/my', requireAuth, async (req, res) => {
 app.post('/api/teams/join', requireAuth, async (req, res) => {
   try {
     const { inviteCode } = req.body;
-    
+
     // For demo purposes, any invite code works - in production, implement proper invite system
     const teamId = inviteCode;
     const teamData = await db.get(`team:${teamId}`);
-    
+
     if (!teamData) {
       return res.status(404).json({ message: 'Invalid invite code' });
     }
@@ -498,10 +497,10 @@ app.get('/api/leaderboard', requireAuth, async (req, res) => {
     const leaderboard = await Promise.all(team.memberIds.map(async (memberId) => {
       const memberData = await db.get(`user:${memberId}`);
       const member = JSON.parse(memberData);
-      
+
       // Mock points calculation
       const points = Math.floor(Math.random() * 1000) + 100;
-      
+
       return {
         userId: member.id,
         name: member.fullName,

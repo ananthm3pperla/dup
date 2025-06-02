@@ -5,7 +5,7 @@
  */
 
 import pkg from '@replit/database';
-const { Database } = pkg;
+const Database = pkg.default || pkg;
 
 // Initialize Replit Database
 const db = new Database();

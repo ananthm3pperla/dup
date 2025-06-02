@@ -17,6 +17,12 @@ interface CheckIn {
   photo_url: string;
   location_verified: boolean;
   status: 'pending' | 'approved' | 'rejected';
+  ai_analysis?: {
+    confidence: number;
+    is_person_detected: boolean;
+    office_environment: boolean;
+    analysis_notes: string;
+  };
 }
 
 export default function CheckInVerification() {
@@ -153,6 +159,26 @@ export default function CheckInVerification() {
                         alt="Check-in"
                         className="rounded-lg max-h-48 object-cover"
                       />
+                      {checkin.ai_analysis && (
+                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="text-sm font-medium text-blue-900 dark:text-blue-100">AI Analysis</span>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              checkin.ai_analysis.confidence > 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                              checkin.ai_analysis.confidence > 60 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                            }`}>
+                              {checkin.ai_analysis.confidence}% confidence
+                            </span>
+                          </div>
+                          <div className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                            <div>Person detected: {checkin.ai_analysis.is_person_detected ? '✓' : '✗'}</div>
+                            <div>Office environment: {checkin.ai_analysis.office_environment ? '✓' : '✗'}</div>
+                            <div className="italic">{checkin.ai_analysis.analysis_notes}</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {checkin.status === 'pending' && (
                       <div className="mt-4 flex items-center gap-2">
