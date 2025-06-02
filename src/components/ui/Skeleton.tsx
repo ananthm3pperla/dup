@@ -6,7 +6,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   animation?: "pulse" | "shimmer" | "none";
 }
 
-export function Skeleton({
+export default function Skeleton({
   className,
   variant = "default",
   animation = "shimmer",
