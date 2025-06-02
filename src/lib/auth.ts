@@ -1,123 +1,54 @@
-interface User {
+const API_BASE_URL = '/api';
+
+export interface User {
   id: string;
   email: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   role: 'employee' | 'manager' | 'hr';
-  emailConfirmed: boolean;
-  points: number;
-  remoteDays: number;
-  teamId?: string;
+  createdAt: string;
 }
 
-interface AuthResponse {
-  user: User;
-}
-
-class AuthService {
-  private baseUrl = '';
-
-  async signUp(email: string, password: string, fullName: string, role: string = 'employee'): Promise<AuthResponse> {
-    const response = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, fullName, role }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Registration failed');
-    }
-
-    return response.json();
-  }
-
-  async signIn(email: string, password: string): Promise<AuthResponse> {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Login failed');
-    }
-
-    return response.json();
-  }
-
-  async signOut(): Promise<void> {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-    });
-
-    if (!response.ok) {
-      throw new Error('Logout failed');
-    }
-  }
-
-  async getCurrentUser(): Promise<User | null> {
-    try {
-      const response = await fetch('/api/auth/me');
-
-      if (response.status === 401) {
-        return null;
-      }
-
-      if (!response.ok) {
-        throw new Error('Failed to get user data');
-      }
-
-      const data = await response.json();
-      return data.user;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  async resetPassword(email: string): Promise<void> {
-    // Stub for password reset - implement as needed
-    console.log('Password reset requested for:', email);
-  }
-
-  async updatePassword(newPassword: string): Promise<void> {
-    // Stub for password update - implement as needed
-    console.log('Password update requested');
-  }
-
-  async confirmEmail(token: string): Promise<void> {
-    // Stub for email confirmation - implement as needed
-    console.log('Email confirmation requested with token:', token);
-  }
-}
-
-export const authService = new AuthService();
-
-// Export types
-export type { User, AuthResponse };
-/**
- * Register a new user account
- */
-export const signUp = async (userData: {
+export interface LoginCredentials {
   email: string;
   password: string;
-  fullName: string;
-  role?: string;
-}) => {
-  const response = await fetch('/api/auth/register', {
+}
+
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role?: 'employee' | 'manager' | 'hr';
+}
+
+export async function loginUser(credentials: LoginCredentials): Promise<User> {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email: userData.email,
-      password: userData.password,
-      firstName: userData.fullName.split(' ')[0] || userData.fullName,
-      lastName: userData.fullName.split(' ').slice(1).join(' ') || '',
-      role: userData.role || 'employee'
-    })
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Login failed');
+  }
+
+  const data = await response.json();
+  return data.user;
+}
+
+export async function registerUser(credentials: RegisterCredentials): Promise<User> {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -125,57 +56,44 @@ export const signUp = async (userData: {
     throw new Error(error.error || 'Registration failed');
   }
 
-  return response.json();
-};
+  const data = await response.json();
+  return data.user;
+}
 
-/**
- * Login user with email and password
- */
-export const login = async (email: string, password: string) => {
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Login failed');
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-  }
-};
-
-/**
- * Alias for backward compatibility
- */
-export const loginUser = login;
-export const getCurrentUser = async () => {
-  const response = await fetch('/api/auth/me');
-
-  if (!response.ok) {
-    throw new Error('Failed to get user data');
-  }
-
-  return response.json();
-};
-
-export const logout = async () => {
-  const response = await fetch('/api/auth/logout', {
-    method: 'POST'
+export async function logoutUser(): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
   });
 
   if (!response.ok) {
     throw new Error('Logout failed');
   }
+}
 
-  return response.json();
-};
+export async function getCurrentUser(): Promise<User | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data.user;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
+  }
+}
+
+export async function checkAuthStatus(): Promise<boolean> {
+  try {
+    const user = await getCurrentUser();
+    return user !== null;
+  } catch (error) {
+    return false;
+  }
+}
