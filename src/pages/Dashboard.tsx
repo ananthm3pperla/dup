@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import Badge from "@/components/ui/Badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { pulseAPI, checkinAPI, analyticsAPI } from "@/lib/api";
 import {

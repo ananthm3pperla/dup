@@ -1,7 +1,8 @@
 import React from "react";
 import { format } from "date-fns";
 import { Users, Video, ExternalLink, MapPin, Clock } from "lucide-react";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@/components/ui";
+import Badge from "@/components/ui/Badge";
 import { motion } from "framer-motion";
 
 export interface MeetingEvent {

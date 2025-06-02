@@ -12,7 +12,8 @@ import {
   Calendar,
   Target
 } from "lucide-react";
-import { Button, Card, Badge, Avatar, LoadingState } from "@/components/ui";
+import { Button, Card, Avatar, LoadingState } from "@/components/ui";
+import Badge from "@/components/ui/Badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { gamesAPI, teamsAPI } from "@/lib/api";
 import { isDemoMode } from "@/lib/demo";
