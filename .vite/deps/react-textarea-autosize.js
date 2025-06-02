@@ -1,29 +1,31 @@
-import { require_react } from "./chunk-JINCTG6U.js";
-import { __toESM } from "./chunk-624QZG55.js";
+import {
+  require_react
+} from "./chunk-JINCTG6U.js";
+import {
+  __toESM
+} from "./chunk-624QZG55.js";
 
 // node_modules/@babel/runtime/helpers/esm/extends.js
 function _extends() {
-  return (
-    (_extends = Object.assign
-      ? Object.assign.bind()
-      : function (n) {
-          for (var e = 1; e < arguments.length; e++) {
-            var t = arguments[e];
-            for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
-          }
-          return n;
-        }),
-    _extends.apply(null, arguments)
-  );
+  return _extends = Object.assign ? Object.assign.bind() : function(n) {
+    for (var e = 1; e < arguments.length; e++) {
+      var t = arguments[e];
+      for (var r in t)
+        ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+    }
+    return n;
+  }, _extends.apply(null, arguments);
 }
 
 // node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js
 function _objectWithoutPropertiesLoose(r, e) {
-  if (null == r) return {};
+  if (null == r)
+    return {};
   var t = {};
   for (var n in r)
     if ({}.hasOwnProperty.call(r, n)) {
-      if (-1 !== e.indexOf(n)) continue;
+      if (-1 !== e.indexOf(n))
+        continue;
       t[n] = r[n];
     }
   return t;
@@ -42,7 +44,7 @@ var index = import_react.useLayoutEffect;
 // node_modules/use-latest/dist/use-latest.esm.js
 var useLatest = function useLatest2(value) {
   var ref = import_react2.default.useRef(value);
-  index(function () {
+  index(function() {
     ref.current = value;
   });
   return ref;
@@ -59,20 +61,17 @@ var updateRef = function updateRef2(ref, value) {
 };
 var useComposedRef = function useComposedRef2(libRef, userRef) {
   var prevUserRef = import_react3.default.useRef();
-  return import_react3.default.useCallback(
-    function (instance) {
-      libRef.current = instance;
-      if (prevUserRef.current) {
-        updateRef(prevUserRef.current, null);
-      }
-      prevUserRef.current = userRef;
-      if (!userRef) {
-        return;
-      }
-      updateRef(userRef, instance);
-    },
-    [userRef],
-  );
+  return import_react3.default.useCallback(function(instance) {
+    libRef.current = instance;
+    if (prevUserRef.current) {
+      updateRef(prevUserRef.current, null);
+    }
+    prevUserRef.current = userRef;
+    if (!userRef) {
+      return;
+    }
+    updateRef(userRef, instance);
+  }, [userRef]);
 };
 
 // node_modules/react-textarea-autosize/dist/react-textarea-autosize.browser.development.esm.js
@@ -86,10 +85,10 @@ var HIDDEN_TEXTAREA_STYLE = {
   "z-index": "-1000",
   top: "0",
   right: "0",
-  display: "block",
+  display: "block"
 };
 var forceHiddenStyles = function forceHiddenStyles2(node) {
-  Object.keys(HIDDEN_TEXTAREA_STYLE).forEach(function (key) {
+  Object.keys(HIDDEN_TEXTAREA_STYLE).forEach(function(key) {
     node.style.setProperty(key, HIDDEN_TEXTAREA_STYLE[key], "important");
   });
 };
@@ -118,11 +117,9 @@ function calculateNodeHeight(sizingData, value, minRows, maxRows) {
   if (hiddenTextarea.parentNode === null) {
     document.body.appendChild(hiddenTextarea);
   }
-  var paddingSize = sizingData.paddingSize,
-    borderSize = sizingData.borderSize,
-    sizingStyle = sizingData.sizingStyle;
+  var paddingSize = sizingData.paddingSize, borderSize = sizingData.borderSize, sizingStyle = sizingData.sizingStyle;
   var boxSizing = sizingStyle.boxSizing;
-  Object.keys(sizingStyle).forEach(function (_key) {
+  Object.keys(sizingStyle).forEach(function(_key) {
     var key = _key;
     hiddenTextarea.style[key] = sizingStyle[key];
   });
@@ -145,9 +142,10 @@ function calculateNodeHeight(sizingData, value, minRows, maxRows) {
   height = Math.min(maxHeight, height);
   return [height, rowHeight];
 }
-var noop = function noop2() {};
+var noop = function noop2() {
+};
 var pick = function pick2(props, obj) {
-  return props.reduce(function (acc, prop) {
+  return props.reduce(function(acc, prop) {
     acc[prop] = obj[prop];
     return acc;
   }, {});
@@ -177,7 +175,7 @@ var SIZING_STYLE = [
   "width",
   "wordBreak",
   "wordSpacing",
-  "scrollbarGutter",
+  "scrollbarGutter"
 ];
 var isIE = !!document.documentElement.currentStyle;
 var getSizingData = function getSizingData2(node) {
@@ -191,29 +189,20 @@ var getSizingData = function getSizingData2(node) {
     return null;
   }
   if (isIE && boxSizing === "border-box") {
-    sizingStyle.width =
-      parseFloat(sizingStyle.width) +
-      parseFloat(sizingStyle.borderRightWidth) +
-      parseFloat(sizingStyle.borderLeftWidth) +
-      parseFloat(sizingStyle.paddingRight) +
-      parseFloat(sizingStyle.paddingLeft) +
-      "px";
+    sizingStyle.width = parseFloat(sizingStyle.width) + parseFloat(sizingStyle.borderRightWidth) + parseFloat(sizingStyle.borderLeftWidth) + parseFloat(sizingStyle.paddingRight) + parseFloat(sizingStyle.paddingLeft) + "px";
   }
-  var paddingSize =
-    parseFloat(sizingStyle.paddingBottom) + parseFloat(sizingStyle.paddingTop);
-  var borderSize =
-    parseFloat(sizingStyle.borderBottomWidth) +
-    parseFloat(sizingStyle.borderTopWidth);
+  var paddingSize = parseFloat(sizingStyle.paddingBottom) + parseFloat(sizingStyle.paddingTop);
+  var borderSize = parseFloat(sizingStyle.borderBottomWidth) + parseFloat(sizingStyle.borderTopWidth);
   return {
     sizingStyle,
     paddingSize,
-    borderSize,
+    borderSize
   };
 };
 var getSizingData$1 = getSizingData;
 function useListener(target, type, listener) {
   var latestListener = useLatest(listener);
-  React3.useLayoutEffect(function () {
+  React3.useLayoutEffect(function() {
     var handler = function handler2(ev) {
       return latestListener.current(ev);
     };
@@ -221,13 +210,13 @@ function useListener(target, type, listener) {
       return;
     }
     target.addEventListener(type, handler);
-    return function () {
+    return function() {
       return target.removeEventListener(type, handler);
     };
   }, []);
 }
 var useFormResetListener = function useFormResetListener2(libRef, listener) {
-  useListener(document.body, "reset", function (ev) {
+  useListener(document.body, "reset", function(ev) {
     if (libRef.current.form === ev.target) {
       listener(ev);
     }
@@ -239,33 +228,15 @@ var useWindowResizeListener = function useWindowResizeListener2(listener) {
 var useFontsLoadedListener = function useFontsLoadedListener2(listener) {
   useListener(document.fonts, "loadingdone", listener);
 };
-var _excluded = [
-  "cacheMeasurements",
-  "maxRows",
-  "minRows",
-  "onChange",
-  "onHeightChange",
-];
+var _excluded = ["cacheMeasurements", "maxRows", "minRows", "onChange", "onHeightChange"];
 var TextareaAutosize = function TextareaAutosize2(_ref, userRef) {
-  var cacheMeasurements = _ref.cacheMeasurements,
-    maxRows = _ref.maxRows,
-    minRows = _ref.minRows,
-    _ref$onChange = _ref.onChange,
-    onChange = _ref$onChange === void 0 ? noop : _ref$onChange,
-    _ref$onHeightChange = _ref.onHeightChange,
-    onHeightChange =
-      _ref$onHeightChange === void 0 ? noop : _ref$onHeightChange,
-    props = _objectWithoutPropertiesLoose(_ref, _excluded);
+  var cacheMeasurements = _ref.cacheMeasurements, maxRows = _ref.maxRows, minRows = _ref.minRows, _ref$onChange = _ref.onChange, onChange = _ref$onChange === void 0 ? noop : _ref$onChange, _ref$onHeightChange = _ref.onHeightChange, onHeightChange = _ref$onHeightChange === void 0 ? noop : _ref$onHeightChange, props = _objectWithoutPropertiesLoose(_ref, _excluded);
   if (props.style) {
     if ("maxHeight" in props.style) {
-      throw new Error(
-        "Using `style.maxHeight` for <TextareaAutosize/> is not supported. Please use `maxRows`.",
-      );
+      throw new Error("Using `style.maxHeight` for <TextareaAutosize/> is not supported. Please use `maxRows`.");
     }
     if ("minHeight" in props.style) {
-      throw new Error(
-        "Using `style.minHeight` for <TextareaAutosize/> is not supported. Please use `minRows`.",
-      );
+      throw new Error("Using `style.minHeight` for <TextareaAutosize/> is not supported. Please use `minRows`.");
     }
   }
   var isControlled = props.value !== void 0;
@@ -275,27 +246,17 @@ var TextareaAutosize = function TextareaAutosize2(_ref, userRef) {
   var measurementsCacheRef = React3.useRef();
   var resizeTextarea = function resizeTextarea2() {
     var node = libRef.current;
-    var nodeSizingData =
-      cacheMeasurements && measurementsCacheRef.current
-        ? measurementsCacheRef.current
-        : getSizingData$1(node);
+    var nodeSizingData = cacheMeasurements && measurementsCacheRef.current ? measurementsCacheRef.current : getSizingData$1(node);
     if (!nodeSizingData) {
       return;
     }
     measurementsCacheRef.current = nodeSizingData;
-    var _calculateNodeHeight = calculateNodeHeight(
-        nodeSizingData,
-        node.value || node.placeholder || "x",
-        minRows,
-        maxRows,
-      ),
-      height = _calculateNodeHeight[0],
-      rowHeight = _calculateNodeHeight[1];
+    var _calculateNodeHeight = calculateNodeHeight(nodeSizingData, node.value || node.placeholder || "x", minRows, maxRows), height = _calculateNodeHeight[0], rowHeight = _calculateNodeHeight[1];
     if (heightRef.current !== height) {
       heightRef.current = height;
       node.style.setProperty("height", height + "px", "important");
       onHeightChange(height, {
-        rowHeight,
+        rowHeight
       });
     }
   };
@@ -307,10 +268,10 @@ var TextareaAutosize = function TextareaAutosize2(_ref, userRef) {
   };
   {
     React3.useLayoutEffect(resizeTextarea);
-    useFormResetListener(libRef, function () {
+    useFormResetListener(libRef, function() {
       if (!isControlled) {
         var currentValue = libRef.current.value;
-        requestAnimationFrame(function () {
+        requestAnimationFrame(function() {
           var node = libRef.current;
           if (node && currentValue !== node.value) {
             resizeTextarea();
@@ -320,15 +281,14 @@ var TextareaAutosize = function TextareaAutosize2(_ref, userRef) {
     });
     useWindowResizeListener(resizeTextarea);
     useFontsLoadedListener(resizeTextarea);
-    return React3.createElement(
-      "textarea",
-      _extends({}, props, {
-        onChange: handleChange,
-        ref,
-      }),
-    );
+    return React3.createElement("textarea", _extends({}, props, {
+      onChange: handleChange,
+      ref
+    }));
   }
 };
 var index2 = React3.forwardRef(TextareaAutosize);
-export { index2 as default };
+export {
+  index2 as default
+};
 //# sourceMappingURL=react-textarea-autosize.js.map

@@ -1,14 +1,15 @@
-import { require_fs } from "./chunk-MG562XKQ.js";
-import { __commonJS } from "./chunk-624QZG55.js";
+import {
+  require_fs
+} from "./chunk-MG562XKQ.js";
+import {
+  __commonJS
+} from "./chunk-624QZG55.js";
 
 // node_modules/@replit/database/node_modules/node-fetch/browser.js
 var require_browser = __commonJS({
-  "node_modules/@replit/database/node_modules/node-fetch/browser.js"(
-    exports,
-    module,
-  ) {
+  "node_modules/@replit/database/node_modules/node-fetch/browser.js"(exports, module) {
     "use strict";
-    var getGlobal = function () {
+    var getGlobal = function() {
       if (typeof self !== "undefined") {
         return self;
       }
@@ -28,7 +29,7 @@ var require_browser = __commonJS({
     exports.Headers = globalObject.Headers;
     exports.Request = globalObject.Request;
     exports.Response = globalObject.Response;
-  },
+  }
 });
 
 // node_modules/@replit/database/index.js
@@ -47,12 +48,9 @@ var require_database = __commonJS({
           this.key = key;
         } else {
           this.key = getKey();
-          setInterval(
-            () => {
-              this.key = getKey();
-            },
-            1e3 * 60 * 60,
-          );
+          setInterval(() => {
+            this.key = getKey();
+          }, 1e3 * 60 * 60);
         }
       }
       // Native Functions
@@ -62,28 +60,26 @@ var require_database = __commonJS({
        * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
        */
       async get(key, options) {
-        return await fetch(this.key + "/" + key)
-          .then((e) => e.text())
-          .then((strValue) => {
-            if (options && options.raw) {
-              return strValue;
-            }
-            if (!strValue) {
-              return null;
-            }
-            let value = strValue;
-            try {
-              value = JSON.parse(strValue);
-            } catch (_err) {
-              throw new SyntaxError(
-                `Failed to parse value of ${key}, try passing a raw option to get the raw value`,
-              );
-            }
-            if (value === null || value === void 0) {
-              return null;
-            }
-            return value;
-          });
+        return await fetch(this.key + "/" + key).then((e) => e.text()).then((strValue) => {
+          if (options && options.raw) {
+            return strValue;
+          }
+          if (!strValue) {
+            return null;
+          }
+          let value = strValue;
+          try {
+            value = JSON.parse(strValue);
+          } catch (_err) {
+            throw new SyntaxError(
+              `Failed to parse value of ${key}, try passing a raw option to get the raw value`
+            );
+          }
+          if (value === null || value === void 0) {
+            return null;
+          }
+          return value;
+        });
       }
       /**
        * Sets a key
@@ -95,7 +91,7 @@ var require_database = __commonJS({
         await fetch(this.key, {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
+          body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue)
         });
         return this;
       }
@@ -113,15 +109,13 @@ var require_database = __commonJS({
        */
       async list(prefix = "") {
         return await fetch(
-          this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`,
-        )
-          .then((r) => r.text())
-          .then((t) => {
-            if (t.length === 0) {
-              return [];
-            }
-            return t.split("\n").map(decodeURIComponent);
-          });
+          this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
+        ).then((r) => r.text()).then((t) => {
+          if (t.length === 0) {
+            return [];
+          }
+          return t.split("\n").map(decodeURIComponent);
+        });
       }
       // Dynamic Functions
       /**
@@ -178,7 +172,7 @@ var require_database = __commonJS({
         return process.env.REPLIT_DB_URL;
       }
     }
-  },
+  }
 });
 export default require_database();
 //# sourceMappingURL=@replit_database.js.map
