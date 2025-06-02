@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../lib/types';
 import { authAPI } from '../lib/api';
@@ -214,5 +215,3 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
-
-export { AuthProvider, useAuth };

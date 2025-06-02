@@ -1,5 +1,5 @@
 
-// UI Components Index
+// UI Components Index - Clean export list
 export { default as Alert } from './Alert';
 export { default as Avatar } from './Avatar';
 export { default as Badge } from './Badge';
