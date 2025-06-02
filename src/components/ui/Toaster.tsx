@@ -3,7 +3,7 @@ import React from 'react';
 import { Toaster as SonnerToaster } from 'sonner';
 import { useTheme } from '../../contexts/ThemeContext';
 
-export function Toaster() {
+export default function Toaster() {
   const { resolvedTheme } = useTheme();
 
   return (
