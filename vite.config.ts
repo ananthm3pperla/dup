@@ -18,10 +18,14 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: [
+      "bcrypt",
       "src/components/PrivateRoute",
       "src/components/layout/Layout",
       "src/components/dashboard/CheckInCard",
     ],
+  },
+  ssr: {
+    external: ["bcrypt", "node-gyp-build"],
   },
   server: {
     hmr: {
@@ -42,6 +46,7 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, "index.html"),
       },
+      external: ["bcrypt", "node-gyp-build"],
     },
   },
   cacheDir: ".vite",
