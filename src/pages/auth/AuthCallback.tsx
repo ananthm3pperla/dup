@@ -65,52 +65,11 @@ export default function AuthCallback() {
           await new Promise((resolve) => setTimeout(resolve, 1000));
 
           try {
-            // FIX: Directly upsert the onboarding record without checking first
-            // This eliminates the race condition that could cause duplicate key errors
-            const { error: upsertError } = await supabase
-              .from("user_onboarding")
-              .upsert(
-                {
-                  user_id: user.id,
-                  onboarding_completed: false,
-                },
-                {
-                  onConflict: "user_id",
-                },
-              );
+            // Check if user has completed onboarding via API
+            const response = await fetch(`/api/users/${user.id}/onboarding`);
+            const onboardingData = response.ok ? await response.json() : null;
 
-            if (upsertError) {
-              if (upsertError.code === "PGRST406") {
-                console.error(
-                  "Permission error creating onboarding record:",
-                  upsertError,
-                );
-                setError(
-                  "Permission denied creating onboarding data. This may be a temporary issue with our database.",
-                );
-                setErrorType("permission");
-                return;
-              } else {
-                // Log but continue with onboarding
-                console.error(
-                  "Error upserting onboarding record:",
-                  upsertError,
-                );
-              }
-            }
-
-            // Get the record to check if onboarding is completed
-            const { data: onboardingRecord, error: getError } = await supabase
-              .from("user_onboarding")
-              .select("onboarding_completed")
-              .eq("user_id", user.id)
-              .maybeSingle();
-
-            if (
-              !getError &&
-              onboardingRecord &&
-              onboardingRecord.onboarding_completed
-            ) {
+            if (onboardingData?.onboarding_completed) {
               // Onboarding is already completed, proceed to next steps
               setProcessingStage("redirecting");
             } else {
