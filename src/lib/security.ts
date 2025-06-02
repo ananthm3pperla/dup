@@ -1,14 +1,17 @@
-import bcrypt from "bcrypt";
 import { z } from "zod";
 
-const SALT_ROUNDS = 12;
-
 /**
- * Hash a password using bcrypt
+ * Hash a password using Web Crypto API (browser-compatible)
+ * Note: In production, password hashing should be done server-side
  */
 export async function hashPassword(password: string): Promise<string> {
   try {
-    return await bcrypt.hash(password, SALT_ROUNDS);
+    // For demo purposes only - real apps should hash passwords server-side
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   } catch (error) {
     console.error("Error hashing password:", error);
     throw new Error("Failed to hash password");
@@ -17,13 +20,16 @@ export async function hashPassword(password: string): Promise<string> {
 
 /**
  * Verify a password against a hash
+ * Note: In production, password verification should be done server-side
  */
 export async function verifyPassword(
   password: string,
   hash: string,
 ): Promise<boolean> {
   try {
-    return await bcrypt.compare(password, hash);
+    // For demo purposes only - real apps should verify passwords server-side
+    const currentHash = await hashPassword(password);
+    return currentHash === hash;
   } catch (error) {
     console.error("Error verifying password:", error);
     return false;
