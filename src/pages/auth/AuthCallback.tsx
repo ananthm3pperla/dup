@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTeam } from "@/contexts/TeamContext";
-import { authAPI } from "@/lib/supabase";
+import { authAPI } from "@/lib/api";
 import { LoadingState, Button, Alert } from "@/components/ui";
 import { AlertCircle, Beaker, Check } from "lucide-react";
 import { toast } from "sonner";

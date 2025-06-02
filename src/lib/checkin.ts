@@ -3,7 +3,7 @@
  * Handles office check-ins with photo verification
  */
 
-import { checkinAPI } from "./supabase";
+import { checkinAPI } from "./api";
 import { isDemoMode } from "./demo";
 
 export async function submitCheckIn(checkInData: {

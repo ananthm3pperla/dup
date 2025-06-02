@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User, Mail, Building2, MapPin, Briefcase } from "lucide-react";
 import { Card, Button, Input } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
-import { userAPI } from "@/lib/supabase";
+import { userAPI } from "@/lib/api";
 import { toast } from "sonner";
 import { isDemoMode, DEMO_USER } from "@/lib/demo";
 

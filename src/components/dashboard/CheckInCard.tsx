@@ -3,7 +3,7 @@ import { Camera, MapPin, Check } from "lucide-react";
 import { Card, Button } from "@/components/ui";
 import { CheckInButton } from "@/components/checkin";
 import { format } from "date-fns";
-import { checkinAPI } from "@/lib/supabase";
+import { checkinAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { isDemoMode } from "@/lib/demo";

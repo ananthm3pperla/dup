@@ -7,7 +7,7 @@ import { useSchedule } from '@/contexts/ScheduleContext';
 import { Card, Button, Badge } from '@/components/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { scheduleAPI } from '@/lib/supabase';
+import { scheduleAPI } from '@/lib/api';
 import { isDemoMode } from '@/lib/demo';
 
 export default function VotingCalendar() {

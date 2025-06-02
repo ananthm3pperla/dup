@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Card, Button } from "@/components/ui";
 import { useTeam } from "@/contexts/TeamContext";
 import { verifyCheckIn } from "@/lib/checkin";
-import { checkinAPI } from "@/lib/supabase";
+import { checkinAPI } from "@/lib/api";
 import { toast } from "sonner";
 
 interface CheckIn {
