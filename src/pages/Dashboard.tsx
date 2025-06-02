@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { LoadingState, Button, Card, Badge } from "../components/ui";
@@ -24,8 +25,14 @@ import { isDemoMode, getDemoUser } from "@/lib/demo";
 import { userAPI, teamAPI, analyticsAPI } from "@/lib/api";
 
 function Dashboard() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
   return (
-    
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      {/* Dashboard Header */}
+      <DashboardHeader />
+
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
@@ -43,7 +50,7 @@ function Dashboard() {
           <RecentAchievements />
         </div>
       </div>
-    
+    </div>
   );
 }
 

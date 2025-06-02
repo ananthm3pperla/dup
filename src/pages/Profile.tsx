@@ -8,6 +8,7 @@ import { TabType } from "@/lib/types";
 import { LoadingState, ErrorState, Button, EmptyState } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import { userAPI } from "@/lib/api";
+import api from "@/lib/api";
 import { ChevronLeft, UserPlus, FileEdit } from "lucide-react";
 import { motion } from "framer-motion";
 

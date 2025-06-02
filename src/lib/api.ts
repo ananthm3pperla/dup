@@ -468,3 +468,6 @@ export default {
   analytics: analyticsAPI,
   games: gamesAPI,
 };
+
+// Also export teamAPI for compatibility
+export { teamAPI };

@@ -12,6 +12,7 @@ export { default as Toast } from './Toast';
 export { default as Toaster } from './Toaster';
 export { default as Tooltip } from "./Tooltip";
 export { default as EmptyState } from "./EmptyState";
+export { default as ErrorState } from "./ErrorState";
 export { default as Alert } from "./Alert";
 export { default as StatusDisplay } from "./StatusDisplay";
 export { default as PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
