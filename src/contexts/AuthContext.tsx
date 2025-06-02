@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authService, User } from '@/lib/auth';
+import { login, getCurrentUser } from '../lib/auth';
 
 interface AuthContextType {
-  user: User | null;
+  user: any | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string, role?: string) => Promise<void>;
@@ -13,35 +13,95 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check for existing session
-    authService.getCurrentUser().then(user => {
-      setUser(user);
-      setLoading(false);
-    });
+    const fetchUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch current user:", error);
+        setUser(null);
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { user } = await authService.signIn(email, password);
-    setUser(user);
+    try {
+      const user = await login(email, password);
+      setUser(user);
+    } catch (error) {
+      console.error("Sign-in failed:", error);
+      throw error; // Re-throw the error to be caught by the component
+    }
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: string = 'employee') => {
-    const { user } = await authService.signUp(email, password, fullName, role);
-    setUser(user);
+    try {
+       // Assuming the signup API returns the user object upon successful signup
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, fullName, role }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Signup failed');
+      }
+
+      const newUser = await response.json();
+      setUser(newUser);
+
+    } catch (error: any) {
+      console.error("Signup failed:", error);
+      throw error; // Re-throw the error for handling in the signup component
+    }
   };
 
   const signOut = async () => {
-    await authService.signOut();
-    setUser(null);
+    try {
+      await fetch('/api/logout', { method: 'POST' });
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const resetPassword = async (email: string) => {
-    await authService.resetPassword(email);
+    try {
+      // Call your reset password API endpoint
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Reset password request failed');
+      }
+
+      // Handle success (e.g., display a success message)
+      console.log('Password reset email sent successfully');
+
+    } catch (error: any) {
+      console.error("Reset password request failed:", error);
+      throw error;
+    }
   };
+
 
   const value = {
     user,

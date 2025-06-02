@@ -99,17 +99,25 @@ export const authService = new AuthService();
 
 // Export types
 export type { User, AuthResponse };
-// Auth API functions
+/**
+ * Register a new user account
+ */
 export const signUp = async (userData: {
   email: string;
   password: string;
   fullName: string;
   role?: string;
 }) => {
-  const response = await fetch('/api/auth/signup', {
+  const response = await fetch('/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData)
+    body: JSON.stringify({
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.fullName.split(' ')[0] || userData.fullName,
+      lastName: userData.fullName.split(' ').slice(1).join(' ') || '',
+      role: userData.role || 'employee'
+    })
   });
 
   if (!response.ok) {
@@ -146,7 +154,9 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-// Alias for backward compatibility
+/**
+ * Alias for backward compatibility
+ */
 export const loginUser = login;
 export const getCurrentUser = async () => {
   const response = await fetch('/api/auth/me');
