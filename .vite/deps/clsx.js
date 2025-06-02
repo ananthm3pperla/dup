@@ -2,7 +2,7 @@ import {
   clsx,
   clsx_default
 } from "./chunk-TMXZRJBF.js";
-import "./chunk-UV5CTPV7.js";
+import "./chunk-624QZG55.js";
 export {
   clsx,
   clsx_default as default
