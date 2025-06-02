@@ -1,140 +1,152 @@
 {
-  "hash": "6c84333c",
+  "hash": "2caf47bc",
   "configHash": "076931d9",
-  "lockfileHash": "e4ffbf56",
-  "browserHash": "81aa94ed",
+  "lockfileHash": "0ebfd806",
+  "browserHash": "e678e7df",
   "optimized": {
     "react": {
       "src": "../../node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "df79e540",
+      "fileHash": "a36d0e00",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "78e3ec9e",
+      "fileHash": "b8961a26",
       "needsInterop": true
     },
     "react/jsx-runtime": {
       "src": "../../node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "7ab98414",
+      "fileHash": "7be39d30",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "3a76c66d",
+      "fileHash": "2ce324c8",
       "needsInterop": true
     },
     "react-router-dom": {
       "src": "../../node_modules/react-router-dom/dist/index.js",
       "file": "react-router-dom.js",
-      "fileHash": "68513f55",
+      "fileHash": "33e8c2ff",
       "needsInterop": false
     },
     "lucide-react": {
       "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
       "file": "lucide-react.js",
-      "fileHash": "8074532a",
+      "fileHash": "ce222773",
       "needsInterop": false
     },
     "framer-motion": {
       "src": "../../node_modules/framer-motion/dist/es/index.mjs",
       "file": "framer-motion.js",
-      "fileHash": "2a64fb9c",
+      "fileHash": "51e51c4e",
       "needsInterop": false
     },
     "sonner": {
       "src": "../../node_modules/sonner/dist/index.mjs",
       "file": "sonner.js",
-      "fileHash": "3d8fd091",
+      "fileHash": "7d689795",
       "needsInterop": false
     },
     "date-fns": {
       "src": "../../node_modules/date-fns/index.mjs",
       "file": "date-fns.js",
-      "fileHash": "276e8f6e",
+      "fileHash": "00ca7f4f",
       "needsInterop": false
     },
     "react-error-boundary": {
       "src": "../../node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
       "file": "react-error-boundary.js",
-      "fileHash": "dd7708e9",
+      "fileHash": "4e68e4e7",
       "needsInterop": false
     },
     "class-variance-authority": {
       "src": "../../node_modules/class-variance-authority/dist/index.mjs",
       "file": "class-variance-authority.js",
-      "fileHash": "c59b0659",
+      "fileHash": "a16bf389",
       "needsInterop": false
     },
     "clsx": {
       "src": "../../node_modules/clsx/dist/clsx.mjs",
       "file": "clsx.js",
-      "fileHash": "baf3da4c",
+      "fileHash": "50f79fe2",
       "needsInterop": false
     },
     "tailwind-merge": {
       "src": "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
       "file": "tailwind-merge.js",
-      "fileHash": "be51925f",
+      "fileHash": "8f2c0994",
       "needsInterop": false
     },
     "zustand": {
       "src": "../../node_modules/zustand/esm/index.mjs",
       "file": "zustand.js",
-      "fileHash": "acc3369b",
+      "fileHash": "f6a3c94d",
       "needsInterop": false
     },
     "zustand/middleware": {
       "src": "../../node_modules/zustand/esm/middleware.mjs",
       "file": "zustand_middleware.js",
-      "fileHash": "bd5b1c95",
+      "fileHash": "5daa94b0",
       "needsInterop": false
     },
     "axios": {
       "src": "../../node_modules/axios/index.js",
       "file": "axios.js",
-      "fileHash": "12d65b96",
+      "fileHash": "3799811d",
       "needsInterop": false
     },
     "react-textarea-autosize": {
       "src": "../../node_modules/react-textarea-autosize/dist/react-textarea-autosize.browser.development.esm.js",
       "file": "react-textarea-autosize.js",
-      "fileHash": "d7aa2025",
+      "fileHash": "c77d1648",
       "needsInterop": false
     },
     "zod": {
       "src": "../../node_modules/zod/lib/index.mjs",
       "file": "zod.js",
-      "fileHash": "5c92f6fb",
+      "fileHash": "4de40ad3",
       "needsInterop": false
     },
     "@fullcalendar/react": {
       "src": "../../node_modules/@fullcalendar/react/dist/index.js",
       "file": "@fullcalendar_react.js",
-      "fileHash": "ac1d865d",
+      "fileHash": "bf98ee68",
       "needsInterop": false
     },
     "@fullcalendar/daygrid": {
       "src": "../../node_modules/@fullcalendar/daygrid/index.js",
       "file": "@fullcalendar_daygrid.js",
-      "fileHash": "b0424b38",
+      "fileHash": "a60f9e19",
       "needsInterop": false
     },
     "@fullcalendar/timegrid": {
       "src": "../../node_modules/@fullcalendar/timegrid/index.js",
       "file": "@fullcalendar_timegrid.js",
-      "fileHash": "6f4de98a",
+      "fileHash": "7091dba5",
       "needsInterop": false
     },
     "@fullcalendar/interaction": {
       "src": "../../node_modules/@fullcalendar/interaction/index.js",
       "file": "@fullcalendar_interaction.js",
-      "fileHash": "71c729bd",
+      "fileHash": "304f966f",
       "needsInterop": false
+    },
+    "@replit/database": {
+      "src": "../../node_modules/@replit/database/index.js",
+      "file": "@replit_database.js",
+      "fileHash": "e0674fba",
+      "needsInterop": true
+    },
+    "bcrypt": {
+      "src": "../../node_modules/bcrypt/bcrypt.js",
+      "file": "bcrypt.js",
+      "fileHash": "ba7b338a",
+      "needsInterop": true
     }
   },
   "chunks": {
@@ -147,17 +159,20 @@
     "chunk-TMXZRJBF": {
       "file": "chunk-TMXZRJBF.js"
     },
-    "chunk-GACRHWME": {
-      "file": "chunk-GACRHWME.js"
+    "chunk-MG562XKQ": {
+      "file": "chunk-MG562XKQ.js"
     },
-    "chunk-DXOUNB47": {
-      "file": "chunk-DXOUNB47.js"
+    "chunk-BWCZL6O6": {
+      "file": "chunk-BWCZL6O6.js"
     },
-    "chunk-JBG67EE7": {
-      "file": "chunk-JBG67EE7.js"
+    "chunk-JY3LWUAG": {
+      "file": "chunk-JY3LWUAG.js"
     },
-    "chunk-UV5CTPV7": {
-      "file": "chunk-UV5CTPV7.js"
+    "chunk-JINCTG6U": {
+      "file": "chunk-JINCTG6U.js"
+    },
+    "chunk-624QZG55": {
+      "file": "chunk-624QZG55.js"
     }
   }
 }
