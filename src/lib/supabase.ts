@@ -1,9 +1,12 @@
 
-// Stub file - Supabase replaced with Replit backend
+// Stub file - Supabase completely replaced with Replit backend
+// This file maintains compatibility while redirecting to proper backend endpoints
+
 export const createClient = () => {
-  throw new Error('Supabase is no longer used. Use /api/auth endpoints instead.');
+  throw new Error('Supabase is no longer used. Use /api/* endpoints instead.');
 };
 
+// Mock auth object for compatibility
 export const supabase = {
   auth: {
     signInWithPassword: () => Promise.reject(new Error('Use /api/auth/login')),
@@ -26,6 +29,12 @@ export const supabase = {
     order: () => Promise.reject(new Error('Direct DB access is not allowed')),
     limit: () => Promise.reject(new Error('Direct DB access is not allowed')),
   }),
+  storage: {
+    from: () => ({
+      upload: () => Promise.reject(new Error('Use /api/upload endpoints')),
+      getPublicUrl: () => ({ data: { publicUrl: '' } }),
+    })
+  },
   channel: () => ({
     on: () => ({ subscribe: () => {} }),
     subscribe: () => {},
@@ -33,7 +42,20 @@ export const supabase = {
   }),
 };
 
-// Legacy exports for compatibility
-export const refreshSession = () => Promise.reject(new Error('Session refresh handled by backend'));
+// Legacy function stubs
+export const refreshSession = async () => {
+  if (typeof window !== 'undefined' && window.location.href.includes('demo=true')) {
+    return { 
+      success: true, 
+      session: {
+        user: { id: 'demo', email: 'demo@example.com' },
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      }
+    };
+  }
+  throw new Error('Session refresh handled by /api/auth/refresh');
+};
+
+export const signOut = () => Promise.reject(new Error('Use /api/auth/logout'));
 
 export default supabase;

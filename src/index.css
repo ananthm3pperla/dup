@@ -238,6 +238,14 @@
     @apply bg-info-bg text-info;
   }
 
+  .glass-card {
+    @apply bg-card border border-gray-200 backdrop-blur-sm relative overflow-hidden;
+  }
+
+  .glass-card[aria-pressed="true"] {
+    @apply bg-blue-800;
+  }
+
   /* Enhanced Card styles with glassmorphism */
   .card {
     @apply bg-card backdrop-blur-sm rounded-xl border border-default shadow-lg 
@@ -305,7 +313,7 @@
   .btn-primary {
     @apply bg-gradient-to-r from-primary to-primary-dark text-white 
            hover:from-primary-dark hover:to-primary-700 focus:ring-primary
-           shadow-lg hover:shadow-primary/25;
+           shadow-lg hover:shadow-lg hover:shadow-blue-500/25;
   }
 
   .btn-secondary {
