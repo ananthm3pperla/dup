@@ -1,4 +1,3 @@
-import { supabase } from './supabase';
 import { isDemoMode } from './demo';
 
 export interface LastCheckIn {
@@ -35,21 +34,30 @@ export async function submitCheckIn(
       };
     }
 
-    // Upload photo
-    const photoPath = `checkins/${userId}/${Date.now()}.jpg`;
-    const { error: uploadError } = await supabase.storage
-      .from('checkins')
-      .upload(photoPath, photo, {
-        contentType: 'image/jpeg',
-        cacheControl: '3600'
-      });
+    // Upload photo to local storage
+    const formData = new FormData();
+    formData.append('photo', photo);
+    formData.append('userId', userId);
+    formData.append('teamId', teamId);
+    
+    if (location) {
+      formData.append('location', JSON.stringify({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        accuracy: location.accuracy
+      }));
+    }
 
-    if (uploadError) throw uploadError;
-
-    // Get photo URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('checkins')
-      .getPublicUrl(photoPath);
+    const response = await fetch('/api/checkins', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) throw new Error(result.error);
+    
+    return result;
 
     // Create check-in record
     const { data, error: checkinError } = await supabase

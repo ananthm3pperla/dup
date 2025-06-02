@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { supabase } from '../supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper to generate unique emails to avoid conflicts
@@ -12,36 +11,49 @@ describe('Database Integrity Tests', () => {
   // Setup: Create a test user
   beforeAll(async () => {
     // Create a test user with a unique email
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: generateUniqueEmail(),
-      password: 'TestPassword123!',
-    });
-
-    if (authError) {
-      console.error('Error creating test user:', authError);
-      throw authError;
-    }
-
-    testUserId = authData.user?.id;
-
-    // Create a test team
-    if (testUserId) {
-      const { data: team, error: teamError } = await supabase
-        .from('teams')
-        .insert({
-          name: 'Test Team',
-          description: 'Team for database integrity tests',
-          created_by: testUserId,
-          invite_code: `TEST-${uuidv4().slice(0, 6)}`
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: generateUniqueEmail(),
+          password: 'TestPassword123!'
         })
-        .select()
-        .single();
-
-      if (teamError) {
-        console.error('Error creating test team:', teamError);
-      } else {
-        testTeamId = team.id;
+      });
+      
+      const authData = await response.json();
+      
+      if (!response.ok) {
+        console.error('Error creating test user:', authData.error);
+        throw new Error(authData.error);
       }
+
+      testUserId = authData.user?.id;
+
+      // Create a test team
+      if (testUserId) {
+        const teamResponse = await fetch('/api/teams', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'Test Team',
+            description: 'Team for database integrity tests',
+            created_by: testUserId,
+            invite_code: `TEST-${uuidv4().slice(0, 6)}`
+          })
+        });
+        
+        const team = await teamResponse.json();
+        
+        if (!teamResponse.ok) {
+          console.error('Error creating test team:', team.error);
+        } else {
+          testTeamId = team.id;
+        }
+      }
+    } catch (error) {
+      console.error('Setup error:', error);
+      throw error;
     }
   });
 

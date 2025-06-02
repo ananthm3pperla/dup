@@ -215,13 +215,11 @@ export default function Profile() {
           return;
         }
         
-        // For non-demo mode, fetch from Supabase
+        // For non-demo mode, fetch from API
         // First get the user's basic info
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', id)
-          .maybeSingle();
+        const response = await fetch(`/api/users/${id}`);
+        const userData = response.ok ? await response.json() : null;
+        const userError = !response.ok ? new Error('User not found') : null;
           
         if (userError) {
           throw userError;

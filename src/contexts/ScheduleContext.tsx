@@ -170,12 +170,11 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
         return staticSchedule;
       }
       
-      // Get user schedules from Supabase - use a direct query without complex joins
-      // to avoid the infinite recursion policy issue
+      // Get user schedules from API
       try {
-        const { data, error } = await supabase
-          .from('work_schedules')
-          .select('*')
+        const response = await fetch(`/api/schedules?user_id=${user.id}&start=${start}&end=${end}`);
+        const data = await response.json();
+        const error = !response.ok ? new Error(data.error) : null;
           .eq('user_id', user.id)
           .gte('date', start)
           .lte('date', end)

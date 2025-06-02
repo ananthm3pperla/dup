@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase, refreshSession } from '@/lib/supabase';
+import { refreshSession } from '@/lib/supabase';
 import { toast } from 'sonner';
 import SessionExpiredDialog from './SessionExpiredDialog';
 import { isDemoMode } from '@/lib/demo';

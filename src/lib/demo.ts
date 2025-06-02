@@ -1,4 +1,4 @@
-import { User } from '@supabase/supabase-js';
+// Demo user data - no external dependencies
 
 // Demo user data
 export const DEMO_USER = {

@@ -1,4 +1,4 @@
-import { User } from '@supabase/supabase-js';
+import { MockUser as User } from './supabase';
 
 // Define user roles
 export type UserRole = 'admin' | 'manager' | 'member' | 'guest';

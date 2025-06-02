@@ -64,41 +64,24 @@ export const useRewardsStore = create<RewardsState>((set, get) => ({
         return;
       }
 
-      // Get reward balance from Supabase
-      const { data: balanceData, error: balanceError } = await supabase
-        .from('reward_balances')
-        .select(`
-          current_balance as current,
-          total_earned,
-          total_used,
-          office_day_streak as streak,
-          last_office_day
-        `)
-        .eq('user_id', userId)
-        .eq('team_id', teamId)
-        .single();
-
-      if (balanceError) throw balanceError;
+      // Get reward balance from API
+      const balanceResponse = await fetch(`/api/rewards/balance?user_id=${userId}&team_id=${teamId}`);
+      const balanceData = await balanceResponse.json();
+      
+      if (!balanceResponse.ok) throw new Error(balanceData.error);
 
       // Get team's reward policy
-      const { data: policyData, error: policyError } = await supabase
-        .from('reward_policies')
-        .select(`
-          accrual_model,
-          office_to_remote_ratio,
-          streak_bonus_threshold,
-          streak_bonus_amount
-        `)
-        .eq('team_id', teamId)
-        .single();
-
-      if (policyError) throw policyError;
+      const policyResponse = await fetch(`/api/teams/${teamId}/reward-policy`);
+      const policyData = await policyResponse.json();
+      
+      if (!policyResponse.ok) throw new Error(policyData.error);
 
       // If no balance exists, create initial balance
       if (!balanceData) {
-        const { data: newBalance, error: insertError } = await supabase
-          .from('reward_balances')
-          .insert({
+        const createResponse = await fetch('/api/rewards/balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             user_id: userId,
             team_id: teamId,
             current_balance: 0,
@@ -106,8 +89,9 @@ export const useRewardsStore = create<RewardsState>((set, get) => ({
             total_used: 0,
             office_day_streak: 0
           })
-          .select()
-          .single();
+        });
+        
+        const newBalance = await createResponse.json();
 
         if (insertError) throw insertError;
         
@@ -185,28 +169,11 @@ export const useRewardsStore = create<RewardsState>((set, get) => ({
         return;
       }
 
-      // Get requests with approvals from Supabase
-      const { data, error } = await supabase
-        .from('remote_day_requests')
-        .select(`
-          id,
-          date,
-          days_requested,
-          status,
-          reason,
-          created_at,
-          requires_high_limit_approval,
-          remote_day_approvals (
-            approval_level,
-            status,
-            notes
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('team_id', teamId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      // Get requests with approvals from API
+      const response = await fetch(`/api/remote-day-requests?user_id=${userId}&team_id=${teamId}`);
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error);
       set({ requests: data });
     } catch (err) {
       console.error('Error loading requests:', err);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, Users } from 'lucide-react';
 import { Button, Alert } from '@/components/ui';
-import { User } from '@supabase/supabase-js';
+import { MockUser as User } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 
 interface TeamJoinConfirmationProps {

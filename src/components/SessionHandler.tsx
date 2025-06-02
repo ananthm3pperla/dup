@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase, refreshSession } from '@/lib/supabase';
+import { refreshSession } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Alert, Button } from '@/components/ui';
 import { AlertTriangle, RefreshCw, LifeBuoy } from 'lucide-react';
