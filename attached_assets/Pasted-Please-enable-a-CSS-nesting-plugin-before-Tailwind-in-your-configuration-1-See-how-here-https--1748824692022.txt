@@ -1,0 +1,60 @@
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+[1] See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+[1] 179|             backdrop-blur-sm relative overflow-hidden;
+[1] 180|  
+[1] 181|      &[aria-pressed="true"] {
+[1]    |      ^^^^^^^^^^^^^^^^^^^^^^^^
+[1] 182|        @apply bg-primary-dark;
+[1]    |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1] 183|      }
+[1]    |  ^^^^^
+[1] 12:37:32 AM [vite] Pre-transform error: Transform failed with 1 error:
+[1] /home/runner/workspace/src/components/ui/Button.tsx:82:9: ERROR: Multiple exports with the same name "Button"
+[1] 12:37:32 AM [vite] Pre-transform error: Transform failed with 1 error:
+[1] /home/runner/workspace/src/components/ui/Button.tsx:82:9: ERROR: Multiple exports with the same name "Button"
+[1] 12:37:33 AM [vite] Internal server error: Transform failed with 1 error:
+[1] /home/runner/workspace/src/components/ui/Button.tsx:82:9: ERROR: Multiple exports with the same name "Button"
+[1]   Plugin: vite:esbuild
+[1]   File: /home/runner/workspace/src/components/ui/Button.tsx:82:9
+[1]   
+[1]   Multiple exports with the same name "Button"
+[1]   80 |  }_c = Button;
+[1]   81 |  
+[1]   82 |  export { Button };
+[1]      |           ^
+[1]   83 |  export default Button;var _c;$RefreshReg$(_c, "Button");
+[1]   84 |  if (import.meta.hot && !inWebWorker) {
+[1]   
+[1]       at failureErrorWithLog (/home/runner/workspace/node_modules/esbuild/lib/main.js:1651:15)
+[1]       at /home/runner/workspace/node_modules/esbuild/lib/main.js:849:29
+[1]       at responseCallbacks.<computed> (/home/runner/workspace/node_modules/esbuild/lib/main.js:704:9)
+[1]       at handleIncomingPacket (/home/runner/workspace/node_modules/esbuild/lib/main.js:764:9)
+[1]       at Socket.readFromStdout (/home/runner/workspace/node_modules/esbuild/lib/main.js:680:7)
+[1]       at Socket.emit (node:events:518:28)
+[1]       at addChunk (node:internal/streams/readable:561:12)
+[1]       at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+[1]       at Readable.push (node:internal/streams/readable:392:5)
+[1]       at Pipe.onStreamRead (node:internal/stream_base_commons:191:23)
+[1] 12:37:48 AM [vite] Internal server error: Transform failed with 1 error:
+[1] /home/runner/workspace/src/components/ui/Button.tsx:82:9: ERROR: Multiple exports with the same name "Button"
+[1]   Plugin: vite:esbuild
+[1]   File: /home/runner/workspace/src/components/ui/Button.tsx:82:9
+[1]   
+[1]   Multiple exports with the same name "Button"
+[1]   80 |  }_c = Button;
+[1]   81 |  
+[1]   82 |  export { Button };
+[1]      |           ^
+[1]   83 |  export default Button;var _c;$RefreshReg$(_c, "Button");
+[1]   84 |  if (import.meta.hot && !inWebWorker) {
+[1]   
+[1]       at failureErrorWithLog (/home/runner/workspace/node_modules/esbuild/lib/main.js:1651:15)
+[1]       at /home/runner/workspace/node_modules/esbuild/lib/main.js:849:29
+[1]       at responseCallbacks.<computed> (/home/runner/workspace/node_modules/esbuild/lib/main.js:704:9)
+[1]       at handleIncomingPacket (/home/runner/workspace/node_modules/esbuild/lib/main.js:764:9)
+[1]       at Socket.readFromStdout (/home/runner/workspace/node_modules/esbuild/lib/main.js:680:7)
+[1]       at Socket.emit (node:events:518:28)
+[1]       at addChunk (node:internal/streams/readable:561:12)
+[1]       at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+[1]       at Readable.push (node:internal/streams/readable:392:5)
+[1]       at Pipe.onStreamRead (node:internal/stream_base_commons:191:23)
