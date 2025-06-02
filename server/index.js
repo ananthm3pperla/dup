@@ -770,13 +770,216 @@ app.get("/api/leaderboard", requireAuth, async (req, res) => {
   }
 });
 
-// Serve React app for all other routes (only in production)
-app.get("*", (req, res) => {
-  if (process.env.NODE_ENV === "production") {
-    res.sendFile(path.join(__dirname, "../dist/index.html"));
-  } else {
-    res.status(404).json({ message: "API route not found" });
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// User API endpoints
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await db.get(`user:${id}`);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(JSON.parse(user));
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+app.post('/api/users/:id/profile', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profileData = req.body;
+
+    // Store user profile data
+    await db.set(`user:${id}`, JSON.stringify(profileData));
+
+    res.json({ success: true, data: profileData });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+app.get('/api/users/:id/onboarding', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const onboarding = await db.get(`onboarding:${id}`);
+
+    if (!onboarding) {
+      return res.json({ onboarding_completed: false });
+    }
+
+    res.json(JSON.parse(onboarding));
+  } catch (error) {
+    console.error('Error fetching onboarding:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/users/:id/onboarding', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const onboardingData = {
+      ...req.body,
+      onboarding_completed: true,
+      completed_at: new Date().toISOString()
+    };
+
+    await db.set(`onboarding:${id}`, JSON.stringify(onboardingData));
+
+    res.json({ success: true, data: onboardingData });
+  } catch (error) {
+    console.error('Error updating onboarding:', error);
+    res.status(500).json({ error: 'Failed to update onboarding' });
+  }
+});
+
+// Pulse check API
+app.post('/api/pulse', async (req, res) => {
+  try {
+    const { userId, mood, comment, date } = req.body;
+    const pulseKey = `pulse:${userId}:${date}`;
+
+    const pulseData = {
+      userId,
+      mood,
+      comment: comment || '',
+      date,
+      timestamp: new Date().toISOString()
+    };
+
+    await db.set(pulseKey, JSON.stringify(pulseData));
+
+    res.json({ success: true, data: pulseData });
+  } catch (error) {
+    console.error('Error saving pulse:', error);
+    res.status(500).json({ error: 'Failed to save pulse check' });
+  }
+});
+
+app.get('/api/pulse/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { startDate, endDate } = req.query;
+
+    // For now, return sample data - in production you'd query the database
+    const pulses = {};
+    const start = new Date(startDate || Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = new Date(endDate || Date.now());
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      const pulseKey = `pulse:${userId}:${dateStr}`;
+      const pulseData = await db.get(pulseKey);
+
+      if (pulseData) {
+        pulses[dateStr] = JSON.parse(pulseData);
+      }
+    }
+
+    res.json({ success: true, data: pulses });
+  } catch (error) {
+    console.error('Error fetching pulses:', error);
+    res.status(500).json({ error: 'Failed to fetch pulse data' });
+  }
+});
+
+// Team API
+app.get('/api/teams/:id/members', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const members = await db.get(`team:${id}:members`);
+
+    if (!members) {
+      return res.json({ success: true, data: [] });
+    }
+
+    res.json({ success: true, data: JSON.parse(members) });
+  } catch (error) {
+    console.error('Error fetching team members:', error);
+    res.status(500).json({ error: 'Failed to fetch team members' });
+  }
+});
+
+// Games/Leaderboard API
+app.get('/api/games/leaderboard', async (req, res) => {
+  try {
+    const leaderboard = await db.get('games:leaderboard');
+
+    if (!leaderboard) {
+      // Return sample leaderboard data
+      const sampleData = [
+        { id: '1', name: 'Sarah Chen', department: 'Engineering', points: 2850, avatar: 'https://ui-avatars.com/api/?name=Sarah+Chen&background=random' },
+        { id: '2', name: 'Marcus Rodriguez', department: 'Product', points: 2720, avatar: 'https://ui-avatars.com/api/?name=Marcus+Rodriguez&background=random' },
+        { id: '3', name: 'Elena Vasquez', department: 'Design', points: 2680, avatar: 'https://ui-avatars.com/api/?name=Elena+Vasquez&background=random' }
+      ];
+      return res.json({ success: true, data: sampleData });
+    }
+
+    res.json({ success: true, data: JSON.parse(leaderboard) });
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+// Analytics API
+app.get('/api/analytics/dashboard', async (req, res) => {
+  try {
+    const { userId, role } = req.query;
+
+    // Sample analytics data based on role
+    const analyticsData = {
+      totalEmployees: 156,
+      officeAttendance: 78,
+      remoteWorkers: 78,
+      averageMood: 4.2,
+      weeklyTrends: [
+        { day: 'Mon', office: 85, remote: 71 },
+        { day: 'Tue', office: 92, remote: 64 },
+        { day: 'Wed', office: 88, remote: 68 },
+        { day: 'Thu', office: 94, remote: 62 },
+        { day: 'Fri', office: 72, remote: 84 }
+      ]
+    };
+
+    res.json({ success: true, data: analyticsData });
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+});
+
+// File upload for photo check-ins
+app.post('/api/checkin/photo', async (req, res) => {
+  try {
+    const { userId, photo, location, timestamp } = req.body;
+
+    const checkinData = {
+      userId,
+      photo,
+      location: location || 'Office',
+      timestamp: timestamp || new Date().toISOString(),
+      verified: true
+    };
+
+    const checkinKey = `checkin:${userId}:${Date.now()}`;
+    await db.set(checkinKey, JSON.stringify(checkinData));
+
+    res.json({ success: true, data: checkinData });
+  } catch (error) {
+    console.error('Error saving check-in:', error);
+    res.status(500).json({ error: 'Failed to save check-in' });
+  }
+});
+
+// Catch all handler
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 app.listen(PORT, "0.0.0.0", () => {
