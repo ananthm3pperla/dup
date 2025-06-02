@@ -1,8 +1,4 @@
-import type { User } from '@/lib/types';
-
-/**
- * Authentication service using Replit backend
- */
+import { User } from '@/types';
 
 const API_BASE = '/api';
 
@@ -17,7 +13,7 @@ class AuthService {
     return AuthService.instance;
   }
 
-  async login(email: string, password: string): Promise<{ user: User }> {
+  async login(email: string, password: string): Promise<User> {
     const response = await fetch(`${this.baseURL}/login`, {
       method: 'POST',
       headers: {
@@ -32,7 +28,8 @@ class AuthService {
       throw new Error(error.error || 'Login failed');
     }
 
-    return response.json();
+    const data = await response.json();
+    return data.user;
   }
 
   async register(userData: {
@@ -41,7 +38,7 @@ class AuthService {
     firstName: string;
     lastName: string;
     role?: string;
-  }): Promise<{ user: User }> {
+  }): Promise<User> {
     const response = await fetch(`${this.baseURL}/register`, {
       method: 'POST',
       headers: {
@@ -56,7 +53,8 @@ class AuthService {
       throw new Error(error.error || 'Registration failed');
     }
 
-    return response.json();
+    const data = await response.json();
+    return data.user;
   }
 
   async logout(): Promise<void> {
@@ -66,52 +64,38 @@ class AuthService {
     });
 
     if (!response.ok) {
-      throw new Error('Logout failed');
+      const error = await response.json();
+      throw new Error(error.error || 'Logout failed');
     }
   }
 
-  async getCurrentUser(): Promise<{ user: User }> {
-    const response = await fetch(`${this.baseURL}/me`, {
-      credentials: 'include',
-    });
+  async getCurrentUser(): Promise<User | null> {
+    try {
+      const response = await fetch(`${this.baseURL}/me`, {
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      throw new Error('Not authenticated');
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      return data.user;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
     }
-
-    return response.json();
   }
 }
 
-export const authService = AuthService.getInstance();
+// Create singleton instance
+const authService = AuthService.getInstance();
 
-// Main API functions
-export const loginUser = async (email: string, password: string) => {
-  return authService.login(email, password);
-};
-
-export const signupUser = async (userData: {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role?: string;
-}) => {
-  return authService.register(userData);
-};
-
-export const logoutUser = async () => {
-  return authService.logout();
-};
-
-export const getCurrentUser = async () => {
-  try {
-    const result = await authService.getCurrentUser();
-    return result.user;
-  } catch (error) {
-    return null;
-  }
-};
+// Export functions
+export const loginUser = (email: string, password: string) => authService.login(email, password);
+export const signupUser = (userData: any) => authService.register(userData);
+export const logoutUser = () => authService.logout();
+export const getCurrentUser = () => authService.getCurrentUser();
 
 // Legacy aliases for backward compatibility
 export const login = loginUser;
@@ -126,33 +110,9 @@ export async function checkAuth(): Promise<boolean> {
     const user = await getCurrentUser();
     return user !== null;
   } catch (error) {
+    console.error('Auth check failed:', error);
     return false;
   }
 }
 
-// Social login stubs (implement when needed)
-export async function signInWithGoogle(): Promise<User> {
-  throw new Error('Google sign-in not implemented yet');
-}
-
-export async function signInWithMicrosoft(): Promise<User> {
-  throw new Error('Microsoft sign-in not implemented yet');
-}
-
-// Demo mode functions
-export function isDemoMode(): boolean {
-  return localStorage.getItem('demo-mode') === 'true';
-}
-
-export async function enterDemoMode(): Promise<void> {
-  localStorage.setItem('demo-mode', 'true');
-  // Set demo user data
-  localStorage.setItem('demo-user', JSON.stringify({
-    id: 'demo-user',
-    email: 'demo@hibridge.com',
-    firstName: 'Demo',
-    lastName: 'User',
-    role: 'employee',
-    createdAt: new Date().toISOString()
-  }));
-}
+export default authService;

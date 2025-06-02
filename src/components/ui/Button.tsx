@@ -78,6 +78,6 @@ export function Button({
     </button>
   );
 }
+
 export { Button };
-export default Button;
 export default Button;
