@@ -1,164 +1,140 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { authAPI } from '@/lib/api';
 import { logger } from '@/lib/logger';
-import { performanceMonitor } from '@/lib/performance';
-import type { User } from '@/lib/database';
-import { loginUser, getCurrentUser, registerUser, logout } from '@/lib/auth';
 
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (userData: SignUpData) => Promise<void>;
-  signOut: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-  clearError: () => void;
+export interface AuthUser {
+  id: string;
+  email: string;
+  fullName?: string;
+  avatar?: string;
+  role?: 'employee' | 'manager' | 'hr';
+  teamId?: string;
+  emailVerified?: boolean;
+  lastSignIn?: string;
 }
 
-interface SignUpData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role?: string;
+interface AuthContextType {
+  user: AuthUser | null;
+  loading: boolean;
+  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<AuthUser>;
+  signIn: (email: string, password: string) => Promise<AuthUser>;
+  signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  // Check for existing session on mount
   useEffect(() => {
-    let mounted = true;
-
-    const initializeAuth = async () => {
-      const endTimer = performanceMonitor.startTimer('auth_initialization');
-
-      try {
-        logger.info('Initializing authentication');
-        const currentUser = await getCurrentUser();
-
-        if (mounted) {
-          setUser(currentUser);
-          logger.info('User authenticated', { userId: currentUser?.id });
-        }
-      } catch (error) {
-        if (mounted) {
-          logger.info('No authenticated user found');
-          setUser(null);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-          endTimer({ success: true });
-        }
-      }
-    };
-
-    initializeAuth();
-
-    return () => {
-      mounted = false;
-    };
+    checkSession();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const endTimer = performanceMonitor.startTimer('auth_signin');
-    setLoading(true);
-    setError(null);
-
+  const checkSession = async () => {
     try {
-      logger.info('Attempting user sign in', { email });
-      const user = await loginUser(email, password);
-      setUser(user);
-      logger.info('User signed in successfully', { userId: user.id });
-      endTimer({ success: true });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Sign in failed';
-      logger.error('Sign in failed', err as Error, { email });
-      setError(errorMessage);
-      endTimer({ success: false, error: errorMessage });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signUp = async (userData: SignUpData) => {
-    const endTimer = performanceMonitor.startTimer('auth_signup');
-    setLoading(true);
-    setError(null);
-
-    try {
-      logger.info('Attempting user sign up', { email: userData.email });
-      const user = await registerUser(userData);
-      setUser(user);
-      logger.info('User signed up successfully', { userId: user.id });
-      endTimer({ success: true });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Sign up failed';
-      logger.error('Sign up failed', err as Error, { email: userData.email });
-      setError(errorMessage);
-      endTimer({ success: false, error: errorMessage });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signOut = async () => {
-    const endTimer = performanceMonitor.startTimer('auth_signout');
-    setLoading(true);
-    setError(null);
-
-    try {
-      logger.info('Attempting user sign out', { userId: user?.id });
-      await logout();
+      const response = await authAPI.getCurrentUser();
+      if (response.user) {
+        setUser(response.user);
+      }
+    } catch (error) {
+      logger.error('Session check failed', { error });
+      // Session is invalid or expired
       setUser(null);
-      logger.info('User signed out successfully');
-      endTimer({ success: true });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Sign out failed';
-      logger.error('Sign out failed', err as Error);
-      setError(errorMessage);
-      endTimer({ success: false, error: errorMessage });
-      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const refreshUser = async () => {
-    const endTimer = performanceMonitor.startTimer('auth_refresh');
-
+  const signUp = async (email: string, password: string, fullName: string, role: string = 'employee'): Promise<AuthUser> => {
     try {
-      logger.debug('Refreshing user data');
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-      logger.debug('User data refreshed successfully', { userId: currentUser.id });
-      endTimer({ success: true });
-    } catch (err) {
-      logger.warn('Failed to refresh user data', err as Error);
-      setUser(null);
-      endTimer({ success: false });
+      logger.info('Attempting user signup', { email });
+
+      const response = await authAPI.register({
+        email,
+        password,
+        fullName,
+        role
+      });
+
+      if (response.user) {
+        setUser(response.user);
+        logger.info('User signup successful', { userId: response.user.id });
+        return response.user;
+      }
+
+      throw new Error('Signup failed - no user data returned');
+    } catch (error: any) {
+      logger.error('Signup failed', { error, email });
+      throw new Error(error.response?.data?.message || 'Signup failed');
     }
   };
 
-  const clearError = () => {
-    setError(null);
+  const signIn = async (email: string, password: string): Promise<AuthUser> => {
+    try {
+      logger.info('Attempting user signin', { email });
+
+      const response = await authAPI.login(email, password);
+
+      if (response.user) {
+        setUser(response.user);
+        logger.info('User signin successful', { userId: response.user.id });
+        return response.user;
+      }
+
+      throw new Error('Login failed - no user data returned');
+    } catch (error: any) {
+      logger.error('Signin failed', { error, email });
+      throw new Error(error.response?.data?.message || 'Login failed');
+    }
   };
 
-  const value = {
+  const signOut = async (): Promise<void> => {
+    try {
+      logger.info('Attempting user signout');
+
+      await authAPI.logout();
+      setUser(null);
+
+      logger.info('User signout successful');
+    } catch (error) {
+      logger.error('Signout failed', { error });
+      // Even if logout fails on server, clear local state
+      setUser(null);
+    }
+  };
+
+  const refreshSession = async (): Promise<void> => {
+    try {
+      await authAPI.refreshSession();
+      await checkSession(); // Re-fetch user data
+    } catch (error) {
+      logger.error('Session refresh failed', { error });
+      setUser(null);
+    }
+  };
+
+  const value: AuthContextType = {
     user,
     loading,
-    error,
-    signIn,
     signUp,
+    signIn,
     signOut,
-    refreshUser,
-    clearError,
+    refreshSession
   };
 
   return (
@@ -168,10 +144,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+export default AuthContext;
