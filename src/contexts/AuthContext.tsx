@@ -1,28 +1,29 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { database } from '../lib/database';
-import { hashPassword, verifyPassword } from '../lib/auth';
-import { toast } from 'sonner';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'employee' | 'manager' | 'hr';
-  company_name?: string;
-  job_title?: string;
-  department?: string;
-  office_location?: string;
-  created_at: string;
-  updated_at: string;
-}
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User } from '@/lib/types';
+import { authAPI } from '@/lib/api';
+import { isDemoMode, getDemoUser } from '@/lib/demo';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  updateProfile: (userData: Partial<User>) => Promise<void>;
+  error: string | null;
+  isAuthenticated: boolean;
+  isDemo: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
+  logout: () => Promise<void>;
+  enterDemoMode: () => void;
+  clearError: () => void;
+  refreshUser: () => Promise<void>;
+}
+
+interface RegisterData {
+  email: string;
+  password: string;
+  fullName: string;
+  role?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,142 +43,170 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isDemo, setIsDemo] = useState(false);
 
-  // Check for existing session on mount
+  const isAuthenticated = !!user;
+
+  const clearError = () => setError(null);
+
+  const refreshUser = async () => {
+    try {
+      if (isDemo) {
+        setUser(getDemoUser());
+        return;
+      }
+
+      const userData = await authAPI.getCurrentUser();
+      setUser(userData);
+      setError(null);
+    } catch (err: any) {
+      console.error('Failed to refresh user:', err);
+      if (err.response?.status === 401) {
+        setUser(null);
+        setError('Session expired. Please log in again.');
+      } else {
+        setError('Failed to refresh user session');
+      }
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (isDemoMode()) {
+        // Demo mode login
+        setUser(getDemoUser());
+        setIsDemo(true);
+        toast.success('Logged in to demo mode');
+        return;
+      }
+
+      const userData = await authAPI.login(email, password);
+      setUser(userData);
+      toast.success('Successfully logged in');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Login failed';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (userData: RegisterData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (isDemoMode()) {
+        // Demo mode registration
+        setUser(getDemoUser());
+        setIsDemo(true);
+        toast.success('Account created in demo mode');
+        return;
+      }
+
+      const newUser = await authAPI.register(userData);
+      setUser(newUser);
+      toast.success('Account created successfully');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Registration failed';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!isDemo) {
+        await authAPI.logout();
+      }
+
+      setUser(null);
+      setIsDemo(false);
+      toast.success('Logged out successfully');
+    } catch (err: any) {
+      console.error('Logout error:', err);
+      // Still clear user state even if API call fails
+      setUser(null);
+      setIsDemo(false);
+      toast.error('Logout failed, but you have been signed out locally');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const enterDemoMode = () => {
+    setUser(getDemoUser());
+    setIsDemo(true);
+    setError(null);
+    toast.success('Entered demo mode');
+  };
+
+  // Initialize auth state
   useEffect(() => {
-    const checkSession = async () => {
+    const initializeAuth = async () => {
       try {
-        const sessionData = localStorage.getItem('hibridge_session');
-        if (sessionData) {
-          const { userId } = JSON.parse(sessionData);
-          const userData = await database.get(`user_by_id:${userId}`);
-          if (userData) {
-            setUser(userData as User);
-          } else {
-            localStorage.removeItem('hibridge_session');
-          }
+        setLoading(true);
+        
+        // Check if already in demo mode
+        if (isDemoMode()) {
+          setUser(getDemoUser());
+          setIsDemo(true);
+          return;
         }
-      } catch (error) {
-        console.error('Error checking session:', error);
-        localStorage.removeItem('hibridge_session');
+
+        // Try to get current user from server
+        await refreshUser();
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+        // Don't set error here, let user try to login
       } finally {
         setLoading(false);
       }
     };
 
-    checkSession();
+    initializeAuth();
   }, []);
 
-  const signUp = async (email: string, password: string, userData: Partial<User>) => {
-    try {
-      // Check if user already exists
-      const existingUser = await database.get(`user:${email}`);
-      if (existingUser) {
-        throw new Error('User already exists with this email');
+  // Session refresh interval
+  useEffect(() => {
+    if (!user || isDemo) return;
+
+    const interval = setInterval(async () => {
+      try {
+        await authAPI.refreshSession();
+      } catch (err) {
+        console.error('Session refresh failed:', err);
+        // Don't automatically log out, let the user handle it
       }
+    }, 15 * 60 * 1000); // Refresh every 15 minutes
 
-      // Hash password
-      const hashedPassword = await hashPassword(password);
+    return () => clearInterval(interval);
+  }, [user, isDemo]);
 
-      // Create user object
-      const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const newUser: User = {
-        id: userId,
-        email,
-        name: userData.name || '',
-        role: userData.role || 'employee',
-        company_name: userData.company_name,
-        job_title: userData.job_title,
-        department: userData.department,
-        office_location: userData.office_location,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      // Store user data
-      await database.set(`user:${email}`, { ...newUser, password: hashedPassword });
-      await database.set(`user_by_id:${userId}`, newUser);
-
-      // Create session
-      localStorage.setItem('hibridge_session', JSON.stringify({ userId }));
-      setUser(newUser);
-      toast.success('Account created successfully!');
-    } catch (error) {
-      console.error('Sign up error:', error);
-      throw error;
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      // Get user data
-      const userData = await database.get(`user:${email}`);
-      if (!userData) {
-        throw new Error('Invalid email or password');
-      }
-
-      // Verify password
-      const isValidPassword = await verifyPassword(password, userData.password);
-      if (!isValidPassword) {
-        throw new Error('Invalid email or password');
-      }
-
-      // Remove password from user object before setting state
-      const { password: _, ...userWithoutPassword } = userData;
-
-      // Create session
-      localStorage.setItem('hibridge_session', JSON.stringify({ userId: userData.id }));
-      setUser(userWithoutPassword as User);
-      toast.success('Welcome back!');
-    } catch (error) {
-      console.error('Sign in error:', error);
-      throw error;
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      localStorage.removeItem('hibridge_session');
-      setUser(null);
-      toast.success('Signed out successfully');
-    } catch (error) {
-      console.error('Sign out error:', error);
-      throw error;
-    }
-  };
-
-  const updateProfile = async (userData: Partial<User>) => {
-    if (!user) {
-      throw new Error('No user logged in');
-    }
-
-    try {
-      const updatedUser: User = {
-        ...user,
-        ...userData,
-        updated_at: new Date().toISOString()
-      };
-
-      // Update both user records
-      const existingUserData = await database.get(`user:${user.email}`);
-      await database.set(`user:${user.email}`, { ...existingUserData, ...userData, updated_at: updatedUser.updated_at });
-      await database.set(`user_by_id:${user.id}`, updatedUser);
-
-      setUser(updatedUser);
-      toast.success('Profile updated successfully');
-    } catch (error) {
-      console.error('Update profile error:', error);
-      throw error;
-    }
-  };
-
-  const value: AuthContextType = {
+  const value = {
     user,
     loading,
-    signUp,
-    signIn,
-    signOut,
-    updateProfile
+    error,
+    isAuthenticated,
+    isDemo,
+    login,
+    register,
+    logout,
+    enterDemoMode,
+    clearError,
+    refreshUser,
   };
 
   return (
@@ -186,3 +215,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
+
+export { AuthContext };

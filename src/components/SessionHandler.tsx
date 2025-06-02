@@ -1,57 +1,40 @@
+
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
 import { Alert, Button } from '@/components/ui';
-import { AlertTriangle, RefreshCw, LifeBuoy } from 'lucide-react';
-import { isDemoMode } from '@/lib/demo';
+import { AlertTriangle, RefreshCw, LifeBuoy, LogOut } from 'lucide-react';
+import { authAPI } from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function SessionHandler() {
-  const [error, setError] = useState<string | null>(null);
+  const { user, error, isDemo, logout, refreshUser, clearError } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [showSessionError, setShowSessionError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    const handleAuthError = () => {
-      // In demo mode, ignore auth errors
-      if (isDemoMode()) {
-        return;
-      }
-
-      // Check if user session is valid
-      const sessionData = localStorage.getItem('hibridge_session');
-      if (!sessionData && location.pathname.startsWith('/dashboard')) {
-        setError('Your session has expired. Please sign in again.');
-      }
-    };
-
-    // Check on mount and location changes
-    handleAuthError();
-  }, [location.pathname]);
+    // Show session error dialog for certain auth errors
+    if (error && (error.includes('Session expired') || error.includes('unauthorized'))) {
+      setShowSessionError(true);
+    }
+  }, [error]);
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
     try {
-      // Attempt to refresh session by checking user data
-      const sessionData = localStorage.getItem('hibridge_session');
-      if (sessionData) {
-        const { userId } = JSON.parse(sessionData);
-        // Update timestamp to extend session
-        const updatedSession = {
-          userId,
-          timestamp: Date.now()
-        };
-        localStorage.setItem('hibridge_session', JSON.stringify(updatedSession));
-        setError(null);
-        toast.success('Session refreshed successfully');
-      } else {
-        throw new Error('No valid session found');
-      }
+      setIsRefreshing(true);
+      await refreshUser();
+      setShowSessionError(false);
+      setRetryCount(0);
+      clearError();
+      toast.success('Session refreshed successfully');
     } catch (err) {
-      console.error('Session refresh failed:', err);
-      setError('Failed to refresh session. Please sign in again.');
+      setRetryCount(prev => prev + 1);
+      if (retryCount >= 2) {
+        toast.error('Multiple refresh attempts failed. Please sign in again.');
+        handleSignOut();
+      } else {
+        toast.error('Refresh failed. Please try again.');
+      }
     } finally {
       setIsRefreshing(false);
     }
@@ -59,65 +42,97 @@ export default function SessionHandler() {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
-      navigate('/auth/login');
+      await logout();
+      setShowSessionError(false);
+      window.location.href = '/login';
     } catch (err) {
-      console.error('Sign out failed:', err);
-      // Force navigation even if sign out fails
-      localStorage.removeItem('hibridge_session');
-      navigate('/auth/login');
+      console.error('Logout error:', err);
+      // Force redirect even if logout fails
+      window.location.href = '/login';
     }
   };
 
   const handleContactSupport = () => {
-    // In a real app, this would open a support chat or email
-    toast.info('Support contact feature coming soon');
+    // In a real app, this would open a support chat or redirect to support page
+    toast.info('Support feature coming soon. Please try refreshing your session.');
   };
 
-  if (!error) {
+  const handleDismiss = () => {
+    setShowSessionError(false);
+    clearError();
+  };
+
+  // Don't show for demo mode or if no error
+  if (isDemo || !showSessionError || !error) {
     return null;
   }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Alert className="max-w-md bg-white dark:bg-gray-800">
-        <AlertTriangle className="h-4 w-4 text-amber-600" />
-        <div className="ml-3">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Session Error
-          </h3>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-            {error}
-          </p>
-          <div className="mt-4 flex space-x-2">
-            <Button
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Refreshing...' : 'Refresh Session'}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleSignOut}
-            >
-              Sign In Again
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleContactSupport}
-              className="flex items-center gap-2"
-            >
-              <LifeBuoy className="h-4 w-4" />
-              Support
-            </Button>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <AlertTriangle className="h-6 w-6 text-amber-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              Session Error
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              {error}
+            </p>
+            
+            {retryCount > 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mb-4">
+                Retry attempt {retryCount} of 3
+              </p>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh Session'}
+              </Button>
+              
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSignOut}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign In Again
+              </Button>
+            </div>
+
+            <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleContactSupport}
+                className="flex items-center gap-2 text-xs"
+              >
+                <LifeBuoy className="h-3 w-3" />
+                Get Help
+              </Button>
+              
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleDismiss}
+                className="text-xs"
+              >
+                Dismiss
+              </Button>
+            </div>
           </div>
         </div>
-      </Alert>
+      </div>
     </div>
   );
 }
