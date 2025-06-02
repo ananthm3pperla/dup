@@ -7,7 +7,7 @@ import { useSchedule } from '@/contexts/ScheduleContext';
 import { Card, Button, Badge } from '@/components/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase';
+import { scheduleAPI } from '@/lib/supabase';
 import { isDemoMode } from '@/lib/demo';
 
 export default function VotingCalendar() {
@@ -74,7 +74,15 @@ export default function VotingCalendar() {
       // In production mode, submit to database
       if (!isDemoMode() && user && currentTeam) {
         // Submit to the team_votes table
-        const { error: submitError } = await supabase
+        const result = await scheduleAPI.updateSchedule({
+          date: format(date, 'yyyy-MM-dd'),
+          preference: preference,
+          userId: user.id
+        });
+        
+        if (!result.success) {
+          throw new Error(result.error);
+        }
           .from('team_votes')
           .upsert({
             user_id: user.id,

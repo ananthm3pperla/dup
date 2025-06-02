@@ -116,6 +116,17 @@ export const userAPI = {
     } catch (error) {
       return { success: false, error: 'Avatar upload failed' };
     }
+  },
+
+  async getProfile(): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch('/api/users/profile', {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: 'Failed to get profile' };
+    }
   }
 };
 
@@ -324,17 +335,7 @@ export async function refreshSession(): Promise<{ success: boolean; session?: an
   };
 }
 
-// Export all API modules for easy importing
-export {
-  authAPI,
-  userAPI,
-  teamAPI,
-  pulseAPI,
-  checkinAPI,
-  scheduleAPI,
-  analyticsAPI
-};
-
+// Default export with all API modules
 export default {
   auth: authAPI,
   users: userAPI,

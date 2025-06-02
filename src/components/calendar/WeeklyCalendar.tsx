@@ -36,7 +36,7 @@ export default function WeeklyCalendar({
     goToNextWeek, 
     goToPrevWeek 
   } = useSchedule();
-  
+
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedWorkType, setSelectedWorkType] = useState<'office' | 'remote' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,33 +44,33 @@ export default function WeeklyCalendar({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  
+
   // Get current week days (Mon-Fri)
   const weekDays = React.useMemo(() => {
     const startDay = startOfWeek(viewMode === 'current' ? currentWeek : nextWeek, { weekStartsOn: 1 });
     return Array.from({ length: 5 }, (_, i) => addDays(startDay, i));
   }, [currentWeek, nextWeek, viewMode]);
-  
+
   // Check if the current view should be editable
   const allowEditing = viewMode === 'next';
-  
+
   // In demo mode, use static schedules
   const demoStaticSchedules = isDemoMode() && DEMO_STATIC_SCHEDULES ? 
     (viewMode === 'current' ? DEMO_STATIC_SCHEDULES.current_week : DEMO_STATIC_SCHEDULES.next_week) : 
     null;
-  
+
   // Load schedules on mount and week change
   useEffect(() => {
     const loadScheduleData = async () => {
       if (!user?.id || !currentTeam?.id) return;
-      
+
       setLoading(true);
       setError(null);
-      
+
       try {
         const startDate = viewMode === 'current' ? currentWeek : nextWeek;
         const endDate = addDays(startDate, 6); // Include weekend in query but display Mon-Fri
-        
+
         if (!isDemoMode()) {
           try {
             // In production, try to fetch data from API
@@ -78,7 +78,7 @@ export default function WeeklyCalendar({
             await loadTeamSchedule(startDate, endDate);
           } catch (error) {
             console.error('Error loading schedule data, falling back to demo mode:', error);
-            
+
             // Create fallback schedules
             const fallbackSchedules = [];
             for (let i = 0; i < 5; i++) {
@@ -106,7 +106,7 @@ export default function WeeklyCalendar({
                 });
               }
             }
-            
+
             // Work around Supabase API calls
             userSchedule.splice(0, userSchedule.length, ...fallbackSchedules);
           }
@@ -118,10 +118,10 @@ export default function WeeklyCalendar({
         setLoading(false);
       }
     };
-    
+
     loadScheduleData();
   }, [user?.id, currentTeam?.id, currentWeek, nextWeek, viewMode, loadUserSchedule, loadTeamSchedule, retryCount, userSchedule]);
-  
+
   // Get work type for a specific day
   const getWorkTypeForDay = (date: Date): 'office' | 'remote' | null => {
     if (isDemoMode() && demoStaticSchedules) {
@@ -130,36 +130,36 @@ export default function WeeklyCalendar({
       );
       return matchingSchedule?.work_type as 'office' | 'remote' || null;
     }
-    
+
     const dateStr = format(date, 'yyyy-MM-dd');
     const scheduleItem = userSchedule.find(item => item.date === dateStr);
     return scheduleItem ? (scheduleItem.work_type === 'flexible' ? 'remote' : scheduleItem.work_type as 'office' | 'remote') : null;
   };
-  
+
   // Get team count for a specific day
   const getTeamCountForDay = (date: Date) => {
     if (!teamSchedule || !teamSchedule.days) return { office: 0, remote: 0 };
-    
+
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayData = teamSchedule.days.find(day => day.date === dateStr);
-    
+
     if (!dayData) return { office: 0, remote: 0 };
-    
+
     return {
       office: dayData.officeMemberCount,
       remote: dayData.remoteMemberCount
     };
   };
-  
+
   // Check if day is an anchor day
   const isAnchorDay = (date: Date): boolean => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    
+
     // First check explicitly provided anchor days
     if (anchorDays.includes(dateStr)) {
       return true;
     }
-    
+
     // For demo mode in current week, mark Monday, Tuesday and Thursday as anchor days
     if (isDemoMode() && viewMode === 'current') {
       const dayOfWeek = date.getDay();
@@ -167,28 +167,28 @@ export default function WeeklyCalendar({
       const isDemoAnchorDay = dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 4;
       return isDemoAnchorDay;
     }
-    
+
     // Otherwise check if more than 50% of the team is in office
     if (currentTeam && teamSchedule && teamSchedule.days) {
       const dayData = teamSchedule.days.find(day => day.date === dateStr);
-      
+
       if (!dayData) return false;
-      
+
       // Consider a day an "anchor day" if more than 50% of the team is in office
       const totalMembers = dayData.officeMemberCount + dayData.remoteMemberCount;
       return totalMembers > 0 && (dayData.officeMemberCount / totalMembers) > 0.5;
     }
-    
+
     return false;
   };
-  
+
   // Check if the schedule complies with RTO policy
   const checkRtoCompliance = () => {
     if (!currentTeam?.rto_policy?.required_days) return { compliant: true };
-    
+
     const requiredDays = currentTeam.rto_policy.required_days;
     const officeDays = userSchedule.filter(s => s.work_type === 'office').length;
-    
+
     return {
       compliant: officeDays >= requiredDays,
       officeDays,
@@ -196,33 +196,33 @@ export default function WeeklyCalendar({
       remaining: Math.max(0, requiredDays - officeDays)
     };
   };
-  
+
   // Handle day selection
   const handleDaySelect = (date: Date) => {
     if (!allowEditing) return;
-    
+
     const dateStr = format(date, 'yyyy-MM-dd');
     setSelectedDay(dateStr);
-    
+
     const currentWorkType = getWorkTypeForDay(date);
     setSelectedWorkType(currentWorkType);
-    
+
     // Find schedule for notes
     const schedule = userSchedule.find(s => s.date === dateStr);
     setNotes(schedule?.notes || '');
   };
-  
+
   // Handle work type selection
   const handleWorkTypeSelect = (type: 'office' | 'remote') => {
     setSelectedWorkType(type);
   };
-  
+
   // Handle schedule save
   const handleSaveSchedule = async () => {
     if (!selectedDay || !selectedWorkType || !user) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // In production mode, save to API directly
       if (!isDemoMode()) {
@@ -236,16 +236,16 @@ export default function WeeklyCalendar({
               notes
             })
           });
-          
+
           if (!response.ok) {
             throw new Error('Failed to save schedule');
           }
-          
+
           // Refresh data
           const startDate = viewMode === 'current' ? currentWeek : nextWeek;
           const endDate = addDays(startDate, 6);
           await loadUserSchedule(startDate, endDate);
-          
+
           toast.success('Schedule updated successfully');
         } catch (error) {
           console.error('Error saving schedule:', error);
@@ -253,7 +253,7 @@ export default function WeeklyCalendar({
         }
           .eq('date', selectedDay)
           .single();
-          
+
         if (existingSchedule) {
           // Update existing schedule
           const { data, error } = await supabase
@@ -266,7 +266,7 @@ export default function WeeklyCalendar({
             .eq('id', existingSchedule.id)
             .select()
             .single();
-            
+
           if (error) throw error;
         } else {
           // Insert new schedule
@@ -280,20 +280,20 @@ export default function WeeklyCalendar({
             })
             .select()
             .single();
-            
+
           if (error) throw error;
         }
       }
-      
+
       // Always update the context
       await saveSchedule(selectedDay, selectedWorkType, notes);
-      
+
       // Refresh the schedules
       await loadUserSchedule();
       await loadTeamSchedule();
-      
+
       toast.success('Schedule updated successfully');
-      
+
       // Reset selection
       setSelectedDay(null);
       setSelectedWorkType(null);
@@ -305,7 +305,7 @@ export default function WeeklyCalendar({
       setIsSubmitting(false);
     }
   };
-  
+
   // Handle cancel
   const handleCancel = () => {
     setSelectedDay(null);
@@ -320,14 +320,14 @@ export default function WeeklyCalendar({
       onChangeWeek(addDays(currentWeek, -7));
     }
   };
-  
+
   const handleNextWeek = () => {
     goToNextWeek();
     if (onChangeWeek) {
       onChangeWeek(addDays(currentWeek, 7));
     }
   };
-  
+
   // Handle retry after error
   const handleRetry = () => {
     setError(null);
@@ -353,12 +353,12 @@ export default function WeeklyCalendar({
           >
             Previous Week
           </Button>
-          
+
           <h2 className="text-lg font-medium text-center">
             <span className="hidden sm:inline">Week of </span>
             {format(weekDays[0], 'MMM d')} - {format(weekDays[4], 'MMM d, yyyy')}
           </h2>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -370,17 +370,17 @@ export default function WeeklyCalendar({
           </Button>
         </div>
       )}
-      
+
       {/* Week display without navigation */}
       {hideNavigation && (
         <div className="text-center mb-4">
           <h2 className="text-lg font-medium">
-            <span className="hidden sm:inline">Week of </span>
+            <span className="hidden sm:inline">Week of </span> 
             {format(weekDays[0], 'MMM d')} - {format(weekDays[4], 'MMM d, yyyy')}
           </h2>
         </div>
       )}
-      
+
       {/* RTO Policy Compliance Alert */}
       {viewMode === 'current' && !compliance.compliant && (
         <Card className="p-3 mb-4 bg-warning/10 border-warning/20 dark:bg-warning/20 dark:border-warning/30" role="alert">
@@ -392,7 +392,7 @@ export default function WeeklyCalendar({
           </div>
         </Card>
       )}
-      
+
       {/* Calendar grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-3" aria-busy="true" aria-label="Loading schedule data">
@@ -422,7 +422,7 @@ export default function WeeklyCalendar({
             const workType = getWorkTypeForDay(day);
             const isAnchorDayValue = isAnchorDay(day);
             const teamCounts = getTeamCountForDay(day);
-            
+
             return (
               <motion.div
                 key={dateStr}
@@ -446,7 +446,7 @@ export default function WeeklyCalendar({
                     ANCHOR DAY
                   </div>
                 )}
-                
+
                 <div className={`p-4 ${isAnchorDayValue ? 'pt-7' : ''}`}>
                   {/* Date header */}
                   <div className="text-center mb-4">
@@ -462,7 +462,7 @@ export default function WeeklyCalendar({
                       </span>
                     )}
                   </div>
-                  
+
                   {/* Current work type */}
                   {workType ? (
                     <div className="mt-2">
@@ -489,7 +489,7 @@ export default function WeeklyCalendar({
                       </span>
                     </div>
                   )}
-                  
+
                   {/* Team summary */}
                   {!isSelected && teamCounts && (teamCounts.office > 0 || teamCounts.remote > 0) && (
                     <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted">
@@ -510,7 +510,7 @@ export default function WeeklyCalendar({
           })}
         </div>
       )}
-      
+
       {/* Schedule editor */}
       {selectedDay && allowEditing && (
         <motion.div
@@ -524,7 +524,7 @@ export default function WeeklyCalendar({
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4" id="schedule-editor-title">
             Update Schedule for {format(parseISO(selectedDay), 'EEEE, MMMM d')}
           </h3>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <motion.button
               whileHover={{ scale: 1.03 }}
@@ -547,7 +547,7 @@ export default function WeeklyCalendar({
                 <p className="text-xs text-gray-600 dark:text-gray-400">Work from the company office</p>
               </div>
             </motion.button>
-            
+
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
@@ -570,7 +570,7 @@ export default function WeeklyCalendar({
               </div>
             </motion.button>
           </div>
-          
+
           <div className="mb-4">
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Notes (Optional)
@@ -584,7 +584,7 @@ export default function WeeklyCalendar({
               placeholder="Add any notes about your schedule for this day..."
             />
           </div>
-          
+
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
@@ -605,7 +605,7 @@ export default function WeeklyCalendar({
           </div>
         </motion.div>
       )}
-      
+
       {/* Legend */}
       <div className="flex flex-wrap gap-4 mt-4 justify-center text-sm text-gray-600 dark:text-gray-400">
         <div className="flex items-center gap-1" role="presentation">

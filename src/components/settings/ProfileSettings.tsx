@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Building2, MapPin, Briefcase } from 'lucide-react';
 import { Card, Button, Input } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { userAPI } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { isDemoMode, DEMO_USER } from '@/lib/demo';
 
@@ -44,25 +44,15 @@ export default function ProfileSettings() {
           return;
         }
         
-        // Get profile data
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-          
-        if (error && error.code !== 'PGRST116') throw error;
+        // Get profile data from API
+        const result = await userAPI.getProfile();
         
-        // Get onboarding data
-        const { data: onboardingData, error: onboardingError } = await supabase
-          .from('user_onboarding')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-          
-        if (onboardingError && onboardingError.code !== 'PGRST116') {
-          console.error('Error loading onboarding data:', onboardingError);
+        if (!result.success) {
+          throw new Error(result.error);
         }
+        
+        const data = result.data;
+        const onboardingData = data?.onboarding;
         
         // Set form data
         setFormData({
@@ -124,56 +114,27 @@ export default function ProfileSettings() {
       // Upload avatar if changed
       let newAvatarUrl = avatarUrl;
       if (avatarFile) {
-        const fileExt = avatarFile.name.split('.').pop();
-        const filePath = `avatars/${user.id}/${Date.now()}.${fileExt}`;
+        const uploadResult = await userAPI.uploadAvatar(avatarFile);
         
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, avatarFile);
-          
-        if (uploadError) throw uploadError;
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.error);
+        }
         
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(filePath);
-          
-        newAvatarUrl = publicUrl;
-        
-        // Update user metadata
-        const { error: updateUserError } = await supabase.auth.updateUser({
-          data: { avatar_url: publicUrl }
-        });
-        
-        if (updateUserError) throw updateUserError;
+        newAvatarUrl = uploadResult.data?.avatarUrl;
       }
       
       // Update profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          full_name: formData.fullName,
-          location: formData.location,
-          bio: formData.bio,
-          avatar_url: newAvatarUrl
-        });
+      const updateResult = await userAPI.updateProfile({
+        fullName: formData.fullName,
+        location: formData.location,
+        bio: formData.bio,
+        avatarUrl: newAvatarUrl,
+        jobTitle: formData.jobTitle,
+        department: formData.department
+      });
         
-      if (profileError) throw profileError;
-      
-      // Update onboarding data
-      const { error: onboardingError } = await supabase
-        .from('user_onboarding')
-        .upsert({
-          user_id: user.id,
-          job_title: formData.jobTitle,
-          department: formData.department,
-          office_location: formData.location
-        });
-        
-      if (onboardingError) {
-        console.warn('Error updating onboarding data:', onboardingError);
-        // Don't throw, as this is not critical
+      if (!updateResult.success) {
+        throw new Error(updateResult.error);
       }
       
       toast.success('Profile updated successfully');
