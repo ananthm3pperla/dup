@@ -240,9 +240,14 @@
 
   /* Enhanced Card styles with glassmorphism */
   .card {
-    @apply bg-card/80 backdrop-blur-sm rounded-xl border border-default/50 shadow-lg 
+    @apply bg-card backdrop-blur-sm rounded-xl border border-default/50 shadow-lg 
            transition-all duration-300 hover:shadow-xl hover:border-primary/30
-           hover:bg-card/90 relative overflow-hidden;
+           hover:bg-card-hover relative overflow-hidden;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark .card {
+    background-color: rgba(30, 33, 48, 0.8);
   }
 
   .card::before {
@@ -257,10 +262,10 @@
 
   /* Enhanced Input styles */
   .input {
-    @apply block w-full rounded-lg border-default/60 bg-card/80 backdrop-blur-sm
+    @apply block w-full rounded-lg border-default/60 bg-card backdrop-blur-sm
            text-default shadow-sm focus:border-primary focus:ring-primary 
            focus:ring-2 focus:ring-offset-0 sm:text-sm transition-all duration-200
-           hover:border-primary/50 hover:bg-card/90;
+           hover:border-primary/50 hover:bg-card-hover;
   }
 
   .input-error {

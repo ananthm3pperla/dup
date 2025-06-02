@@ -1,47 +1,34 @@
+// Placeholder supabase module for Hi-Bridge
+// This app uses Replit Database instead of Supabase
+
 /**
- * Session management utilities for Replit backend
+ * Placeholder functions for compatibility with existing code
+ * All actual authentication and data operations go through the Replit backend
  */
-export class SessionManager {
-  private static instance: SessionManager;
-  private sessionCheckInterval: NodeJS.Timeout | null = null;
 
-  static getInstance(): SessionManager {
-    if (!SessionManager.instance) {
-      SessionManager.instance = new SessionManager();
-    }
-    return SessionManager.instance;
-  }
+export const supabase = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    signOut: async () => ({ error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+  },
+  from: (table: string) => ({
+    select: () => ({ data: [], error: null }),
+    insert: () => ({ data: null, error: null }),
+    update: () => ({ data: null, error: null }),
+    delete: () => ({ data: null, error: null }),
+  }),
+};
 
-  async checkSession(): Promise<boolean> {
-    try {
-      const response = await fetch('/api/auth/me', {
-        credentials: 'include',
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }
+// Placeholder exports for backward compatibility
+export const refreshSession = async () => {
+  console.warn('refreshSession called but using Replit backend');
+  return null;
+};
 
-  startSessionMonitoring(onSessionExpired: () => void): void {
-    if (this.sessionCheckInterval) {
-      clearInterval(this.sessionCheckInterval);
-    }
+export const getSession = async () => {
+  console.warn('getSession called but using Replit backend');
+  return null;
+};
 
-    this.sessionCheckInterval = setInterval(async () => {
-      const isValid = await this.checkSession();
-      if (!isValid) {
-        onSessionExpired();
-      }
-    }, 5 * 60 * 1000); // Check every 5 minutes
-  }
-
-  stopSessionMonitoring(): void {
-    if (this.sessionCheckInterval) {
-      clearInterval(this.sessionCheckInterval);
-      this.sessionCheckInterval = null;
-    }
-  }
-}
-
-export const sessionManager = SessionManager.getInstance();
+export default supabase;
