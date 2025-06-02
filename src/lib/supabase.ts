@@ -1,17 +1,20 @@
-// This file is now deprecated - using native Replit auth instead
-// All auth functionality has been moved to src/lib/auth.ts
 
-export const supabase = null;
+/**
+ * Compatibility layer for Supabase migration
+ * This file provides stub implementations for functions that were previously from Supabase
+ */
 
-// Legacy exports for compatibility
-export const refreshSession = async () => {
-  throw new Error('Supabase has been replaced with native auth');
+import { refreshSession as authRefreshSession } from './auth';
+
+// Re-export auth functions for compatibility
+export { refreshSession } from './auth';
+
+// Stub implementation for any remaining Supabase references
+export const supabase = {
+  auth: {
+    refreshSession: authRefreshSession
+  }
 };
 
-export const getCurrentUser = async () => {
-  throw new Error('Use auth.getCurrentUser() instead');
-};
-
-export const signOut = async () => {
-  throw new Error('Use auth.logout() instead');
-};
+// Default export for compatibility
+export default supabase;

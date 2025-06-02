@@ -7,6 +7,7 @@ export interface User {
   user_metadata: {
     full_name?: string;
     avatar_url?: string;
+    role?: string;
   };
 }
 
@@ -17,18 +18,24 @@ export interface Session {
 
 export interface AuthResponse {
   user: User;
-  session: Session;
+  session?: Session;
 }
 
 /**
  * Register a new user
  */
-export async function registerUser(userData: { email: string; password: string; firstName: string; lastName: string; role?: string }): Promise<User> {
+export async function registerUser(userData: { 
+  email: string; 
+  password: string; 
+  firstName: string; 
+  lastName: string; 
+  role?: string 
+}): Promise<User> {
   const response = await api.post('/auth/register', {
     email: userData.email,
     password: userData.password,
     full_name: `${userData.firstName} ${userData.lastName}`,
-    role: userData.role
+    role: userData.role || 'employee'
   });
 
   if (!response.ok) {
@@ -59,6 +66,11 @@ export async function loginUser(email: string, password: string): Promise<User> 
 }
 
 /**
+ * Alternative login function name for compatibility
+ */
+export const login = loginUser;
+
+/**
  * Get current authenticated user
  */
 export async function getCurrentUser(): Promise<User> {
@@ -82,14 +94,18 @@ export async function logout(): Promise<void> {
 /**
  * Refresh user session
  */
-export async function refreshSession(): Promise<AuthResponse> {
-  const response = await api.post('/auth/refresh');
+export async function refreshSession(): Promise<{ success: boolean; session?: Session }> {
+  try {
+    const response = await api.post('/auth/refresh');
 
-  if (!response.ok) {
-    throw new Error('Failed to refresh session');
+    if (!response.ok) {
+      return { success: false };
+    }
+
+    return { success: true, session: { id: 'session', expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() } };
+  } catch (error) {
+    return { success: false };
   }
-
-  return response.json();
 }
 
 /**
