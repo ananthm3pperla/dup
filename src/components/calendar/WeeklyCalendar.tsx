@@ -252,38 +252,6 @@ export default function WeeklyCalendar({
           console.error('Error saving schedule:', error);
           toast.error('Failed to save schedule');
         }
-          .eq('date', selectedDay)
-          .single();
-
-        if (existingSchedule) {
-          // Update existing schedule
-          const { data, error } = await supabase
-            .from('work_schedules')
-            .update({
-              work_type: selectedWorkType,
-              notes: notes || null,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', existingSchedule.id)
-            .select()
-            .single();
-
-          if (error) throw error;
-        } else {
-          // Insert new schedule
-          const { data, error } = await supabase
-            .from('work_schedules')
-            .insert({
-              user_id: user.id,
-              date: selectedDay,
-              work_type: selectedWorkType,
-              notes: notes || null
-            })
-            .select()
-            .single();
-
-          if (error) throw error;
-        }
       }
 
       // Always update the context

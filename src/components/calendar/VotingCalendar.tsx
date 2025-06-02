@@ -83,18 +83,6 @@ export default function VotingCalendar() {
         if (!result.success) {
           throw new Error(result.error);
         }
-          .from('team_votes')
-          .upsert({
-            user_id: user.id,
-            team_id: currentTeam.id,
-            voting_week: format(votingWeekStart, 'yyyy-MM-dd'),
-            voted_days: votedDays,
-            created_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,team_id,voting_week'
-          });
-          
-        if (submitError) throw submitError;
       }
       
       setVoteSubmitted(true);
