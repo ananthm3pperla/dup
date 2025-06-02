@@ -80,3 +80,6 @@ export function SimpleCard({
     </div>
   );
 }
+
+// Default export
+export default Card;
