@@ -25,7 +25,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/PrivateRoute";
-import { AppErrorBoundary } from "./components/error/AppErrorBoundary";
+import AppErrorBoundary from "./components/error/AppErrorBoundary";
 import Layout from "./components/layout/Layout";
 
 function App() {
