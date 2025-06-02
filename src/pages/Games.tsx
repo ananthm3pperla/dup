@@ -15,7 +15,7 @@ import {
 import { Button, Card, Avatar, LoadingState } from "@/components/ui";
 import Badge from "@/components/ui/Badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { gamesAPI, teamsAPI } from "@/lib/api";
+import { gamesAPI, teamAPI } from "@/lib/api";
 import { isDemoMode } from "@/lib/demo";
 
 interface GameStats {

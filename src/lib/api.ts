@@ -401,6 +401,62 @@ export async function refreshSession(): Promise<{
   };
 }
 
+/**
+ * Games API functions
+ */
+export const gamesAPI = {
+  async getPlayerStats(): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch("/api/games/stats");
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get player stats" };
+    }
+  },
+
+  async getLeaderboard(): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await fetch("/api/games/leaderboard");
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to get leaderboard" };
+    }
+  },
+
+  async uploadPhoto(formData: FormData): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch("/api/games/photos", {
+        method: "POST",
+        body: formData,
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: "Failed to upload photo" };
+    }
+  },
+};
+
+// Helper function to get auth headers
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  
+  // Add auth token if available
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  
+  return headers;
+}
+
+// Check if we're in demo mode
+function isDemoMode(): boolean {
+  return localStorage.getItem("demoMode") === "true" || 
+         window.location.search.includes("demo=true");
+}
+
 // Default export with all API modules
 export default {
   auth: authAPI,
@@ -410,4 +466,5 @@ export default {
   checkins: checkinAPI,
   schedule: scheduleAPI,
   analytics: analyticsAPI,
+  games: gamesAPI,
 };
