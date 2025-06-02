@@ -1,51 +1,73 @@
-import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
 
-const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
-      },
-      size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-10 w-10',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
+import React, { forwardRef, ButtonHTMLAttributes } from 'react';
+import { clsx } from 'clsx';
+import { Loader2 } from 'lucide-react';
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'success' | 'glass';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  fullWidth?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({
+    className,
+    variant = 'primary',
+    size = 'md',
+    loading = false,
+    leftIcon,
+    rightIcon,
+    fullWidth = false,
+    children,
+    disabled,
+    ...props
+  }, ref) => {
+    const baseClasses = 'btn focus-visible';
+    
+    const variantClasses = {
+      primary: 'btn-primary',
+      secondary: 'btn-secondary',
+      accent: 'btn-accent',
+      outline: 'btn-outline',
+      ghost: 'btn-ghost',
+      success: 'btn-success',
+      glass: 'btn-glass'
+    };
+
+    const sizeClasses = {
+      sm: 'px-3 py-1.5 text-xs',
+      md: 'px-4 py-2 text-sm',
+      lg: 'px-6 py-3 text-base'
+    };
+
+    const classes = clsx(
+      baseClasses,
+      variantClasses[variant],
+      sizeClasses[size],
+      fullWidth && 'w-full',
+      (disabled || loading) && 'opacity-50 cursor-not-allowed',
+      className
+    );
+
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        className={classes}
+        disabled={disabled || loading}
         {...props}
-      />
+      >
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {!loading && leftIcon && <span className="mr-2">{leftIcon}</span>}
+        {children}
+        {!loading && rightIcon && <span className="ml-2">{rightIcon}</span>}
+      </button>
     );
   }
 );
+
 Button.displayName = 'Button';
 
-export { Button };
 export default Button;

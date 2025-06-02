@@ -1,3 +1,4 @@
+
 // Stub file - Supabase replaced with Replit backend
 export const createClient = () => {
   throw new Error('Supabase is no longer used. Use /api/auth endpoints instead.');

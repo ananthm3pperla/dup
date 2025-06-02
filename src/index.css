@@ -243,6 +243,9 @@
     @apply bg-card backdrop-blur-sm rounded-xl border border-default shadow-lg 
            transition-all duration-300 hover:shadow-xl hover:border-primary
            hover:bg-card-hover relative overflow-hidden;
+  }
+
+  .card {
     background-color: rgba(255, 255, 255, 0.8);
     border-color: rgba(226, 228, 237, 0.5);
   }
@@ -276,6 +279,9 @@
            text-default shadow-sm focus:border-primary focus:ring-primary 
            focus:ring-2 focus:ring-offset-0 sm:text-sm transition-all duration-200
            hover:border-primary hover:bg-card-hover;
+  }
+
+  .input {
     border-color: rgba(226, 228, 237, 0.6);
   }
 
@@ -318,6 +324,9 @@
     @apply border-2 border-primary bg-transparent text-primary 
            hover:bg-primary hover:border-primary backdrop-blur-sm
            hover:shadow-lg;
+  }
+
+  .btn-outline {
     border-color: rgba(0, 73, 119, 0.3);
   }
 
@@ -383,7 +392,7 @@
 
   /* Authentication form styles */
   .auth-form {
-    @apply bg-white/80 backdrop-blur-sm rounded-xl border p-8
+    @apply backdrop-blur-sm rounded-xl border p-8
            shadow-xl transition-all duration-300 hover:shadow-2xl;
     background-color: rgba(255, 255, 255, 0.8);
     border-color: rgba(226, 228, 237, 0.5);

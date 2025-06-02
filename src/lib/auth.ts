@@ -1,118 +1,132 @@
-import { User } from '@/types';
 
-const API_BASE = '/api';
+import { API_BASE_URL } from './config';
+import { User } from './types';
 
-class AuthService {
-  private static instance: AuthService;
-  private baseURL = '/api/auth';
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
 
-  static getInstance(): AuthService {
-    if (!AuthService.instance) {
-      AuthService.instance = new AuthService();
-    }
-    return AuthService.instance;
+export interface RegisterData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+/**
+ * Login user with email and password
+ */
+export async function loginUser(credentials: LoginCredentials): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
   }
 
-  async login(email: string, password: string): Promise<User> {
-    const response = await fetch(`${this.baseURL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include',
-    });
+  return response.json();
+}
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Login failed');
-    }
+/**
+ * Register new user
+ */
+export async function registerUser(data: RegisterData): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
 
-    const data = await response.json();
-    return data.user;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Registration failed');
   }
 
-  async register(userData: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role?: string;
-  }): Promise<User> {
-    const response = await fetch(`${this.baseURL}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-      credentials: 'include',
-    });
+  return response.json();
+}
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Registration failed');
-    }
-
-    const data = await response.json();
-    return data.user;
+/**
+ * Get current user from token
+ */
+export async function getCurrentUser(): Promise<User> {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('No authentication token found');
   }
 
-  async logout(): Promise<void> {
-    const response = await fetch(`${this.baseURL}/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Logout failed');
+  if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('auth_token');
+      throw new Error('Authentication token expired');
     }
+    throw new Error('Failed to get user data');
   }
 
-  async getCurrentUser(): Promise<User | null> {
+  return response.json();
+}
+
+/**
+ * Logout user
+ */
+export async function logout(): Promise<void> {
+  const token = localStorage.getItem('auth_token');
+  
+  if (token) {
     try {
-      const response = await fetch(`${this.baseURL}/me`, {
-        credentials: 'include',
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = await response.json();
-      return data.user;
     } catch (error) {
-      console.error('Error getting current user:', error);
-      return null;
+      console.warn('Logout request failed:', error);
     }
   }
+
+  localStorage.removeItem('auth_token');
 }
 
-// Create singleton instance
-const authService = AuthService.getInstance();
+/**
+ * Check if user is authenticated
+ */
+export function isAuthenticated(): boolean {
+  return !!localStorage.getItem('auth_token');
+}
 
-// Export functions
-export const loginUser = (email: string, password: string) => authService.login(email, password);
-export const signupUser = (userData: any) => authService.register(userData);
-export const logoutUser = () => authService.logout();
-export const getCurrentUser = () => authService.getCurrentUser();
+/**
+ * Get auth token
+ */
+export function getAuthToken(): string | null {
+  return localStorage.getItem('auth_token');
+}
 
-// Legacy aliases for backward compatibility
+/**
+ * Set auth token
+ */
+export function setAuthToken(token: string): void {
+  localStorage.setItem('auth_token', token);
+}
+
+// Legacy alias for compatibility
 export const login = loginUser;
-export const register = signupUser;
-export const signUp = signupUser;
-export const signOut = logoutUser;
-export const logout = logoutUser;
-
-// Check authentication status
-export async function checkAuth(): Promise<boolean> {
-  try {
-    const user = await getCurrentUser();
-    return user !== null;
-  } catch (error) {
-    console.error('Auth check failed:', error);
-    return false;
-  }
-}
-
-export default authService;
