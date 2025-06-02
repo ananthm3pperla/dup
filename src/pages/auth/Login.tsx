@@ -10,13 +10,13 @@ export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, signIn, signInWithGoogle, signInWithMicrosoft, error: authError, enterDemoMode } = useAuth();
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEnteringDemo, setIsEnteringDemo] = useState(false);
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [twoFactorEmail, setTwoFactorEmail] = useState('');
-  
+
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
@@ -28,7 +28,7 @@ export default function Login() {
   const handleSubmit = async (email: string, password: string, rememberMe: boolean) => {
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       // For demo purposes, show 2FA for specific email
       if (email === 'demo@example.com') {
@@ -37,7 +37,7 @@ export default function Login() {
         setIsSubmitting(false);
         return;
       }
-      
+
       await signIn(email, password);
       const redirectTo = searchParams.get('redirect') || '/dashboard';
       navigate(redirectTo);
@@ -84,7 +84,7 @@ export default function Login() {
       setIsEnteringDemo(false);
     }
   };
-  
+
   // Handle 2FA verification
   const handleVerifyTwoFactor = async (code: string): Promise<boolean> => {
     // In a real app, this would verify the code with your auth provider
@@ -141,13 +141,16 @@ export default function Login() {
         </motion.div>
       </div>
 
-      <motion.div 
-        className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
-        <div className="bg-white dark:bg-gray-800 px-4 py-8 shadow sm:rounded-lg sm:px-10">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <motion.div 
+          className="bg-card/80 backdrop-blur-md py-8 px-6 shadow-2xl rounded-2xl sm:px-10 border border-default/30 relative overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+
           {/* SSO Buttons */}
           <SocialLoginButtons 
             onGoogleLogin={handleGoogleSignIn}
@@ -218,9 +221,9 @@ export default function Login() {
               Privacy Policy
             </a>
           </div>
-        </div>
-      </motion.div>
-      
+        </motion.div>
+      </div>
+
       {/* Two-factor authentication dialog */}
       <TwoFactorAuth 
         isOpen={showTwoFactor}

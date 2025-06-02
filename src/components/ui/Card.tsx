@@ -2,140 +2,57 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  as?: React.ElementType;
-  variant?: 'default' | 'outline' | 'elevated' | 'filled';
-  interactive?: boolean;
-  isHoverable?: boolean;
-  onClick?: () => void;
+  children: React.ReactNode;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'glass' | 'elevated' | 'interactive';
+  hover?: boolean;
 }
 
 export function Card({ 
   className, 
-  as: Component = 'div', 
+  children, 
+  padding = 'md',
   variant = 'default',
-  interactive = false,
-  isHoverable = false,
-  onClick,
+  hover = false,
   ...props 
 }: CardProps) {
-  const variantClasses = {
-    default: 'bg-card border border-default shadow-sm dark:bg-gray-800 dark:border-gray-700',
-    outline: 'bg-transparent border border-default dark:border-gray-700',
-    elevated: 'bg-card shadow-md border border-gray-100 dark:bg-gray-800 dark:border-gray-700',
-    filled: 'bg-gray-50 dark:bg-gray-800 border border-transparent',
-  };
-
-  const baseProps = {
-    className: cn(
-      'rounded-lg',
-      variantClasses[variant],
-      isHoverable && 'hover:shadow-md transition-shadow duration-300',
-      interactive && 'cursor-pointer transform transition-all duration-300 hover:-translate-y-1 hover:shadow-md active:translate-y-0',
-      className
-    ),
-    onClick,
-    ...props
-  };
-
-  return <Component {...baseProps} />;
-}
-
-Card.Header = function CardHeader({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('flex flex-col space-y-1.5 p-6 border-b border-default dark:border-gray-700', className)}
-      {...props}
-    />
-  );
-};
+      className={cn(
+        // Base styles
+        'rounded-xl border shadow-lg transition-all duration-300 relative overflow-hidden',
 
-Card.Title = function CardTitle({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3
-      className={cn('text-lg font-semibold leading-none tracking-tight text-default', className)}
-      {...props}
-    />
-  );
-};
+        // Variant styles
+        {
+          'bg-card/80 backdrop-blur-sm border-default/50 hover:shadow-xl hover:border-primary/30 hover:bg-card/90': variant === 'default',
+          'bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 hover:border-white/30': variant === 'glass',
+          'bg-card shadow-2xl border-default/30 hover:shadow-3xl': variant === 'elevated',
+          'bg-card/80 backdrop-blur-sm border-default/50 hover:shadow-2xl hover:border-primary/40 hover:-translate-y-1 cursor-pointer': variant === 'interactive',
+        },
 
-Card.Description = function CardDescription({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p
-      className={cn('text-sm text-muted', className)}
-      {...props}
-    />
-  );
-};
+        // Hover effects
+        hover && 'hover:shadow-2xl hover:border-primary/40 hover:-translate-y-1 cursor-pointer',
 
-Card.Content = function CardContent({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn('p-6 pt-0', className)} {...props} />
-  );
-};
-
-Card.Footer = function CardFooter({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn('flex items-center p-6 pt-0 border-t border-default dark:border-gray-700 mt-2', className)}
-      {...props}
-    />
-  );
-};
-
-export function SimpleCard({
-  title,
-  description,
-  children,
-  footer,
-  className,
-  variant = 'default',
-  interactive = false,
-  isHoverable = false,
-  onClick,
-  ...props
-}: {
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-  className?: string;
-  variant?: 'default' | 'outline' | 'elevated' | 'filled';
-  interactive?: boolean;
-  isHoverable?: boolean;
-  onClick?: () => void;
-} & React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <Card
-      variant={variant}
-      interactive={interactive}
-      isHoverable={isHoverable}
-      onClick={onClick}
-      className={className}
+        // Padding
+        {
+          'p-0': padding === 'none',
+          'p-3': padding === 'sm', 
+          'p-6': padding === 'md',
+          'p-8': padding === 'lg',
+        },
+        className
+      )}
       {...props}
     >
-      {(title || description) && (
-        <Card.Header>
-          {title && <Card.Title>{title}</Card.Title>}
-          {description && <Card.Description>{description}</Card.Description>}
-        </Card.Header>
+      {/* Gradient overlay for glass effect */}
+      {variant !== 'glass' && (
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
       )}
-      <Card.Content>{children}</Card.Content>
-      {footer && <Card.Footer>{footer}</Card.Footer>}
-    </Card>
+
+      {/* Content */}
+      <div className="relative z-10">
+        {children}
+      </div>
+    </div>
   );
 }

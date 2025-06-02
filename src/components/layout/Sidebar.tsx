@@ -34,7 +34,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   const { sidebarState, toggleSidebar } = useSidebar();
   const isCollapsed = sidebarState === 'collapsed';
   const location = useLocation();
-  
+
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, id: 'nav-dashboard' },
     { name: 'Schedule', href: '/schedule', icon: Calendar, id: 'nav-schedule' },
@@ -42,12 +42,12 @@ export default function Sidebar({ onClose }: SidebarProps) {
     { name: 'Profile', href: `/profile/${user?.id}`, icon: User, id: 'nav-profile' },
     { name: 'Settings', href: '/settings', icon: Settings, id: 'nav-settings' }
   ];
-  
+
   // Add Team Pulse for team leaders
   if (isTeamLeader) {
     navigation.splice(4, 0, { name: 'Team Pulse', href: '/team/pulse', icon: MessageSquare, id: 'nav-team-pulse' });
   }
-  
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
@@ -87,7 +87,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <X className="h-6 w-6" />
         </button>
       </div>
-      
+
       {/* Desktop logo */}
       <div className="hidden lg:flex h-16 flex-shrink-0 items-center px-4 justify-between">
         <div className="flex items-center">
@@ -124,7 +124,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           )}
         </button>
       </div>
-      
+
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-2 py-4" aria-label="Sidebar">
         <div className="mb-4 px-3">
@@ -141,7 +141,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
             )}
           </AnimatePresence>
         </div>
-        
+
         {/* Navigation Items */}
         <div className="space-y-1">
           {navigation.map((item) => (
@@ -196,7 +196,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           ))}
         </div>
       </nav>
-      
+
       {/* Footer */}
       <div className="border-t border-default p-4 dark:border-gray-800 mt-auto">
         <div className="flex flex-col space-y-3">

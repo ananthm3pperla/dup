@@ -35,13 +35,13 @@ export default function Dashboard() {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-      
+
       // If in demo mode, trigger walkthrough if not seen
       if (isDemoMode() && !localStorage.getItem('hasSeenWalkthrough')) {
         localStorage.removeItem('hasSeenWalkthrough');
       }
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -52,7 +52,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6 sm:space-y-8 animate-fadeIn">
       <DashboardHeader firstName={firstName} />
-      
+
       {/* Email verification prompt */}
       {showVerificationPrompt && (
         <AccountVerificationPrompt 
@@ -60,7 +60,7 @@ export default function Dashboard() {
           onSkip={() => setShowVerificationPrompt(false)}
         />
       )}
-      
+
       <div className="grid grid-cols-1 gap-4 sm:gap-8 pb-4 sm:pb-8">
         {/* First row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
@@ -71,7 +71,7 @@ export default function Dashboard() {
             <DailyPulse />
           </div>
         </div>
-        
+
         {/* Second row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 dark:border dark:border-gray-700">

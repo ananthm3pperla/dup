@@ -16,7 +16,7 @@ export default function DashboardHeader({ firstName }: DashboardHeaderProps) {
     const generateWeeklyData = () => {
       return { completed: 2, required: 3 };
     };
-    
+
     return getConsistentMockData('weeklyProgress', generateWeeklyData);
   });
 

@@ -48,7 +48,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         setIsUserMenuOpen(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -64,7 +64,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm bg-white/90 dark:bg-gray-900/90">
+    <header className="bg-card/80 backdrop-blur-md shadow-lg border-b border-default/30 sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between items-center">
           <div className="flex items-center gap-4">
@@ -108,7 +108,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </span>
                 <ChevronDown className={`h-4 w-4 text-muted transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               <AnimatePresence>
                 {isUserMenuOpen && (
                   <motion.div
@@ -126,7 +126,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                           {isDemo && <span className="ml-1 text-primary">(Demo)</span>}
                         </p>
                       </div>
-                      
+
                       <div className="py-1">
                         <button
                           onClick={() => {
@@ -140,7 +140,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                           <span className="dark:text-gray-300">Your Profile</span>
                         </button>
                       </div>
-                      
+
                       <div className="py-1">
                         <button
                           className="w-full text-left flex items-center px-4 py-2 text-sm text-error hover:bg-error/5 transition-colors"

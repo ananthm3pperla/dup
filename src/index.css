@@ -170,12 +170,13 @@
 }
 
 @layer components {
-  /* Button styles with ARIA support */
+  /* Enhanced Button styles with ARIA support */
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 border border-transparent 
-           text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 
-           focus:ring-offset-2 focus:ring-primary transition-colors cursor-pointer
-           disabled:opacity-50 disabled:cursor-not-allowed;
+           text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 
+           focus:ring-offset-2 focus:ring-primary transition-all duration-200 cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md
+           backdrop-blur-sm relative overflow-hidden;
     
     &[aria-pressed="true"] {
       @apply bg-primary-dark;
@@ -183,6 +184,17 @@
 
     &[aria-expanded="true"] {
       @apply bg-primary-light;
+    }
+
+    /* Subtle gradient overlay */
+    &::before {
+      content: '';
+      @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent
+             translate-x-[-100%] transition-transform duration-700;
+    }
+
+    &:hover::before {
+      @apply translate-x-[100%];
     }
   }
 
@@ -226,44 +238,74 @@
     @apply bg-info-bg text-info;
   }
 
-  /* Card styles */
+  /* Enhanced Card styles with glassmorphism */
   .card {
-    @apply bg-card rounded-lg border border-default shadow-sm transition-shadow;
+    @apply bg-card/80 backdrop-blur-sm rounded-xl border border-default/50 shadow-lg 
+           transition-all duration-300 hover:shadow-xl hover:border-primary/30
+           hover:bg-card/90 relative overflow-hidden;
+  }
+
+  .card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none;
   }
 
   .card-hover {
-    @apply hover:shadow-md hover:border-primary/20;
+    @apply hover:shadow-2xl hover:border-primary/40 hover:-translate-y-1
+           hover:bg-gradient-to-br hover:from-card hover:to-card/95;
   }
 
-  /* Input styles */
+  /* Enhanced Input styles */
   .input {
-    @apply block w-full rounded-md border-default bg-card text-default shadow-sm
-           focus:border-primary focus:ring-primary sm:text-sm;
+    @apply block w-full rounded-lg border-default/60 bg-card/80 backdrop-blur-sm
+           text-default shadow-sm focus:border-primary focus:ring-primary 
+           focus:ring-2 focus:ring-offset-0 sm:text-sm transition-all duration-200
+           hover:border-primary/50 hover:bg-card/90;
   }
 
   .input-error {
-    @apply border-error focus:border-error focus:ring-error;
+    @apply border-error focus:border-error focus:ring-error animate-shake;
   }
 
-  /* Button variants */
+  /* Enhanced Button variants */
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+    @apply bg-gradient-to-r from-primary to-primary-dark text-white 
+           hover:from-primary-dark hover:to-primary-700 focus:ring-primary
+           shadow-lg hover:shadow-primary/25;
   }
 
   .btn-secondary {
-    @apply bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary;
+    @apply bg-gradient-to-r from-secondary to-secondary-dark text-white 
+           hover:from-secondary-dark hover:to-secondary-700 focus:ring-secondary
+           shadow-lg hover:shadow-secondary/25;
   }
 
   .btn-accent {
-    @apply bg-accent text-white hover:bg-accent-dark focus:ring-accent;
+    @apply bg-gradient-to-r from-accent to-accent-dark text-white 
+           hover:from-accent-dark hover:to-accent-700 focus:ring-accent
+           shadow-lg hover:shadow-accent/25;
   }
 
   .btn-outline {
-    @apply border border-default bg-transparent text-default hover:bg-card-hover;
+    @apply border-2 border-primary/30 bg-transparent text-primary 
+           hover:bg-primary/5 hover:border-primary/50 backdrop-blur-sm
+           hover:shadow-lg hover:shadow-primary/10;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-default hover:bg-card-hover;
+    @apply bg-transparent text-default hover:bg-card-hover/50 
+           backdrop-blur-sm hover:shadow-lg;
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-success to-success-dark text-white 
+           hover:from-success-dark hover:to-success focus:ring-success
+           shadow-lg hover:shadow-success/25;
+  }
+
+  .btn-glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 text-default
+           hover:bg-white/20 hover:border-white/30 shadow-lg;
   }
 
   /* Custom scrollbar */
@@ -310,7 +352,7 @@
     @apply ring-primary-light ring-offset-gray-900;
   }
 
-  /* Animation utilities */
+  /* Enhanced Animation utilities */
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -322,8 +364,79 @@
     }
   }
 
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
   .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .animate-slideInUp {
+    animation: slideInUp 0.5s ease-out forwards;
+  }
+
+  .animate-slideInRight {
+    animation: slideInRight 0.4s ease-out forwards;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
   }
 
   @keyframes shake {
@@ -345,6 +458,27 @@
   .animate-gradient {
     background-size: 200% auto;
     animation: gradient 4s ease infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .animate-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animate-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2s infinite;
   }
 
   /* Accessibility utilities */
