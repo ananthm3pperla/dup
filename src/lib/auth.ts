@@ -1,210 +1,111 @@
-
-import { isDemoMode, DEMO_USER } from './demo';
+import { api } from './api';
 
 export interface User {
   id: string;
   email: string;
-  user_metadata?: {
+  user_metadata: {
     full_name?: string;
     avatar_url?: string;
-    roles?: string[];
-    is_team_leader?: boolean;
   };
 }
 
+export interface Session {
+  id: string;
+  expires_at: string;
+}
+
 export interface AuthResponse {
-  user: User | null;
-  error?: string;
+  user: User;
+  session: Session;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+/**
+ * Register a new user
+ */
+export async function registerUser(email: string, password: string, fullName?: string): Promise<AuthResponse> {
+  const response = await api.post('/auth/register', {
+    email,
+    password,
+    full_name: fullName
+  });
 
-export interface SignupCredentials {
-  email: string;
-  password: string;
-  full_name?: string;
-}
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Registration failed');
+  }
 
-// API base URL for authentication
-const AUTH_API_BASE = '/api/auth';
+  return response.json();
+}
 
 /**
  * Login user with email and password
  */
-export async function loginUser(credentials: LoginCredentials): Promise<AuthResponse> {
-  try {
-    // Demo mode - return demo user
-    if (isDemoMode()) {
-      return {
-        user: {
-          id: DEMO_USER.id,
-          email: DEMO_USER.email,
-          user_metadata: {
-            full_name: DEMO_USER.full_name,
-            avatar_url: DEMO_USER.avatar_url
-          }
-        }
-      };
-    }
+export async function loginUser(email: string, password: string): Promise<AuthResponse> {
+  const response = await api.post('/auth/login', {
+    email,
+    password
+  });
 
-    const response = await fetch(`${AUTH_API_BASE}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-      credentials: 'include'
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { user: null, error: data.message || 'Login failed' };
-    }
-
-    return { user: data.user };
-  } catch (error) {
-    console.error('Login error:', error);
-    return { user: null, error: 'Network error during login' };
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
   }
-}
 
-/**
- * Register new user
- */
-export async function registerUser(credentials: SignupCredentials): Promise<AuthResponse> {
-  try {
-    if (isDemoMode()) {
-      throw new Error('Registration not available in demo mode');
-    }
-
-    const response = await fetch(`${AUTH_API_BASE}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-      credentials: 'include'
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { user: null, error: data.message || 'Registration failed' };
-    }
-
-    return { user: data.user };
-  } catch (error) {
-    console.error('Registration error:', error);
-    return { user: null, error: 'Network error during registration' };
-  }
+  return response.json();
 }
 
 /**
  * Get current authenticated user
  */
-export async function getCurrentUser(): Promise<User | null> {
-  try {
-    // Demo mode - return demo user
-    if (isDemoMode()) {
-      return {
-        id: DEMO_USER.id,
-        email: DEMO_USER.email,
-        user_metadata: {
-          full_name: DEMO_USER.full_name,
-          avatar_url: DEMO_USER.avatar_url
-        }
-      };
-    }
+export async function getCurrentUser(): Promise<User> {
+  const response = await api.get('/auth/me');
 
-    const response = await fetch(`${AUTH_API_BASE}/me`, {
-      method: 'GET',
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.user;
-  } catch (error) {
-    console.error('Get current user error:', error);
-    return null;
+  if (!response.ok) {
+    throw new Error('Failed to get current user');
   }
+
+  const data = await response.json();
+  return data.user;
 }
 
 /**
  * Logout current user
  */
-export async function logoutUser(): Promise<{ success: boolean; error?: string }> {
-  try {
-    if (isDemoMode()) {
-      // In demo mode, just clear local state
-      return { success: true };
-    }
-
-    const response = await fetch(`${AUTH_API_BASE}/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      return { success: false, error: data.message || 'Logout failed' };
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error('Logout error:', error);
-    return { success: false, error: 'Network error during logout' };
-  }
+export async function logout(): Promise<void> {
+  await api.post('/auth/logout');
 }
 
 /**
- * Refresh authentication session
+ * Refresh user session
  */
-export async function refreshSession(): Promise<{ success: boolean; session?: any }> {
-  try {
-    if (isDemoMode()) {
-      return { 
-        success: true, 
-        session: {
-          user: {
-            id: DEMO_USER.id,
-            email: DEMO_USER.email,
-            user_metadata: {
-              full_name: DEMO_USER.full_name,
-              avatar_url: DEMO_USER.avatar_url
-            }
-          },
-          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-        }
-      };
-    }
+export async function refreshSession(): Promise<AuthResponse> {
+  const response = await api.post('/auth/refresh');
 
-    const response = await fetch(`${AUTH_API_BASE}/refresh`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      return { success: false };
-    }
-
-    const data = await response.json();
-    return { success: true, session: data.session };
-  } catch (error) {
-    console.error('Session refresh error:', error);
-    return { success: false };
+  if (!response.ok) {
+    throw new Error('Failed to refresh session');
   }
+
+  return response.json();
 }
 
-// Legacy function aliases for compatibility
-export const signInWithPassword = loginUser;
-export const signUp = registerUser;
-export const signOut = logoutUser;
-export const login = loginUser;
+/**
+ * Store session in localStorage
+ */
+export function storeSession(session: Session): void {
+  localStorage.setItem('hibridge_session', JSON.stringify(session));
+}
+
+/**
+ * Get stored session from localStorage
+ */
+export function getStoredSession(): Session | null {
+  const stored = localStorage.getItem('hibridge_session');
+  return stored ? JSON.parse(stored) : null;
+}
+
+/**
+ * Clear stored session
+ */
+export function clearStoredSession(): void {
+  localStorage.removeItem('hibridge_session');
+}

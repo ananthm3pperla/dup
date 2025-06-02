@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authService } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { performanceMonitor } from '@/lib/performance';
 import type { User } from '@/lib/types';
+import { loginUser, getCurrentUser, registerUser, logout, refreshSession, storeSession, getStoredSession, clearStoredSession } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -38,11 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         logger.info('Initializing authentication');
-        const { user: currentUser } = await authService.getCurrentUser();
+        const currentUser = await getCurrentUser();
 
         if (mounted) {
           setUser(currentUser);
-          logger.info('User authenticated', { userId: currentUser.id });
+          logger.info('User authenticated', { userId: currentUser?.id });
         }
       } catch (error) {
         if (mounted) {
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       logger.info('Attempting user sign in', { email });
-      const { user } = await authService.login(email, password);
+      const user = await loginUser(email, password);
       setUser(user);
       logger.info('User signed in successfully', { userId: user.id });
       endTimer({ success: true });
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       logger.info('Attempting user sign up', { email: userData.email });
-      const { user } = await authService.register(userData);
+      const user = await registerUser(userData);
       setUser(user);
       logger.info('User signed up successfully', { userId: user.id });
       endTimer({ success: true });
@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       logger.info('Attempting user sign out', { userId: user?.id });
-      await authService.logout();
+      await logout();
       setUser(null);
       logger.info('User signed out successfully');
       endTimer({ success: true });
@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       logger.debug('Refreshing user data');
-      const { user: currentUser } = await authService.getCurrentUser();
+      const currentUser = await getCurrentUser();
       setUser(currentUser);
       logger.debug('User data refreshed successfully', { userId: currentUser.id });
       endTimer({ success: true });
