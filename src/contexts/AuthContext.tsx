@@ -1,25 +1,29 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authAPI } from '@/lib/api';
-import { logger } from '@/lib/logger';
 
-export interface AuthUser {
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { database } from '../lib/database';
+import { hashPassword, verifyPassword } from '../lib/auth';
+import { toast } from 'sonner';
+
+interface User {
   id: string;
   email: string;
-  fullName?: string;
-  avatar?: string;
-  role?: 'employee' | 'manager' | 'hr';
-  teamId?: string;
-  emailVerified?: boolean;
-  lastSignIn?: string;
+  name: string;
+  role: 'employee' | 'manager' | 'hr';
+  company_name?: string;
+  job_title?: string;
+  department?: string;
+  office_location?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<AuthUser>;
-  signIn: (email: string, password: string) => Promise<AuthUser>;
+  signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  refreshSession: () => Promise<void>;
+  updateProfile: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,94 +41,134 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Check for existing session on mount
   useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const sessionData = localStorage.getItem('hibridge_session');
+        if (sessionData) {
+          const { userId } = JSON.parse(sessionData);
+          const userData = await database.get(`user_by_id:${userId}`);
+          if (userData) {
+            setUser(userData as User);
+          } else {
+            localStorage.removeItem('hibridge_session');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+        localStorage.removeItem('hibridge_session');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     checkSession();
   }, []);
 
-  const checkSession = async () => {
+  const signUp = async (email: string, password: string, userData: Partial<User>) => {
     try {
-      const response = await authAPI.getCurrentUser();
-      if (response.user) {
-        setUser(response.user);
+      // Check if user already exists
+      const existingUser = await database.get(`user:${email}`);
+      if (existingUser) {
+        throw new Error('User already exists with this email');
       }
-    } catch (error) {
-      logger.error('Session check failed', { error });
-      // Session is invalid or expired
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const signUp = async (email: string, password: string, fullName: string, role: string = 'employee'): Promise<AuthUser> => {
-    try {
-      logger.info('Attempting user signup', { email });
-
-      const response = await authAPI.register({
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+      
+      // Create user object
+      const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const newUser: User = {
+        id: userId,
         email,
-        password,
-        fullName,
-        role
-      });
+        name: userData.name || '',
+        role: userData.role || 'employee',
+        company_name: userData.company_name,
+        job_title: userData.job_title,
+        department: userData.department,
+        office_location: userData.office_location,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-      if (response.user) {
-        setUser(response.user);
-        logger.info('User signup successful', { userId: response.user.id });
-        return response.user;
+      // Store user data
+      await database.set(`user:${email}`, { ...newUser, password: hashedPassword });
+      await database.set(`user_by_id:${userId}`, newUser);
+
+      // Create session
+      localStorage.setItem('hibridge_session', JSON.stringify({ userId }));
+      setUser(newUser);
+      toast.success('Account created successfully!');
+    } catch (error) {
+      console.error('Sign up error:', error);
+      throw error;
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      // Get user data
+      const userData = await database.get(`user:${email}`);
+      if (!userData) {
+        throw new Error('Invalid email or password');
       }
 
-      throw new Error('Signup failed - no user data returned');
-    } catch (error: any) {
-      logger.error('Signup failed', { error, email });
-      throw new Error(error.response?.data?.message || 'Signup failed');
-    }
-  };
-
-  const signIn = async (email: string, password: string): Promise<AuthUser> => {
-    try {
-      logger.info('Attempting user signin', { email });
-
-      const response = await authAPI.login(email, password);
-
-      if (response.user) {
-        setUser(response.user);
-        logger.info('User signin successful', { userId: response.user.id });
-        return response.user;
+      // Verify password
+      const isValidPassword = await verifyPassword(password, userData.password);
+      if (!isValidPassword) {
+        throw new Error('Invalid email or password');
       }
 
-      throw new Error('Login failed - no user data returned');
-    } catch (error: any) {
-      logger.error('Signin failed', { error, email });
-      throw new Error(error.response?.data?.message || 'Login failed');
+      // Remove password from user object before setting state
+      const { password: _, ...userWithoutPassword } = userData;
+      
+      // Create session
+      localStorage.setItem('hibridge_session', JSON.stringify({ userId: userData.id }));
+      setUser(userWithoutPassword as User);
+      toast.success('Welcome back!');
+    } catch (error) {
+      console.error('Sign in error:', error);
+      throw error;
     }
   };
 
-  const signOut = async (): Promise<void> => {
+  const signOut = async () => {
     try {
-      logger.info('Attempting user signout');
-
-      await authAPI.logout();
+      localStorage.removeItem('hibridge_session');
       setUser(null);
-
-      logger.info('User signout successful');
+      toast.success('Signed out successfully');
     } catch (error) {
-      logger.error('Signout failed', { error });
-      // Even if logout fails on server, clear local state
-      setUser(null);
+      console.error('Sign out error:', error);
+      throw error;
     }
   };
 
-  const refreshSession = async (): Promise<void> => {
+  const updateProfile = async (userData: Partial<User>) => {
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+
     try {
-      await authAPI.refreshSession();
-      await checkSession(); // Re-fetch user data
+      const updatedUser: User = {
+        ...user,
+        ...userData,
+        updated_at: new Date().toISOString()
+      };
+
+      // Update both user records
+      const existingUserData = await database.get(`user:${user.email}`);
+      await database.set(`user:${user.email}`, { ...existingUserData, ...userData, updated_at: updatedUser.updated_at });
+      await database.set(`user_by_id:${user.id}`, updatedUser);
+
+      setUser(updatedUser);
+      toast.success('Profile updated successfully');
     } catch (error) {
-      logger.error('Session refresh failed', { error });
-      setUser(null);
+      console.error('Update profile error:', error);
+      throw error;
     }
   };
 
@@ -134,7 +178,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signIn,
     signOut,
-    refreshSession
+    updateProfile
   };
 
   return (
@@ -143,5 +187,3 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
-
-export default AuthContext;
