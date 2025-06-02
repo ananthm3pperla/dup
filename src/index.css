@@ -24,6 +24,43 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+
+    /* Hi-Bridge app custom variables */
+    --bg-app: hsl(var(--background));
+    --bg-card: hsl(var(--card));
+    --bg-card-hover: hsl(210 40% 96%);
+    --text-default: hsl(var(--foreground));
+    --text-muted: hsl(var(--muted-foreground));
+    --text-light: hsl(215.4 16.3% 56.9%);
+    --border-default: hsl(var(--border));
+    --border-dark: hsl(214.3 31.8% 81.4%);
+    
+    /* Color system variables */
+    --color-primary: #004977;
+    --color-primary-light: #3385BF;
+    --color-primary-dark: #003A5F;
+    --color-secondary: #A12B2B;
+    --color-secondary-light: #E74747;
+    --color-secondary-dark: #812222;
+    --color-accent: #00A4B4;
+    --color-accent-light: #33C1CB;
+    --color-accent-dark: #008390;
+    --color-success: #10b981;
+    --color-success-light: #34d399;
+    --color-success-dark: #059669;
+    --color-success-bg: #ecfdf5;
+    --color-warning: #f59e0b;
+    --color-warning-light: #fbbf24;
+    --color-warning-dark: #d97706;
+    --color-warning-bg: #fffbeb;
+    --color-error: #ef4444;
+    --color-error-light: #f87171;
+    --color-error-dark: #dc2626;
+    --color-error-bg: #fef2f2;
+    --color-info: #3b82f6;
+    --color-info-light: #60a5fa;
+    --color-info-dark: #2563eb;
+    --color-info-bg: #eff6ff;
   }
 
   .dark {
@@ -46,6 +83,24 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+
+    /* Dark mode overrides */
+    --bg-app: hsl(222.2 84% 4.9%);
+    --bg-card: hsl(222.2 84% 4.9%);
+    --bg-card-hover: hsl(217.2 32.6% 17.5%);
+    --text-default: hsl(210 40% 98%);
+    --text-muted: hsl(215 20.2% 65.1%);
+    --text-light: hsl(215 20.2% 75.1%);
+    --border-default: hsl(217.2 32.6% 17.5%);
+    --border-dark: hsl(217.2 32.6% 25.5%);
+  }
+
+  * {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
@@ -60,6 +115,14 @@
 
 /* Custom utilities */
 @layer utilities {
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+
+  .bg-card {
+    background-color: hsl(var(--card));
+  }
+
   .bg-card-hover {
     @apply bg-gray-50 dark:bg-gray-800;
   }
@@ -74,6 +137,10 @@
 
   .text-muted {
     @apply text-gray-500 dark:text-gray-400;
+  }
+
+  .text-foreground {
+    color: hsl(var(--foreground));
   }
 }
 
