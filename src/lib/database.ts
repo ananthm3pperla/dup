@@ -4,7 +4,8 @@
  * Uses Replit's built-in key-value database for data persistence
  */
 
-import { Database } from '@replit/database';
+import pkg from '@replit/database';
+const { Database } = pkg;
 
 // Initialize Replit Database
 const db = new Database();
