@@ -1,0 +1,187 @@
+{
+  "hash": "f216ff4b",
+  "configHash": "c779616a",
+  "lockfileHash": "908423e8",
+  "browserHash": "09328559",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "a9d900c5",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "a784b3b9",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "c0456308",
+      "needsInterop": true
+    },
+    "@faker-js/faker": {
+      "src": "../../node_modules/@faker-js/faker/dist/esm/index.mjs",
+      "file": "@faker-js_faker.js",
+      "fileHash": "875e4a47",
+      "needsInterop": false
+    },
+    "@fullcalendar/daygrid": {
+      "src": "../../node_modules/@fullcalendar/daygrid/index.js",
+      "file": "@fullcalendar_daygrid.js",
+      "fileHash": "447fdfba",
+      "needsInterop": false
+    },
+    "@fullcalendar/interaction": {
+      "src": "../../node_modules/@fullcalendar/interaction/index.js",
+      "file": "@fullcalendar_interaction.js",
+      "fileHash": "49ab507d",
+      "needsInterop": false
+    },
+    "@fullcalendar/react": {
+      "src": "../../node_modules/@fullcalendar/react/dist/index.js",
+      "file": "@fullcalendar_react.js",
+      "fileHash": "f400a850",
+      "needsInterop": false
+    },
+    "@fullcalendar/timegrid": {
+      "src": "../../node_modules/@fullcalendar/timegrid/index.js",
+      "file": "@fullcalendar_timegrid.js",
+      "fileHash": "463b2ccb",
+      "needsInterop": false
+    },
+    "@replit/database": {
+      "src": "../../node_modules/@replit/database/index.js",
+      "file": "@replit_database.js",
+      "fileHash": "36b8f35b",
+      "needsInterop": true
+    },
+    "class-variance-authority": {
+      "src": "../../node_modules/class-variance-authority/dist/index.mjs",
+      "file": "class-variance-authority.js",
+      "fileHash": "88ab479e",
+      "needsInterop": false
+    },
+    "clsx": {
+      "src": "../../node_modules/clsx/dist/clsx.mjs",
+      "file": "clsx.js",
+      "fileHash": "1a9f781e",
+      "needsInterop": false
+    },
+    "date-fns": {
+      "src": "../../node_modules/date-fns/index.mjs",
+      "file": "date-fns.js",
+      "fileHash": "31a785df",
+      "needsInterop": false
+    },
+    "face-api.js": {
+      "src": "../../node_modules/face-api.js/build/es6/index.js",
+      "file": "face-api__js.js",
+      "fileHash": "a222e6e4",
+      "needsInterop": false
+    },
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "6b3771e3",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "b638d224",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "bf45c281",
+      "needsInterop": true
+    },
+    "react-error-boundary": {
+      "src": "../../node_modules/react-error-boundary/dist/react-error-boundary.development.esm.js",
+      "file": "react-error-boundary.js",
+      "fileHash": "1894ea07",
+      "needsInterop": false
+    },
+    "react-focus-lock": {
+      "src": "../../node_modules/react-focus-lock/dist/es2015/index.js",
+      "file": "react-focus-lock.js",
+      "fileHash": "2873016c",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "3e3b14fe",
+      "needsInterop": false
+    },
+    "react-textarea-autosize": {
+      "src": "../../node_modules/react-textarea-autosize/dist/react-textarea-autosize.browser.development.esm.js",
+      "file": "react-textarea-autosize.js",
+      "fileHash": "3da37e6b",
+      "needsInterop": false
+    },
+    "sonner": {
+      "src": "../../node_modules/sonner/dist/index.mjs",
+      "file": "sonner.js",
+      "fileHash": "b6a5177b",
+      "needsInterop": false
+    },
+    "tailwind-merge": {
+      "src": "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+      "file": "tailwind-merge.js",
+      "fileHash": "bc86df8b",
+      "needsInterop": false
+    },
+    "zod": {
+      "src": "../../node_modules/zod/lib/index.mjs",
+      "file": "zod.js",
+      "fileHash": "4217e7a5",
+      "needsInterop": false
+    },
+    "zustand": {
+      "src": "../../node_modules/zustand/esm/index.mjs",
+      "file": "zustand.js",
+      "fileHash": "3b4fe7db",
+      "needsInterop": false
+    },
+    "zustand/middleware": {
+      "src": "../../node_modules/zustand/esm/middleware.mjs",
+      "file": "zustand_middleware.js",
+      "fileHash": "8d494ae3",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-XLW57I3Q": {
+      "file": "chunk-XLW57I3Q.js"
+    },
+    "chunk-TMXZRJBF": {
+      "file": "chunk-TMXZRJBF.js"
+    },
+    "chunk-MG562XKQ": {
+      "file": "chunk-MG562XKQ.js"
+    },
+    "chunk-BWCZL6O6": {
+      "file": "chunk-BWCZL6O6.js"
+    },
+    "chunk-JY3LWUAG": {
+      "file": "chunk-JY3LWUAG.js"
+    },
+    "chunk-JINCTG6U": {
+      "file": "chunk-JINCTG6U.js"
+    },
+    "chunk-K33Y5SO4": {
+      "file": "chunk-K33Y5SO4.js"
+    },
+    "chunk-M4O6YPK6": {
+      "file": "chunk-M4O6YPK6.js"
+    },
+    "chunk-624QZG55": {
+      "file": "chunk-624QZG55.js"
+    }
+  }
+}
